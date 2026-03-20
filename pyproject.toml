@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "controlled-kernel-evaluation-under-shift"
+version = "0.1.0"
+description = "Reproducible experimental framework for controlled kernel comparison under distribution shift."
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+license = {text = "BSD-3-Clause"}
+authors = [
+  {name = "Roberto Fernández-Barrios"},
+  {name = "Iker Pastor-López"},
+  {name = "Asier González-Santocildes"},
+  {name = "Pablo Garcia Bringas"}
+]
+keywords = ["quantum machine learning", "kernel methods", "distribution shift", "malware detection", "EMBER"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "License :: OSI Approved :: BSD License",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+dependencies = [
+  "numpy==2.3.5",
+  "pandas==2.2.3",
+  "scikit-learn==1.8.0",
+  "qiskit==2.3.1"
+]
+
+[project.optional-dependencies]
+compat = [
+  "numpy>=1.26,<3",
+  "pandas>=2.2,<3",
+  "scikit-learn>=1.4,<1.9",
+  "qiskit>=1.0,<3"
+]
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]

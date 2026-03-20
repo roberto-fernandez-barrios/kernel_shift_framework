@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  smoke-and-reporting:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run CLI smoke test
+        run: |
+          python scripts/smoke/smoke_test_cli.py
+
+      - name: Verify smoke test report exists
+        run: |
+          test -f docs/smoke_test_report.json
+
+      - name: Run reporting on versioned aggregates
+        run: |
+          python scripts/reporting/make_summary_tables.py \
+            --metrics results/aggregated/AGG_ROOT_mean_std_metrics__by_variant_seed_and_size.csv \
+            --drops results/aggregated/AGG_ROOT_mean_std_drop__by_variant_seed_and_size.csv \
+            --outdir results/tables_ci \
+            --topn 10 \
+            --round 4
+
+      - name: Verify expected reporting outputs exist
+        run: |
+          test -f results/tables_ci/table_18settings_best_ood__with_std.csv
+          test -f results/tables_ci/table_18settings_best_id__with_std.csv
+          test -f results/tables_ci/table_18settings_best_drop__with_std.csv
+          test -f results/tables_ci/table_90cells_dimlevel_best_ood__with_std.csv
+          test -f results/tables_ci/table_top10_cases_ood__with_std.csv

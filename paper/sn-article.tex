@@ -1,0 +1,722 @@
+%Version 3.1 December 2024
+% See section 11 of the User Manual for version history
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%                                                                 %%
+%% Please do not use \input{...} to include other tex files.       %%
+%% Submit your LaTeX manuscript as one .tex document.              %%
+%%                                                                 %%
+%% All additional figures and files should be attached             %%
+%% separately and not embedded in the \TeX\ document itself.       %%
+%%                                                                 %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%\documentclass[referee,sn-basic]{sn-jnl}% referee option is meant for double line spacing
+
+%%=======================================================%%
+%% to print line numbers in the margin use lineno option %%
+%%=======================================================%%
+
+%%\documentclass[lineno,pdflatex,sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
+
+%%=========================================================================================%%
+%% the documentclass is set to pdflatex as default. You can delete it if not appropriate.  %%
+%%=========================================================================================%%
+
+%%\documentclass[sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
+
+%%Note: the following reference styles support Namedate and Numbered referencing. By default the style follows the most common style. To switch between the options you can add or remove Numbered in the optional parenthesis. 
+%%The option is available for: sn-basic.bst, sn-chicago.bst%  
+ 
+%%\documentclass[pdflatex,sn-nature]{sn-jnl}% Style for submissions to Nature Portfolio journals
+%%\documentclass[pdflatex,sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
+\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}% Math and Physical Sciences Numbered Reference Style
+%%\documentclass[pdflatex,sn-mathphys-ay]{sn-jnl}% Math and Physical Sciences Author Year Reference Style
+%%\documentclass[pdflatex,sn-aps]{sn-jnl}% American Physical Society (APS) Reference Style
+%%\documentclass[pdflatex,sn-vancouver-num]{sn-jnl}% Vancouver Numbered Reference Style
+%%\documentclass[pdflatex,sn-vancouver-ay]{sn-jnl}% Vancouver Author Year Reference Style
+%%\documentclass[pdflatex,sn-apa]{sn-jnl}% APA Reference Style
+%%\documentclass[pdflatex,sn-chicago]{sn-jnl}% Chicago-based Humanities Reference Style
+
+%%%% Standard Packages
+%%<additional latex packages if required can be included here>
+
+\usepackage{graphicx}%
+\usepackage{multirow}%
+\usepackage{amsmath,amssymb,amsfonts}%
+\usepackage{amsthm}%
+\usepackage{mathrsfs}%
+\usepackage[title]{appendix}%
+\usepackage{xcolor}%
+\usepackage{textcomp}%
+\usepackage{manyfoot}%
+\usepackage{booktabs}%
+\usepackage{algorithm}%
+\usepackage{algorithmicx}%
+\usepackage{algpseudocode}%
+\usepackage{listings}%
+\usepackage{array}%
+\usepackage{url}
+%%%%
+
+%%%%%=============================================================================%%%%
+%%%%  Remarks: This template is provided to aid authors with the preparation
+%%%%  of original research articles intended for submission to journals published 
+%%%%  by Springer Nature. The guidance has been prepared in partnership with 
+%%%%  production teams to conform to Springer Nature technical requirements. 
+%%%%  Editorial and presentation requirements differ among journal portfolios and 
+%%%%  research disciplines. You may find sections in this template are irrelevant 
+%%%%  to your work and are empowered to omit any such section if allowed by the 
+%%%%  journal you intend to submit to. The submission guidelines and policies 
+%%%%  of the journal take precedence. A detailed User Manual is available in the 
+%%%%  template package for technical guidance.
+%%%%%=============================================================================%%%%
+
+%% as per the requirement new theorem styles can be included as shown below
+\theoremstyle{thmstyleone}%
+\newtheorem{theorem}{Theorem}%  meant for continuous numbers
+%%\newtheorem{theorem}{Theorem}[section]% meant for sectionwise numbers
+%% optional argument [theorem] produces theorem numbering sequence instead of independent numbers for Proposition
+\newtheorem{proposition}[theorem]{Proposition}% 
+%%\newtheorem{proposition}{Proposition}% to get separate numbers for theorem and proposition etc.
+
+\theoremstyle{thmstyletwo}%
+\newtheorem{example}{Example}%
+\newtheorem{remark}{Remark}%
+
+\theoremstyle{thmstylethree}%
+\newtheorem{definition}{Definition}%
+
+\raggedbottom
+%%\unnumbered% uncomment this for unnumbered level heads
+
+\begin{document}
+
+\title[Quantum vs Classical Kernels under Shift]{Comparing Quantum and Classical Kernels under Distribution Shift: A Controlled Kernel-Swap Study on EMBER Malware Detection}
+
+
+%%=============================================================%%
+%% GivenName	-> \fnm{Joergen W.}
+%% Particle	-> \spfx{van der} -> surname prefix
+%% FamilyName	-> \sur{Ploeg}
+%% Suffix	-> \sfx{IV}
+%% \author*[1,2]{\fnm{Joergen W.} \spfx{van der} \sur{Ploeg} 
+%%  \sfx{IV}}\email{iauthor@gmail.com}
+%%=============================================================%%
+
+\author*[1]{\fnm{Roberto} \sur{Fernández-Barrios}}\email{roberto.fernandez.b@deusto.es}
+
+\author[1]{\fnm{Iker} \sur{Pastor-López}}\email{iker.pastor@deusto.es}
+
+\author[1]{\fnm{Asier} \sur{González-Santocildes}}\email{gonzalez.asier@deusto.es}
+
+\author[1]{\fnm{Pablo} \sur{Garcia Bringas}}\email{pablo.garcia.bringas@deusto.es}
+
+\affil*[1]{\orgdiv{Faculty of Engineering}, \orgname{University of Deusto}, \orgaddress{\street{Avda. de las Universidades, 24.}, \city{Bilbao}, \postcode{48007}, \country{Spain}}}
+
+
+%%==================================%%
+%% Sample for unstructured abstract %%
+%%==================================%%
+
+\abstract{Machine-learning malware detectors are often evaluated under i.i.d.\ test assumptions, although real malware ecosystems evolve over time and routinely induce distribution shift. This makes strong in-distribution performance an unreliable proxy for deployed robustness. In this paper, we study whether fidelity-based quantum kernels can improve robustness under shift when compared fairly against strong classical kernels. Our central methodological contribution is a strictly controlled kernel-swap protocol in which the classifier family, preprocessing pipeline, split definitions, and model-selection logic are held fixed, and only the kernel is changed. Using EMBER malware detection as a case study, we compare classical linear and RBF kernels against multiple quantum kernels induced by commonly used feature maps, all within a precomputed-kernel SVC framework. Evaluation is performed on paired in-distribution (ID) and out-of-distribution (OOD) splits using balanced accuracy and ID-to-OOD degradation, with repeated runs to quantify variability. Across 18 main settings, quantum kernels outperform classical kernels in 14 settings under robustness-oriented Best-by-OOD selection, with a mean OOD gain of +0.0189 and gains exceeding the combined variability scale in 9 settings. Under Best-by-ID selection, quantum kernels improve ID balanced accuracy in all 18 settings. At the same time, the gains are not universal: we identify structured regimes in which classical kernels remain competitive or favorable. Overall, the results support a conservative empirical claim: under a controlled and reproducible comparison protocol, quantum kernels can provide measurable robustness benefits under distribution shift in malware detection.}
+
+
+
+%%================================%%
+%% Sample for structured abstract %%
+%%================================%%
+
+% \abstract{\textbf{Purpose:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.
+% 
+% \textbf{Methods:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.
+% 
+% \textbf{Results:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.
+% 
+% \textbf{Conclusion:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.}
+
+\keywords{quantum kernels, support vector machines, distribution shift, malware detection, out-of-distribution robustness, benchmark evaluation}
+
+%%\pacs[JEL Classification]{D8, H51}
+
+%%\pacs[MSC Classification]{35A01, 65L10, 65L12, 65L20, 65L70}
+
+\maketitle
+
+\section{Introduction}
+\label{sec:introduction}
+
+Malware detection is one of the clearest high-impact applications of machine learning, but it is also one of the least forgiving. In operational environments, the underlying data distribution is not static: malware families evolve, packing and obfuscation strategies change, developer toolchains shift, and attacker incentives adapt over time. As a result, the conditions under which a detector is evaluated in the laboratory often differ meaningfully from those it faces after deployment. In this setting, strong in-distribution (ID) accuracy is an insufficient proxy for real-world reliability. Robustness under distribution shift is therefore not a secondary concern in security machine learning, but a central requirement for any claim about generalization.
+
+This concern is consistent with a broader lesson from the distribution-shift and domain-generalization literature. When training and test distributions differ, empirical conclusions are only as credible as the protocol used to obtain them \cite{quinonero-candela2008datasetshift,zhou2023dgsurvey}. Recent benchmark-driven work has shown that methodological details---including model-selection strategy, hyperparameter search, and evaluation standardization---can materially alter conclusions about robustness \cite{gulrajani2021domainbed,koh2021wilds,yao2022wildtime}. This matters because many apparent gains under shift disappear, weaken, or become difficult to interpret once comparisons are made under controlled and comparable conditions. A convincing study of robustness must therefore satisfy two requirements at once: it must be controlled enough to isolate the factor of interest, and broad enough to reveal when conclusions hold and when they do not.
+
+These issues are especially acute in malware detection. Drift is not incidental to the problem; it is part of the problem definition itself. Static PE malware classification has been widely studied through benchmarks such as EMBER \cite{anderson2018ember}, while more recent work has highlighted the gap between laboratory evaluation and performance on drifted malware, as well as the difficulty of adapting with limited post-drift data \cite{barbero2022transcending,li2025revisitingdrift}. The emergence of updated resources such as EMBER2024 further reflects an active push toward more realistic, broader, and more deployment-relevant malware evaluation \cite{joyce2025ember2024}. Taken together, this literature suggests that a useful malware-detection study should not merely report accuracy on a convenient split; it should examine how model choices behave when the evaluation explicitly targets shift.
+
+Kernel methods are a natural setting in which to ask such questions cleanly. Because kernel-based support vector machines separate the choice of classifier from the choice of similarity function, they offer a principled way to study how representational geometry affects ID and OOD behavior while keeping the learning machinery fixed \cite{cortes1995svm,scholkopf2002learningwithkernels}. This perspective becomes particularly interesting in quantum machine learning, where quantum kernels are defined through implicit feature maps into quantum Hilbert spaces and estimated via state overlaps or related fidelity-based similarities \cite{havlicek2019quantumenhanced,schuld2019featurehilbert,schuld2021kernelmethods}. From this viewpoint, quantum kernels are not a vague alternative model class, but a concrete family of kernel constructions whose empirical value can---and should---be tested under the same standards applied to classical kernels.
+
+At the same time, the quantum-kernel literature has matured to the point where optimistic demonstrations and critical scrutiny must now be read together. Foundational work established the feature-space interpretation of quantum kernels and motivated them as expressive alternatives to classical similarities \cite{havlicek2019quantumenhanced,schuld2019featurehilbert}. Subsequent studies emphasized that performance in quantum machine learning can depend strongly on the data regime, the encoding, and the effective geometry induced by the model \cite{huang2021powerofdata,schuld2021encoding}. More recent work has sharpened this message further: understanding generalization in quantum machine learning requires care beyond classical intuition, and benchmarking conclusions can be highly sensitive to protocol choices \cite{gilfuster2024rethinkinggeneralization,bowles2024betterthanclassical,schnabel2025scrutiny}. This makes broad claims of superiority difficult to defend and reinforces the need for conservative, protocol-aware empirical studies.
+
+The gap we address lies precisely at this intersection. Despite the importance of shift in security and the growing scrutiny applied to quantum machine learning, there remains limited evidence from controlled, variability-aware comparisons between classical and quantum kernel families in a security-relevant setting where out-of-distribution robustness is part of the evaluation target. Existing studies often differ simultaneously in model class, preprocessing, search space, or data protocol, making it difficult to attribute observed gains to the kernel itself. For a question as specific as whether quantum kernels help under distribution shift, such confounds are not peripheral; they are decisive.
+
+In this paper, we study that question on EMBER malware detection through a strictly controlled \emph{kernel-swap} protocol. We fix the classifier family to support vector classification with precomputed kernels, keep the preprocessing pipeline and split definitions constant, and apply comparable model-selection logic within each family. Classical baselines include linear and RBF kernels, while quantum alternatives are fidelity-based kernels induced by multiple commonly used feature-map families. The only experimental variable is the kernel. To evaluate robustness under shift rather than only separability under i.i.d.\ assumptions, we use paired ID and OOD test sets and report balanced accuracy on both, together with the degradation from ID to OOD. To ensure variability-aware reporting, each configuration is repeated across multiple runs and summarized by mean and standard deviation.
+
+Our experimental design is intentionally broad enough to support regime-level conclusions rather than isolated anecdotes. The main evaluation spans two shift-construction variants, three master seeds, and three training sizes, yielding 18 principal settings, with repeated runs per configuration. We additionally analyze multiple embedding dimensions to characterize how representation size interacts with kernel-family behavior. This design supports two complementary selection views: a robustness-oriented comparison in which each family is represented by its best OOD-performing configuration, and an ID-oriented comparison in which each family is represented by its best ID-performing configuration. Separating these views is methodologically important: strong ID separability does not necessarily imply strong OOD robustness, and conflating the two can blur the actual question being asked.
+
+Under this controlled protocol, our results support a conservative but meaningful empirical claim. When each family is selected by its own OOD performance, quantum kernels achieve higher OOD balanced accuracy in 14 of 18 main settings, with a positive mean improvement and multiple cases where the gain exceeds the combined run-to-run variability scale. When each family is selected by its own ID performance, quantum kernels improve ID balanced accuracy in all 18 settings. These gains are not universal, however: we identify a small number of structured regimes in which classical kernels remain competitive or favorable. We view these exceptions as part of the contribution rather than as nuisances to be explained away, because they reveal that the relevant scientific question is not whether quantum kernels always win, but under which shift regimes and representation conditions they help.
+
+Our contributions are therefore threefold. First, we introduce a controlled and reproducible kernel-swap benchmark for comparing classical and quantum kernel families under distribution shift while holding the rest of the learning pipeline fixed. Second, we provide variability-aware empirical evidence, in a realistic malware-detection setting, that quantum kernels can improve OOD robustness in a majority of evaluated regimes. Third, we provide a regime-level characterization of the exceptions, identifying conditions under which classical kernels remain competitive or preferable. Importantly, the paper does not claim complexity-theoretic quantum advantage or hardware superiority. Its claim is narrower and, for that reason, stronger: under a fair and explicitly shift-aware comparison protocol, quantum kernels emerge as a competitive and often advantageous kernel family for malware detection, while still exhibiting identifiable failure regimes that merit equal attention.
+
+\section{Related Work}
+\label{sec:related_work}
+
+\subsection{Distribution shift, domain generalization, and evaluation rigor}
+
+The broader literature on distribution shift has established that predictive performance can degrade substantially when training and test data are drawn from different distributions, and that robust evaluation under shift requires more than reporting strong in-distribution performance \cite{quinonero-candela2008datasetshift,shimodaira2000covariateshift,sugiyama2007iwcv}. Within machine learning, domain generalization (DG) has emerged as one of the main formal settings for studying out-of-distribution (OOD) performance without access to target-domain labels during training \cite{zhou2023dgsurvey}. This literature has also made clear that empirical conclusions about robustness are highly sensitive to evaluation design.
+
+A particularly important development in this regard is the move toward benchmark-driven scrutiny of robustness claims. Gulrajani and Lopez-Paz showed in DomainBed that many reported improvements in DG are difficult to interpret because they depend strongly on inconsistencies in datasets, architectures, hyperparameter budgets, and model-selection criteria \cite{gulrajani2021domainbed}. WILDS extended this concern to real-world shifts by curating datasets whose train--test differences arise naturally across institutions, locations, and acquisition conditions, and showed that standard training can leave large OOD gaps even on modern pipelines \cite{koh2021wilds}. Wild-Time further emphasized the importance of temporal shift as a distinct and practically relevant regime, highlighting that even when timestamps are available and temporal structure can in principle be exploited, existing methods still struggle to close the ID--OOD gap \cite{yao2022wildtime}.
+
+These works are directly relevant to the present study, not because malware detection is a standard DG benchmark, but because they establish a methodological principle: if the goal is to compare robustness under shift, then fairness of protocol is part of the contribution, not a secondary implementation detail. Our work adopts this perspective by focusing on a comparison in which the classifier family, preprocessing, and split definitions are fixed, so that the role of the kernel can be interpreted with minimal confounding.
+
+\subsection{Malware detection under drift and evolving evaluation benchmarks}
+
+In malware detection, the relevance of distribution shift is especially acute. Malware ecosystems evolve continuously as attackers modify payloads, packers, obfuscation strategies, delivery mechanisms, and development toolchains. Static detection models are therefore exposed to changing distributions in ways that are operationally consequential rather than merely academic. Public benchmarks have played an important role in making this problem more reproducible. EMBER remains one of the most widely used open datasets for static PE malware detection and helped standardize large-scale evaluation in this area \cite{anderson2018ember}. More recent resources such as EMBER2024 push this effort further by broadening scope, increasing scale, and enabling more holistic evaluation across multiple malware-related tasks \cite{joyce2025ember2024}. Other datasets such as BODMAS and SOREL-20M likewise reflect the field's effort to move toward larger and more realistic benchmark settings \cite{yang2021bodmas,harang2020sorel20m}.
+
+At the same time, a growing body of work has shown that strong laboratory performance does not guarantee robustness to evolving malware. Barbero et al.\ revisited malware classification under concept drift and showed that deployment-oriented settings raise challenges that are obscured by simpler static evaluations \cite{barbero2022transcending}. More recently, Li et al.\ studied adaptation to real drifted malware under limited post-drift supervision, reinforcing the point that temporal degradation is not hypothetical and that realistic recovery from drift may be data-constrained \cite{li2025revisitingdrift}. Taken together, these studies support a clear conclusion: in malware detection, robustness under shift is not a niche desideratum but a primary evaluation target.
+
+Our work differs from this line in emphasis. Rather than proposing a new drift-adaptation mechanism, drift detector, or continual-update strategy, we ask a narrower but complementary question: under a tightly controlled protocol, does the choice of kernel family itself materially affect OOD robustness? This question is well motivated by the malware literature, yet comparatively underexplored in a way that isolates kernels from the many other moving parts of the pipeline.
+
+\subsection{Kernel methods, quantum kernels, and careful benchmarking in QML}
+
+Kernel methods provide a natural framework for studying robustness under controlled model comparisons because they separate the learning algorithm from the similarity function used to compare inputs. In classical machine learning, support vector machines and related kernel methods have long provided a principled route for controlling model capacity while varying the geometry of the induced feature space \cite{cortes1995svm,scholkopf2002learningwithkernels}. This makes kernels especially attractive when the scientific question concerns representation and similarity rather than wholesale changes in classifier architecture.
+
+Quantum kernel methods arise from the observation that data can be embedded into quantum states and compared through overlaps in a quantum feature space. Havl{\'\i}{\v{c}}ek et al.\ popularized this perspective in the context of supervised classification with quantum-enhanced feature spaces \cite{havlicek2019quantumenhanced}, while Schuld and Killoran provided a broader theoretical account linking quantum models to kernel methods through feature Hilbert spaces \cite{schuld2019featurehilbert}. Later work sharpened this connection by arguing that supervised quantum machine learning models can often be interpreted directly as kernel methods, making the kernel viewpoint central rather than incidental \cite{schuld2021kernelmethods}. Additional work on data encoding further showed that representational behavior depends critically on how classical inputs are mapped into quantum states, which is directly relevant when comparing quantum feature maps as alternative kernel constructions \cite{schuld2021encoding}.
+
+However, the contemporary QML literature also makes clear that promising empirical behavior should not be read uncritically. Huang et al.\ showed that the role of data can be decisive in quantum machine learning, suggesting that observed performance gains are deeply regime-dependent rather than model-intrinsic \cite{huang2021powerofdata}. Caro et al.\ studied generalization from few training examples, while Gil-Fuster et al.\ later argued that understanding generalization in QML requires rethinking familiar classical intuitions, since standard explanations may fail to account for observed behavior in quantum models \cite{caro2022generalization,gilfuster2024rethinkinggeneralization}. In parallel, broader perspective pieces have emphasized both the promise and the unresolved challenges of QML as a field \cite{cerezo2022qmlchallenges}.
+
+Most importantly for the present work, recent benchmarking studies have raised the standard for empirical claims in QML. Bowles et al.\ argued that experimental design choices can dominate conclusions and showed, in a broad simulated benchmark, that out-of-the-box classical models often remain strong baselines against quantum alternatives \cite{bowles2024betterthanclassical}. Schnabel and Roth extended this benchmarking perspective specifically to quantum kernel methods, conducting a large-scale study across many design choices and showing that performance depends strongly on kernel type, encoding strategy, and hyperparameter configuration rather than on a simple classical-versus-quantum dichotomy \cite{schnabel2025scrutiny}. This line of work is especially relevant to our paper because it supports a conservative framing: the value of quantum kernels, if any, must be demonstrated under controlled and transparent comparisons, and should be expected to be regime-dependent.
+
+Our study is positioned at the intersection of these three literatures. From the distribution-shift literature, we adopt the principle that robustness claims must rest on evaluation protocols that control major confounds. From the malware literature, we take the practical motivation that temporal and distributional change are intrinsic to realistic security deployment. From the QML literature, we take both the motivation for studying quantum kernels and the caution that benchmarking quality is central to interpretation. Relative to prior work, our contribution is not to claim universal superiority for quantum kernels, nor to propose a new adaptation method for drifted malware, but to provide a controlled, variability-aware comparison of classical and quantum kernel families in a malware-detection setting where OOD robustness is part of the primary target of evaluation.
+
+\section{Methods}
+\label{sec:methods}
+
+\subsection{Problem setting}
+
+We study binary malware classification under distribution shift. Let $D_{\mathrm{ID}}$ denote the in-distribution data-generating process and $D_{\mathrm{OOD}}$ an out-of-distribution process induced by a controlled shift mechanism. Given a training set $T \sim D_{\mathrm{ID}}$, we evaluate the learned classifier on both an ID test set $S_{\mathrm{ID}}$ and an OOD test set $S_{\mathrm{OOD}}$. Our objective is not only to measure separability under the i.i.d.\ assumption, but to compare how kernel families behave when generalization is evaluated explicitly under shift.
+
+The central methodological requirement of the study is attribution. Because the scientific question concerns the effect of the kernel, comparisons must avoid confounds from changes in classifier family, preprocessing, optimization protocol, or split design. We therefore adopt a strictly controlled \emph{kernel-swap} protocol in which all components of the pipeline are held fixed except the kernel function itself. This design follows the same evaluation logic that motivates rigorous OOD benchmarking in the broader distribution-shift literature: when the target of inference is robustness, protocol control is not an implementation detail but part of the contribution.
+
+\subsection{Dataset and split construction}
+
+We use EMBER as the base dataset for static PE malware detection \cite{anderson2018ember}. EMBER is a natural choice for this study because it is widely used in static malware classification, supports reproducible feature-based experimentation, and has also motivated later benchmark extensions such as EMBER2024 \cite{joyce2025ember2024}. Our goal, however, is not to benchmark absolute malware-detection performance on a single standard split, but to construct controlled ID/OOD regimes that allow kernel-family comparisons under distribution shift.
+
+For each experimental setting, we adopt a fixed three-way split design:
+\[
+T,\quad S_{\mathrm{ID}},\quad S_{\mathrm{OOD}},
+\]
+where $T$ is used for training, $S_{\mathrm{ID}}$ measures in-distribution performance, and $S_{\mathrm{OOD}}$ measures robustness under the induced shift. All models compared within a setting use exactly the same split definitions. This point is essential: a classical and a quantum model are never compared on different train/test partitions.
+
+We operationalize shift through two controlled OOD-construction variants, denoted $m1$ and $m2$, both built on the histogram + byte-entropy feature blocks and both designed to preserve class balance across splits.
+
+\paragraph{Variant $m1$: sparsity-score extremes within class.}
+For each sample, we compute a sparsity-related score on a predefined feature block. In the main configuration used in the experiments, this score corresponds to the number of non-zero entries within the selected block. The OOD set is formed by taking, within each class separately, the low-score and high-score extremes, i.e., the two tails of the within-class score distribution. The remaining samples form an ID pool from which the training and ID test sets are obtained by stratified sampling. Intuitively, this construction creates an OOD regime driven by atypical sparsity structure while keeping the label distribution under control.
+
+\paragraph{Variant $m2$: distance-to-train extremes within class.}
+We first fix the final training set at an exact target size. Using only this training set, we compute class-conditional centroids and assign each non-training sample a score equal to its Euclidean distance to the centroid of its own class. To reduce noise and avoid leakage, this distance can be computed in a TruncatedSVD-projected space fitted on the training set only. The OOD set is then defined, again within each class separately, by the low- and high-distance extremes from the non-training pool, with exact target OOD size and proportional class allocation. The ID test set is drawn from the remainder. This produces a complementary shift regime in which OOD samples are unusual relative to the final training geometry rather than to a sparsity statistic alone.
+
+These two constructions are not intended as universal models of real-world malware drift. Rather, they provide controlled and reproducible shift mechanisms that are sufficiently different to support regime-level conclusions while preserving comparability across kernel families.
+
+\subsection{Controlled kernel-swap protocol}
+
+Our core experimental principle is to isolate the kernel as the only variable of interest. Accordingly, all compared models share the following components:
+
+\begin{itemize}
+    \item \textbf{Classifier:} Support Vector Classification with \texttt{kernel="precomputed"}.
+    \item \textbf{Preprocessing:} the same scaling and dimensionality-reduction pipeline for all classical and quantum models.
+    \item \textbf{Split design:} identical $T$, $S_{\mathrm{ID}}$, and $S_{\mathrm{OOD}}$ within each setting.
+    \item \textbf{Selection logic:} the same family-internal model-selection principle applied consistently to classical and quantum candidates.
+\end{itemize}
+
+This yields a comparison between kernel families rather than between heterogeneous model pipelines. In particular, it prevents observed OOD differences from being attributed to changes in classifier architecture, feature engineering, or split construction. The choice of precomputed-kernel SVC is deliberate: it allows both classical and quantum similarities to be consumed by exactly the same decision rule, thereby making the comparison interpretable in kernel-method terms \cite{cortes1995svm,scholkopf2002learningwithkernels}.
+
+\subsection{Preprocessing and feature representation}
+
+All models use the same preprocessing pipeline. Let $x \in \mathbb{R}^p$ denote the original EMBER feature vector. We apply the following steps:
+
+\begin{enumerate}
+    \item \textbf{MaxAbs scaling.} We first apply \texttt{MaxAbsScaler} to normalize feature magnitudes while preserving sparsity structure.
+    \item \textbf{Dimensionality reduction.} We project the scaled features using \texttt{TruncatedSVD} to a reduced representation of dimension
+    \[
+    d \in \{4,6,8,10,12\}.
+    \]
+    \item \textbf{Angle mapping.} For the quantum pipeline, the reduced coordinates are linearly mapped to an angle range $[0,\pi]$ before being passed to the quantum feature maps.
+\end{enumerate}
+
+This shared preprocessing serves two purposes. First, it keeps the comparison fair by ensuring that classical and quantum kernels operate on the same reduced representation. Second, it makes representation size itself a controlled factor of the study, enabling both aggregated setting-level comparisons and dimension-level analyses. The dimensionality parameter $d$ is therefore not a tuning artifact hidden in preprocessing, but an explicit axis of the experimental grid.
+
+\subsection{Kernel families}
+
+\paragraph{Classical kernels.}
+We consider two standard classical baselines:
+\begin{align}
+K_{\mathrm{lin}}(x,x') &= x^\top x',\\
+K_{\mathrm{rbf}}(x,x') &= \exp\left(-\gamma\|x-x'\|_2^2\right),
+\end{align}
+with the RBF kernel evaluated using the standard \texttt{scale} convention for $\gamma$. These kernels are intentionally strong and conventional baselines rather than weak straw-man references.
+
+\paragraph{Quantum kernels.}
+Quantum kernels are defined through an implicit feature map $\phi_Q(\cdot)$ induced by a parameterized quantum circuit, with similarity measured through fidelity-like overlaps \cite{havlicek2019quantumenhanced,schuld2019featurehilbert,schuld2021kernelmethods}. For two inputs $x$ and $x'$, the corresponding kernel entry can be written abstractly as
+\[
+K_Q(x,x') = |\langle \phi_Q(x), \phi_Q(x') \rangle|^2,
+\]
+or equivalently through the overlap of states prepared by input-dependent quantum feature maps.
+
+In the experiments, we evaluate multiple commonly used fidelity-based feature-map families chosen to represent distinct inductive biases: ZZ-type maps, PauliXZ-type maps, and Z-map variants. Concretely, the candidate set includes two ZZ configurations with different repetition depths, one PauliXZ configuration, and one Z-map configuration. We emphasize that the study is not attempting to exhaust the quantum-kernel design space; rather, it compares a representative set of commonly used fidelity-based constructions under a tightly controlled protocol. This framing is consistent with recent work arguing that empirical conclusions in QML are often regime-dependent and highly sensitive to protocol choices \cite{schuld2021encoding,bowles2024betterthanclassical,schnabel2025scrutiny}.
+
+\subsection{Model selection and repeated-run protocol}
+
+A major source of ambiguity in robustness studies is the selection criterion. Strong ID performance does not necessarily imply strong OOD performance, and mixing the two objectives can make results difficult to interpret. We therefore use two complementary family-internal selection modes.
+
+\paragraph{Best-by-OOD.}
+Within each family (classical or quantum), we select the configuration with the highest mean OOD balanced accuracy. We then compare the selected classical model against the selected quantum model. This is the robustness-oriented view and constitutes the primary comparison in the paper.
+
+\paragraph{Best-by-ID.}
+Within each family, we instead select the configuration with the highest mean ID balanced accuracy and then compare the selected classical and quantum models. This is the separability-oriented view and is reported separately to avoid conflating ID accuracy with OOD robustness.
+
+This separation is methodological, not cosmetic. It acts as a guardrail against over-interpreting ID gains as robustness gains and helps disentangle two distinct questions: which kernel family yields the strongest in-distribution class separation, and which yields the strongest out-of-distribution generalization.
+
+To quantify variability, each configuration is repeated across 15 runs. At the orchestration level, this repeated-run protocol is generated by combining multiple split seeds and model seeds under fixed setting definitions, after which results are summarized by mean and standard deviation. This repeated-run structure is important because the paper aims to support variability-aware conclusions rather than single-run anecdotes.
+
+\subsection{Evaluation metrics}
+
+Our primary metric is balanced accuracy, reported separately on ID and OOD test sets:
+\[
+\mathrm{BAcc}_{\mathrm{ID}}, \qquad \mathrm{BAcc}_{\mathrm{OOD}}.
+\]
+Balanced accuracy is preferred because it remains informative under moderate class imbalance and is straightforward to interpret in both settings.
+
+We quantify robustness under shift through the ID-to-OOD degradation
+\[
+\mathrm{drop} = \mathrm{BAcc}_{\mathrm{ID}} - \mathrm{BAcc}_{\mathrm{OOD}}.
+\]
+Lower values indicate greater robustness, as they correspond to smaller degradation when moving from ID to OOD evaluation.
+
+To compare families after selection, we compute family deltas:
+\begin{align}
+\Delta_{\mathrm{OOD}} &= \mathrm{BAcc}^{(Q)}_{\mathrm{OOD}} - \mathrm{BAcc}^{(C)}_{\mathrm{OOD}},\\
+\Delta_{\mathrm{ID}}  &= \mathrm{BAcc}^{(Q)}_{\mathrm{ID}}  - \mathrm{BAcc}^{(C)}_{\mathrm{ID}}.
+\end{align}
+Positive values indicate an advantage for the selected quantum model relative to the selected classical model.
+
+Because average gains can be misleading when variability is large, we also report an effect-size-to-variability proxy:
+\[
+\mathrm{effect} =
+\frac{\mu_Q - \mu_C}{\sqrt{\sigma_Q^2 + \sigma_C^2}},
+\]
+where $\mu_Q,\mu_C$ and $\sigma_Q,\sigma_C$ are the repeated-run means and standard deviations for the metric of interest. Values greater than 1 indicate that the observed mean gain exceeds the combined variability scale, which provides a simple and interpretable robustness check on whether an apparent gain is large relative to run-to-run noise.
+
+\subsection{Experimental grid and reporting}
+
+The main evaluation grid comprises 18 principal settings formed by the Cartesian product of:
+\begin{itemize}
+    \item two shift variants ($m1$, $m2$),
+    \item three master seeds,
+    \item and three training-size regimes.
+\end{itemize}
+The three size regimes are:
+\[
+(1000, 500, 500),\quad (2000, 1000, 1000),\quad (4000, 1800, 1800),
+\]
+corresponding to $(n_{\mathrm{train}}, n_{\mathrm{ID}}, n_{\mathrm{OOD}})$.
+
+Within each setting, we evaluate both kernel families across the shared preprocessing grid and the dimension sweep $d \in \{4,6,8,10,12\}$. This produces both a setting-level comparison, used for the main Best-by-OOD and Best-by-ID analyses, and a broader dimension-level view used to characterize how representation size interacts with kernel-family behavior.
+
+For reproducibility, split definitions are fixed within each setting, random seeds are controlled, and all key quantities are reported as mean $\pm$ standard deviation across repeated runs. Throughout the paper, we deliberately avoid claims of universal dominance or complexity-theoretic quantum advantage. The object of study is narrower and more empirical: under a fixed classifier and a fixed evaluation protocol, does changing only the kernel alter robustness under distribution shift in a security-relevant task?
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Overview}
+
+We report results under the controlled kernel-swap protocol described in Section~\ref{sec:methods}. All comparisons share the same classifier family, preprocessing pipeline, and ID/OOD split definitions; the only varying component is the kernel. Performance is summarized using balanced accuracy on the ID and OOD splits, the ID-to-OOD degradation (\emph{drop}), and the variability-aware effect proxy defined in Section~\ref{sec:methods}. To keep the empirical questions distinct, we organize the results around two complementary selection modes: \emph{Best-by-OOD}, which targets robustness under shift, and \emph{Best-by-ID}, which targets in-distribution separability.
+
+Our main evaluation spans 18 principal settings obtained from the Cartesian product of the two shift variants, three master seeds, and three training-size regimes. We then complement this setting-level analysis with a finer-grained dimension-level study over $d \in \{4,6,8,10,12\}$ in order to determine whether the observed trends are stable across representation sizes or concentrated in narrow regions of the grid.
+
+\subsection{Best-by-OOD: quantum kernels improve OOD performance in most settings}
+
+We begin with the robustness-oriented view. For each setting, we select the classical configuration with the highest mean OOD balanced accuracy and the quantum configuration with the highest mean OOD balanced accuracy, and then compare the two selected models directly. This comparison answers the primary practical question of the paper: if each family is allowed to present its strongest OOD candidate under the same protocol, which family tends to generalize better under shift?
+
+The answer is favorable to quantum kernels in the majority of cases. Across the 18 main settings, the selected quantum model achieves higher OOD balanced accuracy in 14 settings, while the selected classical model is superior in the remaining 4. The mean improvement is
+\[
+\Delta_{\mathrm{OOD}} = +0.0189,
+\]
+and the median improvement is
+\[
+\mathrm{median}(\Delta_{\mathrm{OOD}}) = +0.0255.
+\]
+Moreover, in 9 of the 18 settings, the OOD effect proxy exceeds 1, indicating that the observed mean gain is larger than the combined run-to-run variability scale. This is important because it shows that the overall trend is not driven only by marginal wins: in a substantial subset of settings, the quantum advantage is also large relative to the observed noise level.
+
+These results support the central empirical claim of the paper. Under a strictly controlled kernel-swap comparison, fidelity-based quantum kernels can yield measurable and often variability-dominating improvements in OOD balanced accuracy in malware detection under distribution shift. At the same time, the win count is not uniform enough to justify any claim of universal dominance. The more appropriate interpretation is that quantum kernels are advantageous in most, but not all, of the evaluated regimes.
+
+Figure~\ref{fig:winmap_ood} summarizes the setting-level Best-by-OOD comparison across the 18 principal settings. The win map makes the global pattern immediately visible: quantum kernels dominate in most regimes, while the classical wins are concentrated in a small subset of structured settings rather than being randomly scattered across the grid. 
+Table~\ref{tab:headline_results} summarizes the main outcomes under both selection views, while the full setting-level Best-by-OOD comparisons are reported in Appendix~\ref{app:best_ood_full}.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{paper_assets/fig_best_by_ood_winmap.png}
+\caption{Best-by-OOD win map across the 18 principal settings. Each cell indicates the winning family and the corresponding OOD gain. Quantum kernels win in 14 of the 18 settings, while the classical-dominant cases are concentrated in a small subset of structured regimes.}
+\label{fig:winmap_ood}
+\end{figure*}
+
+\begin{table}[t]
+\centering
+\caption{Headline results under the controlled kernel-swap protocol. Best-by-OOD selects, within each family, the configuration with the highest mean OOD balanced accuracy. Best-by-ID applies the same logic using ID balanced accuracy.}
+\label{tab:headline_results}
+\small
+\begin{tabular}{lccccc}
+\toprule
+Selection view & Q wins & C wins & Mean $\Delta$ & Median $\Delta$ & Effect $>1$ \\
+\midrule
+Best-by-OOD & 14/18 & 4/18 & +0.0189 & +0.0255 & 9/18 \\
+Best-by-ID  & 18/18 & 0/18 & +0.0737 & +0.0788 & 18/18 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Best-by-ID: consistent gains in in-distribution separability}
+
+We next turn to the separability-oriented view. For each setting, we now select the best classical configuration by mean ID balanced accuracy and the best quantum configuration by mean ID balanced accuracy, and compare the selected models under ID evaluation. This comparison is not a substitute for the OOD analysis, but it is still scientifically informative because it reveals whether one kernel family more consistently induces favorable decision geometry under the i.i.d.\ assumption.
+
+Under this criterion, the pattern is strikingly consistent. The selected quantum model achieves higher ID balanced accuracy in all 18 main settings. The mean improvement is
+\[
+\Delta_{\mathrm{ID}} = +0.0737,
+\]
+with a large positive median improvement as well. The variability-aware signal is also strong: the gains are not merely frequent but systematically large relative to run-to-run noise.
+
+This result suggests that, in the shared reduced feature space used here, the quantum feature maps frequently induce a similarity structure that is more favorable to class separation for SVC than the strongest selected classical alternatives. However, this should not be misread as implying universal OOD superiority. One of the main reasons for reporting Best-by-ID separately is precisely to avoid conflating stronger ID separation with stronger robustness under shift. The contrast between the 18/18 ID wins and the more qualified 14/18 OOD wins makes that distinction explicit.
+
+The Best-by-ID outcome is summarized in Table~\ref{tab:headline_results}, while the full setting-level Best-by-ID comparisons are reported in Appendix~\ref{app:best_id_full}. This makes the 18/18 ID advantage of the selected quantum models fully transparent and reproducible without overloading the main manuscript.
+
+\subsection{Classical-dominant regimes are structured rather than random}
+
+Although the Best-by-OOD results favor quantum kernels overall, the exceptions are scientifically important. A strong paper should not hide the four settings where classical kernels win; it should explain why their existence strengthens rather than weakens the study.
+
+The key point is that these exceptions are structured. They are not scattered arbitrarily across the grid, but concentrate in specific regimes, particularly in configurations associated with the $m2$ shift mechanism and, more specifically, with the master seed 42 under the histogram+byte-entropy feature block. This concentration suggests that the outcome depends on the interaction between three factors: the shift construction, the induced feature geometry, and the kernel family's similarity bias. In other words, the comparison is not revealing a binary hierarchy in which one family is always better; it is revealing a regime-dependent landscape.
+
+This regime-level structure matters for two reasons. First, it prevents over-generalization from the aggregate win counts. A result such as 14/18 is more informative when the 4 losses are interpretable than when they are dismissed as noise. Second, it produces actionable guidance: practitioners should not treat quantum kernels as an automatic replacement for classical ones, but as a strong candidate family whose utility depends on the expected shift regime.
+
+Table~\ref{tab:classical_dominant} reports the selected winning configurations in the classical-dominant settings, including the kernel type, embedding dimension, and the corresponding OOD mean$\pm$std for both families. This makes the ``where it fails'' story concrete and reproducible rather than anecdotal.
+
+\begin{table}[t]
+\centering
+\caption{Classical-dominant settings under Best-by-OOD selection. Size labels denote S = (1k, 500, 500), M = (2k, 1k, 1k), and L = (4k, 1.8k, 1.8k).}
+\label{tab:classical_dominant}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}cccp{1.45cm}p{1.9cm}r@{}}
+\toprule
+Var. & Seed & Size & Classical & Quantum & $\Delta_{\mathrm{OOD}}$ \\
+\midrule
+m1 & 999 & L & RBF(scale) & ZZ-r1 (d=10)      & -0.010 \\
+m2 & 42  & S & RBF(scale) & PauliXZ-r1 (d=8)  & -0.061 \\
+m2 & 42  & M & Linear     & PauliXZ-r1 (d=12) & -0.061 \\
+m2 & 42  & L & Linear     & PauliXZ-r1 (d=10) & -0.056 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{ID-to-OOD degradation should be read as a complementary robustness signal}
+
+In addition to absolute ID and OOD balanced accuracy, we report the degradation
+\[
+\mathrm{drop} = \mathrm{BAcc}_{\mathrm{ID}} - \mathrm{BAcc}_{\mathrm{OOD}}.
+\]
+This quantity captures how much performance changes when moving from ID to OOD evaluation, and is therefore a complementary indicator of robustness. However, it should not be interpreted in isolation from the absolute OOD scores. In the present study, quantum kernels often improve ID performance very strongly and improve OOD performance in the majority of settings, which means that the \emph{drop} can reflect a combination of two effects: improved OOD behavior and even larger shifts in the corresponding ID baseline.
+
+For this reason, we treat \emph{drop} as a secondary robustness descriptor rather than as the sole basis for model ranking. Its main role in the paper is interpretive: it helps distinguish settings where OOD gains come with similar ID behavior from settings where one family changes the entire ID/OOD profile more substantially. Read this way, \emph{drop} enriches the regime analysis rather than replacing the OOD comparison.
+
+A concise table summarizing the best-drop comparison by setting is still worthwhile, but the main narrative should remain anchored on OOD balanced accuracy, since robustness under shift is the primary target of the study.
+
+\subsection{Dimension-level analysis}
+
+The 18 setting-level comparisons are intentionally complemented by a finer-grained analysis over the dimensionality parameter $d \in \{4,6,8,10,12\}$. This dimension sweep serves two purposes. First, it tests whether the observed OOD gains are stable across representation sizes rather than artifacts of a single projection dimension. Second, it helps identify whether classical-dominant cases arise from a broad regime or from a narrow band of dimensions.
+
+A consistent pattern emerges from this analysis. In many settings, quantum kernels remain competitive or improve across the dimension sweep, while classical kernels can exhibit either saturation or greater regime sensitivity depending on the shift construction. This dimension-level view also clarifies the classical-dominant settings: some exceptions are not full-setting reversals across all dimensions, but rather regimes in which classical kernels hold an advantage over a wider or more influential subset of the dimensionality grid. This is exactly the kind of fine-grained behavior that would be missed by reporting only a single best configuration per family.
+
+Figure~\ref{fig:dim_sweep} shows the dimension-level OOD comparison across $d \in \{4,6,8,10,12\}$. The figure helps determine whether the observed advantages persist across representation sizes and clarifies whether classical-dominant settings reflect broad reversals or only narrow dimensionality bands. Table~\ref{tab:dim_summary} summarizes the dimension-level comparison over all 90 setting--dimension cells.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{paper_assets/fig_dim_sweep_mean_delta.png}
+\caption{Dimension-level OOD comparison across $d \in \{4,6,8,10,12\}$. The plot summarizes how the mean OOD advantage varies with representation size and helps identify whether classical-dominant cases are broad reversals or narrow dimensionality bands.}
+\label{fig:dim_sweep}
+\end{figure}
+
+\begin{table}[t]
+\centering
+\caption{Summary of the dimension-level OOD comparison across the 90 setting--dimension cells.}
+\label{tab:dim_summary}
+\small
+\begin{tabular}{lc}
+\toprule
+Statistic & Value \\
+\midrule
+Quantum OOD wins & 78/90 \\
+Classical OOD wins & 12/90 \\
+Mean $\Delta_{\mathrm{OOD}}$ & +0.0324 \\
+Median $\Delta_{\mathrm{OOD}}$ & +0.0383 \\
+Effect $>1$ & 56/90 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection{Summary of empirical findings}
+
+Taken together, the empirical results support three main conclusions. First, under robustness-oriented selection, quantum kernels improve OOD balanced accuracy in the majority of evaluated settings, with positive average and median gains and a substantial subset of settings in which the gains exceed the observed variability scale. Second, under ID-oriented selection, quantum kernels improve in-distribution balanced accuracy consistently across all main settings, indicating that the induced similarity geometry is often favorable for class separation in the shared representation space. Third, the exceptions are structured rather than random, which enables a regime-based understanding of when classical kernels remain competitive or preferable.
+
+This is the most defensible reading of the evidence. The results do not justify a claim of universal superiority, but they do justify a stronger and more precise statement: under a fair and reproducible kernel-swap protocol, quantum kernels emerge as a competitive and often advantageous family for malware detection under distribution shift, while still exhibiting identifiable failure regimes that must be part of any honest interpretation.
+
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{What do the results say about robustness under shift?}
+
+The primary objective of this study is robustness under distribution shift rather than maximum in-distribution accuracy. Under the controlled kernel-swap protocol, quantum kernels improve OOD balanced accuracy in the majority of the evaluated settings under Best-by-OOD selection. This finding is meaningful for two reasons. First, the comparison is intentionally strict: the classifier family, preprocessing pipeline, split definitions, and model-selection logic are fixed, so the observed differences are interpretable as differences in kernel behavior rather than as artifacts of heterogeneous pipelines. Second, the gains are not supported only by win counts; several settings also exhibit improvements that exceed the combined run-to-run variability scale, indicating that at least part of the observed advantage is large relative to the experimental noise.
+
+From the perspective of the distribution-shift literature, this reinforces a general lesson: conclusions about robustness are only as credible as the protocol used to obtain them \cite{quinonero-candela2008datasetshift,gulrajani2021domainbed,koh2021wilds,yao2022wildtime}. In our case, the relevant conclusion is not that quantum kernels are categorically superior, but that under a fair, explicitly shift-aware comparison, they emerge as a competitive and often advantageous kernel family for malware detection. This is precisely the kind of narrower claim that survives scrutiny better than broad statements of advantage.
+
+At the same time, the evidence should be interpreted as \emph{regime-conditional}. Our OOD splits are induced by two controlled shift mechanisms, not by an exhaustive model of all real malware drift processes. Accordingly, the strongest defensible reading is that quantum kernels improve robustness in many of the shift regimes studied here, not that they would necessarily do so under every temporal, adversarial, or cross-domain drift scenario encountered in practice.
+
+\subsection{Consistent ID gains do not imply universal OOD dominance}
+
+One of the clearest empirical patterns in the paper is the contrast between the ID and OOD views. Under Best-by-ID selection, quantum kernels improve ID balanced accuracy in all 18 main settings. This is a strong and highly consistent result. A natural interpretation is that, within the shared reduced representation used here, the quantum feature maps often induce a similarity geometry that is favorable for class separation under SVC. This interpretation is compatible with the kernel view of quantum models, in which the feature map changes the implicit geometry of the classification problem rather than the classifier itself \cite{havlicek2019quantumenhanced,schuld2019featurehilbert,schuld2021kernelmethods}.
+
+However, the OOD results are more qualified than the ID results, and that distinction matters. A model family can induce better margins, cleaner separation, or stronger fit on the ID distribution without being uniformly more robust once the evaluation distribution changes. This is exactly why we separated Best-by-ID and Best-by-OOD selection modes. That separation acts as a methodological guardrail: it prevents strong ID performance from being mistaken for direct evidence of robustness.
+
+This point is broader than the present paper. In domain generalization and OOD evaluation, methods often look impressive under one selection criterion but lose their advantage under another \cite{gulrajani2021domainbed}. In malware detection, the same caution is even more important because temporal variation and concept drift can alter the relationship between training geometry and future data \cite{barbero2022transcending,li2025revisitingdrift}. Our results fit this pattern well: the ID gains are real and strong, but the OOD story is more nuanced, which is exactly why the robustness-oriented view must remain primary.
+
+\subsection{Why do classical-dominant regimes appear?}
+
+The presence of classical-dominant regimes is not a weakness of the study; it is one of its most informative outcomes. If the results had shown quantum wins everywhere, the paper would be more vulnerable to the suspicion that the benchmark was unintentionally tuned toward one family. Instead, the fact that a small number of structured settings remain favorable to classical kernels strengthens the interpretation that the protocol is actually discriminating between regimes rather than merely amplifying one side.
+
+A plausible explanation is that these exceptions arise from interactions between the shift mechanism and the induced kernel geometry. In the $m2$ construction, OOD samples are selected as within-class extremes of a distance-to-train score anchored on the final training set. Such points may occupy regions where some fidelity-based quantum kernels become overly concentrated, less discriminative, or otherwise poorly matched to the relevant notion of locality. This hypothesis is consistent with the broader quantum-kernel literature, which emphasizes the importance of encoding, kernel concentration, and bandwidth-like effects in determining empirical performance \cite{schuld2021encoding,huang2021powerofdata,gilfuster2024rethinkinggeneralization,schnabel2025scrutiny}. Classical RBF kernels, by contrast, can behave as strong local similarity measures whose effective geometry may align more naturally with certain outlier-driven or centroid-distance-driven OOD constructions.
+
+The key message is therefore not ``quantum versus classical'' as a universal hierarchy, but \emph{kernel family versus shift regime}. The exceptions reveal that kernel usefulness depends on how the induced similarity notion interacts with the representation and with the way OOD examples are generated. This regime-aware interpretation is much more valuable than a binary winner-takes-all narrative, because it points toward a more actionable question for future work: which properties of a shift regime predict whether a given kernel family will be favorable?
+
+\subsection{Implications for security machine learning practice}
+
+From a practical perspective, the paper suggests two takeaways for security ML. The first is substantive: when compared fairly under fixed protocols, quantum kernels can provide meaningful OOD robustness gains in malware detection. This makes them worthy of serious consideration as candidate models in security pipelines, especially when the main concern is not just fitting the present distribution but preserving performance under plausible shift.
+
+The second is methodological. Independently of whether one ultimately prefers a classical or quantum kernel, the protocol used here provides a reusable blueprint for robust evaluation in security settings:
+\begin{enumerate}
+    \item keep the classifier and preprocessing fixed,
+    \item define explicit OOD splits tied to interpretable shift mechanisms,
+    \item repeat runs and report variability rather than single numbers,
+    \item and separate model-selection criteria according to the actual objective (robustness vs.\ separability).
+\end{enumerate}
+This structure is useful beyond the specific models studied here. Security ML frequently suffers from comparisons in which model class, tuning effort, and evaluation conditions change simultaneously. A controlled kernel-swap design avoids that ambiguity and yields conclusions that are easier to trust and easier to reproduce.
+
+Practitioners should nonetheless resist the temptation to interpret these results as a blanket recommendation to replace classical kernels. The more responsible recommendation is narrower: treat quantum kernels as a strong candidate family whose value should be tested under the expected shift regime, not as a default substitute for well-tuned classical baselines.
+
+\subsection{Limitations and threats to validity}
+
+Several limitations define the scope of our conclusions.
+
+\paragraph{Shift operationalization.}
+Our OOD splits are constructed through two controlled mechanisms, $m1$ and $m2$. These mechanisms are reproducible and useful for regime comparisons, but they represent only a subset of possible real-world drift processes. Future work should connect the present protocol to additional forms of shift, including explicit temporal splits, family-based drift, and adversarially induced distribution change.
+
+\paragraph{Kernel-family coverage.}
+We compare strong classical baselines (linear and RBF) against multiple fidelity-based quantum kernels induced by commonly used feature maps. This is a meaningful and fair comparison, but not an exhaustive one. The quantum-kernel design space is much larger, and classical alternatives beyond linear/RBF could also be relevant. Extending the study to broader kernel families would help determine whether the present trends persist or are specific to the compared set.
+
+\paragraph{Selection over candidate sets.}
+Both Best-by-OOD and Best-by-ID are selection procedures over a finite candidate set. Although the same logic is applied within each family, the outcome still depends on the candidate space and search granularity. This is one reason why repeated-run reporting is important, but it does not eliminate all forms of selection sensitivity. Future work could strengthen the analysis further through formal statistical testing, nested selection protocols, or robustness analyses over expanded search spaces.
+
+\paragraph{Hardware interpretation.}
+Our quantum kernels are studied as kernel constructions defined through fidelity-based similarities, not as demonstrations of near-term hardware advantage. This distinction is important. The paper evaluates the geometry induced by the kernels, not the practical performance of noisy quantum devices. We therefore make no claim about hardware superiority, resource advantage, or quantum speedup.
+
+\paragraph{Generality beyond EMBER.}
+EMBER is a strong benchmark for static PE malware detection, and the updated benchmark landscape further supports its relevance \cite{anderson2018ember,joyce2025ember2024}. Even so, conclusions drawn from one dataset family should not be assumed to transfer automatically to other security modalities such as dynamic malware analysis, network intrusion data, or broader cyber-defense settings. Replication on additional benchmark families will be important for establishing external validity.
+
+\subsection{Conservative interpretation}
+
+In light of these limitations and the broader QML benchmarking literature, the appropriate interpretation of the paper is deliberately conservative. We do not claim universal superiority, complexity-theoretic quantum advantage, or immediate hardware relevance. Instead, we provide controlled empirical evidence that quantum kernels can improve OOD robustness in a meaningful fraction of settings relevant to malware detection under shift, while also identifying structured regimes in which classical kernels remain competitive or preferable.
+
+This regime-aware view is, in our view, scientifically stronger than a more ambitious narrative. It is consistent with recent calls for careful benchmarking in QML \cite{bowles2024betterthanclassical,schnabel2025scrutiny} and with the broader lesson from distribution-shift research that robustness claims should be narrow enough to be credible and specific enough to be testable. Under that standard, the present study supports a clear conclusion: kernel choice matters under shift, quantum kernels deserve serious consideration in this setting, and their benefits are best understood not as universal truths but as structured advantages that depend on the interaction between representation, similarity, and shift regime.
+
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper studied whether quantum kernels can improve robustness under distribution shift in malware detection when compared fairly against strong classical kernels. To answer this question, we introduced a controlled kernel-swap protocol in which the classifier family, preprocessing pipeline, and split definitions were held fixed, and only the kernel was changed. This design allowed the comparison to be interpreted as a comparison of kernel behavior rather than as a comparison between heterogeneous model pipelines.
+
+Across 18 principal settings on EMBER malware detection, quantum kernels improved OOD balanced accuracy in the majority of cases under robustness-oriented selection, while improving ID balanced accuracy consistently under ID-oriented selection. At the same time, the results were not uniform enough to justify any claim of universal superiority: a small number of structured regimes remained favorable to classical kernels. This is not a weakness of the study, but one of its main outcomes, because it shows that the practical question is not whether quantum kernels always win, but under which shift regimes and representation conditions they help.
+
+The contribution of the paper is therefore twofold. Empirically, it provides variability-aware evidence that quantum kernels can be a competitive and often advantageous family for malware detection under shift. Methodologically, it provides a reproducible evaluation template for controlled comparison under OOD conditions, separating robustness-oriented and separability-oriented selection views and explicitly reporting variability rather than relying on single-run outcomes.
+
+Our claims are deliberately conservative. We do not claim complexity-theoretic quantum advantage, hardware superiority, or universal dominance over classical kernels. Instead, we show that under a fair and explicitly shift-aware protocol, kernel choice materially affects robustness, and that quantum kernels frequently offer an advantage while still exhibiting identifiable failure regimes. In that narrower and more defensible sense, the results support quantum kernels as a serious candidate family for malware detection under distribution shift.
+
+Several directions follow naturally from this work. Future studies should extend the protocol to additional forms of malware drift, broader classical and quantum kernel families, and further security-relevant datasets. More generally, the results suggest that the most fruitful path forward is not to treat quantum and classical kernels as competing absolutes, but to understand more precisely how kernel geometry interacts with representation and shift regime. That, ultimately, is the level at which robust conclusions about quantum kernels are most likely to endure.
+
+\appendix
+
+\section{Additional Results}
+\label{app:additional_results}
+
+This appendix provides the full setting-level tables underlying the main-text summary results. To preserve readability in the main manuscript, the core narrative is supported there by compact summary tables and figures, while the complete per-setting comparisons are reported here for transparency and reproducibility. For compactness, size labels denote $(n_{\mathrm{train}}, n_{\mathrm{ID}}, n_{\mathrm{OOD}})$ as follows: S = (1k, 500, 500), M = (2k, 1k, 1k), and L = (4k, 1.8k, 1.8k).
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{paper_assets/fig_setting_level_deltas.png}
+\caption{Setting-level OOD deltas across the 18 principal settings. Positive values indicate an advantage for the selected quantum model over the selected classical model under Best-by-OOD selection.}
+\label{fig:setting_deltas_appendix}
+\end{figure*}
+
+\subsection{Full Best-by-OOD comparisons}
+\label{app:best_ood_full}
+
+Tables~\ref{tab:best_ood_m1} and \ref{tab:best_ood_m2} report the full setting-level Best-by-OOD comparisons, split by shift variant for readability.
+
+\begin{table}[t]
+\centering
+\caption{Full Best-by-OOD comparison for shift variant m1.}
+\label{tab:best_ood_m1}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}cccp{1.55cm}p{1.75cm}ccc c@{}}
+\toprule
+Var. & Seed & Size & Classical & Quantum & \shortstack{OOD\\C} & \shortstack{OOD\\Q} & $\Delta_{\mathrm{OOD}}$ & Win. \\
+\midrule
+m1 & 42  & S & RBF(scale) & PauliXZ-r1 (d=12) & 0.722$\pm$0.013 & 0.758$\pm$0.020 & +0.036 & Q \\
+m1 & 42  & M & RBF(scale) & ZZ-r1 (d=12)      & 0.709$\pm$0.009 & 0.761$\pm$0.007 & +0.052 & Q \\
+m1 & 42  & L & RBF(scale) & ZZ-r1 (d=12)      & 0.749$\pm$0.020 & 0.756$\pm$0.008 & +0.008 & Q \\
+m1 & 123 & S & RBF(scale) & PauliXZ-r1 (d=12) & 0.729$\pm$0.024 & 0.750$\pm$0.020 & +0.020 & Q \\
+m1 & 123 & M & RBF(scale) & ZZ-r1 (d=10)      & 0.746$\pm$0.020 & 0.756$\pm$0.029 & +0.010 & Q \\
+m1 & 123 & L & RBF(scale) & ZZ-r1 (d=10)      & 0.741$\pm$0.032 & 0.753$\pm$0.014 & +0.012 & Q \\
+m1 & 999 & S & RBF(scale) & PauliXZ-r1 (d=12) & 0.737$\pm$0.012 & 0.767$\pm$0.022 & +0.030 & Q \\
+m1 & 999 & M & RBF(scale) & ZZ-r1 (d=12)      & 0.750$\pm$0.009 & 0.762$\pm$0.013 & +0.012 & Q \\
+m1 & 999 & L & RBF(scale) & ZZ-r1 (d=10)      & 0.763$\pm$0.024 & 0.753$\pm$0.005 & -0.010 & C \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Full Best-by-OOD comparison for shift variant m2.}
+\label{tab:best_ood_m2}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}cccp{1.55cm}p{1.75cm}ccc c@{}}
+\toprule
+Var. & Seed & Size & Classical & Quantum & \shortstack{OOD\\C} & \shortstack{OOD\\Q} & $\Delta_{\mathrm{OOD}}$ & Win. \\
+\midrule
+m2 & 42  & S & RBF(scale) & PauliXZ-r1 (d=8)  & 0.735$\pm$0.013 & 0.674$\pm$0.030 & -0.061 & C \\
+m2 & 42  & M & Linear     & PauliXZ-r1 (d=12) & 0.769$\pm$0.019 & 0.708$\pm$0.019 & -0.061 & C \\
+m2 & 42  & L & Linear     & PauliXZ-r1 (d=10) & 0.784$\pm$0.012 & 0.728$\pm$0.017 & -0.056 & C \\
+m2 & 123 & S & RBF(scale) & ZZ-r1 (d=12)      & 0.729$\pm$0.017 & 0.786$\pm$0.018 & +0.057 & Q \\
+m2 & 123 & M & RBF(scale) & ZZ-r2 (d=12)      & 0.741$\pm$0.005 & 0.782$\pm$0.016 & +0.042 & Q \\
+m2 & 123 & L & RBF(scale) & ZZ-r2 (d=12)      & 0.747$\pm$0.022 & 0.797$\pm$0.009 & +0.050 & Q \\
+m2 & 999 & S & RBF(scale) & ZZ-r1 (d=10)      & 0.709$\pm$0.024 & 0.774$\pm$0.007 & +0.066 & Q \\
+m2 & 999 & M & RBF(scale) & ZZ-r1 (d=12)      & 0.725$\pm$0.030 & 0.782$\pm$0.017 & +0.057 & Q \\
+m2 & 999 & L & RBF(scale) & ZZ-r1 (d=12)      & 0.724$\pm$0.037 & 0.800$\pm$0.009 & +0.076 & Q \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Full Best-by-ID comparisons}
+\label{app:best_id_full}
+
+Tables~\ref{tab:best_id_m1} and \ref{tab:best_id_m2} report the full setting-level Best-by-ID comparisons, again split by shift variant for readability.
+
+\begin{table}[t]
+\centering
+\caption{Full Best-by-ID comparison for shift variant m1.}
+\label{tab:best_id_m1}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}cccp{1.55cm}p{1.75cm}ccc c@{}}
+\toprule
+Var. & Seed & Size & Classical & Quantum & \shortstack{ID\\C} & \shortstack{ID\\Q} & $\Delta_{\mathrm{ID}}$ & Win. \\
+\midrule
+m1 & 42  & S & RBF(scale) & ZZ-r1 (d=12) & 0.711$\pm$0.024 & 0.778$\pm$0.022 & +0.067 & Q \\
+m1 & 42  & M & RBF(scale) & ZZ-r1 (d=10) & 0.702$\pm$0.005 & 0.793$\pm$0.006 & +0.090 & Q \\
+m1 & 42  & L & RBF(scale) & ZZ-r2 (d=12) & 0.719$\pm$0.005 & 0.805$\pm$0.008 & +0.086 & Q \\
+m1 & 123 & S & RBF(scale) & ZZ-r1 (d=12) & 0.733$\pm$0.020 & 0.790$\pm$0.013 & +0.057 & Q \\
+m1 & 123 & M & RBF(scale) & ZZ-r1 (d=12) & 0.716$\pm$0.011 & 0.798$\pm$0.016 & +0.082 & Q \\
+m1 & 123 & L & RBF(scale) & ZZ-r2 (d=12) & 0.712$\pm$0.011 & 0.801$\pm$0.006 & +0.090 & Q \\
+m1 & 999 & S & RBF(scale) & ZZ-r1 (d=12) & 0.718$\pm$0.030 & 0.773$\pm$0.023 & +0.055 & Q \\
+m1 & 999 & M & RBF(scale) & ZZ-r2 (d=12) & 0.720$\pm$0.011 & 0.793$\pm$0.012 & +0.073 & Q \\
+m1 & 999 & L & RBF(scale) & ZZ-r2 (d=12) & 0.722$\pm$0.017 & 0.802$\pm$0.006 & +0.080 & Q \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Full Best-by-ID comparison for shift variant m2.}
+\label{tab:best_id_m2}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}cccp{1.55cm}p{1.75cm}ccc c@{}}
+\toprule
+Var. & Seed & Size & Classical & Quantum & \shortstack{ID\\C} & \shortstack{ID\\Q} & $\Delta_{\mathrm{ID}}$ & Win. \\
+\midrule
+m2 & 42  & S & RBF(scale) & ZZ-r1 (d=12) & 0.706$\pm$0.015 & 0.772$\pm$0.014 & +0.066 & Q \\
+m2 & 42  & M & RBF(scale) & ZZ-r1 (d=12) & 0.759$\pm$0.014 & 0.797$\pm$0.014 & +0.037 & Q \\
+m2 & 42  & L & RBF(scale) & ZZ-r1 (d=12) & 0.767$\pm$0.012 & 0.820$\pm$0.007 & +0.053 & Q \\
+m2 & 123 & S & RBF(scale) & ZZ-r1 (d=12) & 0.709$\pm$0.022 & 0.784$\pm$0.010 & +0.076 & Q \\
+m2 & 123 & M & RBF(scale) & ZZ-r2 (d=12) & 0.714$\pm$0.020 & 0.792$\pm$0.013 & +0.079 & Q \\
+m2 & 123 & L & RBF(scale) & ZZ-r2 (d=12) & 0.712$\pm$0.007 & 0.793$\pm$0.006 & +0.081 & Q \\
+m2 & 999 & S & RBF(scale) & ZZ-r2 (d=12) & 0.706$\pm$0.024 & 0.798$\pm$0.016 & +0.092 & Q \\
+m2 & 999 & M & RBF(scale) & ZZ-r2 (d=12) & 0.702$\pm$0.019 & 0.787$\pm$0.009 & +0.085 & Q \\
+m2 & 999 & L & RBF(scale) & ZZ-r2 (d=12) & 0.715$\pm$0.019 & 0.793$\pm$0.006 & +0.079 & Q \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
+\backmatter
+\bmhead{Statements and Declarations}
+
+\bmhead{Funding}
+The authors received no specific funding for the submitted work.
+
+\bmhead{Competing Interests}
+The authors declare that they have no competing interests.
+
+\bmhead{Author Contributions}
+Roberto Fernández-Barrios: Conceptualization, Methodology, Software, Data curation, Formal analysis, Visualization, Investigation, Writing--original draft, Writing--review \& editing.
+Iker Pastor-López: Supervision, Validation, Writing--review \& editing.
+Asier González-Santocildes: Validation, Project administration, Writing--review \& editing.
+Pablo Garcia Bringas: Supervision, Resources, Writing--review \& editing.
+
+\bmhead{Data Availability}
+This study is based on the EMBER benchmark dataset \cite{anderson2018ember}. The derived split definitions, aggregated results, and supporting artifacts generated in this work will be publicly available in the project repository at the time of submission/publication.
+
+\bmhead{Code Availability}
+The code used to generate the splits, preprocess the data, run the classical and quantum kernel experiments, aggregate the repeated-run results, and produce the reported tables and figures will be publicly available in the project repository at the time of submission/publication: \url{https://github.com/robertofdzb10/paper1_quantum_malware}
+
+\bmhead{Ethics Approval}
+Not applicable.
+
+\bmhead{Consent to Participate}
+Not applicable.
+
+\bmhead{Consent for Publication}
+Not applicable.
+
+
+
+%%===========================================================================================%%
+%% If you are submitting to one of the Nature Portfolio journals, using the eJP submission   %%
+%% system, please include the references within the manuscript file itself. You may do this  %%
+%% by copying the reference list from your .bbl file, paste it into the main manuscript .tex %%
+%% file, and delete the associated \verb+\bibliography+ commands.                            %%
+%%===========================================================================================%%
+
+\clearpage
+\bibliography{sn-bibliography}% common bib file
+%% if required, the content of .bbl file can be included here once bbl is generated
+%%\input sn-article.bbl
+
+\end{document}
