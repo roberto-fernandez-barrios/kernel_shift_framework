@@ -515,7 +515,7 @@ If you use this repository, please cite the archived software release associated
   author  = {Fernández-Barrios, Roberto and Pastor-López, Iker and González-Santocildes, Asier and Garcia Bringas, Pablo},
   title   = {Controlled Kernel Evaluation under Distribution Shift},
   year    = {2026},
-  version = {0.1.0},
+  version = {0.1.1},
   doi     = {10.5281/zenodo.19147650},
   url     = {https://github.com/roberto-fernandez-barrios/kernel_shift_framework}
 }
