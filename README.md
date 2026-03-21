@@ -3,7 +3,7 @@
 [![CI](https://github.com/roberto-fernandez-barrios/kernel_shift_framework/actions/workflows/ci.yml/badge.svg)](https://github.com/roberto-fernandez-barrios/kernel_shift_framework/actions/workflows/ci.yml)
 [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD--3--Clause-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/roberto-fernandez-barrios/kernel_shift_framework)](https://github.com/roberto-fernandez-barrios/kernel_shift_framework/releases)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19147650.svg)](https://doi.org/10.5281/zenodo.19147650)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19149199.svg)](https://doi.org/10.5281/zenodo.19149199)
 
 A reproducible experimental framework for **controlled kernel comparison under distribution shift**.
 
@@ -506,7 +506,7 @@ Software citation metadata is provided in `CITATION.cff`.
 If you use this repository, please cite the archived software release associated with the public Zenodo record below.
 
 ### Archived software release
-- DOI: `10.5281/zenodo.19147650`
+- DOI: `10.5281/zenodo.19149199`
 
 ### Recommended software citation
 
@@ -516,7 +516,7 @@ If you use this repository, please cite the archived software release associated
   title   = {Controlled Kernel Evaluation under Distribution Shift},
   year    = {2026},
   version = {0.1.1},
-  doi     = {10.5281/zenodo.19147650},
+  doi     = {10.5281/zenodo.19149199},
   url     = {https://github.com/roberto-fernandez-barrios/kernel_shift_framework}
 }
 ```
