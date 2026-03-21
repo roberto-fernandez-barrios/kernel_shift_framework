@@ -517,7 +517,7 @@ If you use this repository, please cite the archived software release associated
   year    = {2026},
   version = {0.1.1},
   doi     = {10.5281/zenodo.19149199},
-  url     = {https://github.com/roberto-fernandez-barrios/kernel_shift_framework}
+  url     = {https://doi.org/10.5281/zenodo.19149199}
 }
 ```
 
