@@ -1,62 +1,89 @@
-# Final Release Checklist
+# Final release checklist
 
-This repository is already functionally validated. The remaining work is release-quality closure rather than core debugging.
+This checklist is intended for the **post-validation public release phase** of the repository. The core scientific pipeline, reduced end-to-end validation path, and public packaging baseline are already in place.
 
-## A. Repository contents
+## 1. Licensing / ownership
+Confirm that the shipped `BSD-3-Clause` license is acceptable for the actual rights holder.
 
-- [ ] `git status` is clean
-- [ ] only canonical result artifacts are versioned
-- [ ] no local sanity artifacts remain tracked
-- [ ] no processed EMBER arrays remain tracked
-- [ ] no extracted/raw EMBER data remains tracked
-- [ ] no memmaps or pipeline-validation internals remain tracked
+If institutional ownership applies, update the copyright line in `LICENSE` and, if needed, align:
 
-## B. Documentation
+- `CITATION.cff`
+- `pyproject.toml`
+- repository hosting namespace / organization
 
-- [ ] `README.md` matches the final repository layout
-- [ ] `docs/VALIDATION_STATUS.md` reflects the completed validation state
-- [ ] `docs/REPRODUCIBILITY_NOTES.md` reflects canonical versioned outputs and exclusions
-- [ ] `docs/FINAL_RELEASE_CHECKLIST.md` reflects release closure rather than pending debugging
-- [ ] `CITATION.cff` is correct
-- [ ] `LICENSE` is correct
+See also `docs/LEGAL_RELEASE_NOTE.md`.
 
-## C. Environment
+## 2. Dependency and environment hygiene
+Confirm that the dependency files accurately reflect their intended roles:
 
-- [ ] `requirements.txt` is final
-- [ ] `requirements-compat.txt` is final
-- [ ] `environment.yml` is final
-- [ ] optional: `environment.lock.yml` exported from the validated machine
-- [ ] optional: `requirements.lock.txt` exported from the validated machine
+- `environment.yml` — recommended Conda setup
+- `requirements.txt` — pinned top-level pip environment
+- `requirements-compat.txt` — looser compatibility envelope
+- `environment.lock.yml` — more explicit Conda snapshot, if retained
+- `requirements.lock.txt` — more explicit pip snapshot, if retained
 
-## D. Continuous integration
+If lockfiles are kept in the repository, they should be defensible as real archival or near-archival environment snapshots rather than placeholders.
 
-- [ ] GitHub Actions workflow exists
-- [ ] smoke test runs in CI
-- [ ] summary-table generation runs in CI
-- [ ] CI passes on the default branch
+## 3. Package and CI hygiene
+Confirm that public CI remains green and that it validates:
 
-## E. Result artifacts
+- `pip install .`
+- CLI smoke test
+- reporting stage
+- Python **3.11** and **3.12** support
 
-- [ ] `results/aggregated/` contains the canonical aggregated outputs
-- [ ] `results/tables/` contains the canonical final tables
-- [ ] duplicated intermediate result trees are excluded from version control
+If CI is green at release time, no further action is required here.
 
-## F. Release metadata
+## 4. Public metadata
+Confirm that the public-facing repository metadata is aligned:
 
-- [ ] final repository URL confirmed
-- [ ] version tag `v0.1.0` created
-- [ ] GitHub Release created
-- [ ] optional DOI / Zenodo integration completed
-- [ ] optional final article citation added after acceptance
+- repository URL
+- release tag
+- archival DOI / Zenodo record
+- `CITATION.cff`
+- README citation block
 
-## G. Final publication decision
+If a newer public release supersedes the current archival DOI, update the citation metadata accordingly.
 
-The repository is ready for public release when:
+## 5. Sanity checks before publishing a new release
+Run from repository root:
 
-1. the tracked artifact set is clean,
-2. the docs reflect the real validated state,
-3. CI passes,
-4. metadata is final,
-5. the release tag is created.
+```bash
+python scripts/smoke/smoke_test_cli.py
+```
 
-At that point, the remaining improvements are optional polish rather than blockers.
+Inspect:
+
+- `docs/smoke_test_report.json`
+
+Optional but useful:
+
+```bash
+python scripts/reporting/make_summary_tables.py \
+  --metrics results/aggregated/AGG_ROOT_mean_std_metrics__by_variant_seed_and_size.csv \
+  --drops results/aggregated/AGG_ROOT_mean_std_drop__by_variant_seed_and_size.csv \
+  --outdir results/tables_check \
+  --topn 10 \
+  --round 4
+```
+
+## 6. Release publication step
+For a GitHub + Zenodo archival workflow:
+
+1. commit final metadata / documentation changes,
+2. push to the public repository,
+3. create the GitHub release,
+4. wait for Zenodo ingestion,
+5. verify the DOI record,
+6. update the default branch citation metadata if needed.
+
+## 7. What is optional rather than blocking
+The following are useful improvements, but they are **not** blockers for a valid public research release:
+
+- stricter future lockfile regeneration,
+- additional GitHub templates (`CONTRIBUTING.md`, issue templates, etc.),
+- cosmetic README improvements,
+- future deprecation-warning cleanup.
+
+## Practical release conclusion
+If licensing is confirmed, CI is green, citation metadata is aligned, and the release archive is publicly resolvable, the repository should be considered **ready for public release and citation**.

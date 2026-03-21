@@ -7,32 +7,32 @@
 
 A reproducible experimental framework for **controlled kernel comparison under distribution shift**.
 
-**Case study implemented in this repository:** EMBER static malware detection  
+**Case study implemented in this release:** EMBER static malware detection  
 **Associated manuscript:**  
 **_Comparing Quantum and Classical Kernels under Distribution Shift: A Controlled Kernel-Swap Study on EMBER Malware Detection_**
 
-This repository should be read as a **reproducible experimental framework**, not as a flat paper supplement. Its central asset is a **controlled kernel-swap protocol** in which the dataset, split logic, preprocessing, classifier family, and reporting views are held fixed while only the **kernel** is changed.
+This repository should be read as a **reproducible experimental framework**, not as a flat code supplement. Its central design principle is a **controlled kernel-swap protocol** in which the dataset, split logic, preprocessing, classifier family, repeated-run structure, and reporting views are held fixed while only the **kernel** changes.
 
-In this release lineage, the protocol is instantiated on EMBER malware detection to compare strong classical kernels against fidelity-based quantum kernels under explicit distribution shift.
-
----
-
-## Why this repository matters
-
-The framework addresses a deliberately narrow question:
-
-> **When the experimental pipeline is controlled, does kernel choice materially affect in-distribution fit and out-of-distribution robustness?**
-
-The repository does **not** claim hardware quantum advantage, universal superiority of quantum kernels, or complexity-theoretic separation. Its purpose is narrower and empirical: to isolate the contribution of the **kernel itself** under a shared evaluation protocol.
+In this release, the protocol is instantiated on EMBER malware detection to compare strong classical kernels against fidelity-based quantum kernels under explicit distribution shift.
 
 ---
 
-## Controlled kernel-swap protocol
+## Why this repository exists
 
-Across model families, the following components are held fixed:
+The framework addresses a narrow and explicit question:
+
+> **When the evaluation protocol is controlled, does kernel choice materially affect in-distribution fit and out-of-distribution robustness?**
+
+This repository does **not** claim hardware quantum advantage, universal superiority of quantum methods, or complexity-theoretic separation. Its purpose is empirical and protocol-driven: under a fixed classifier and a fixed evaluation pipeline, does changing only the kernel alter performance under shift?
+
+---
+
+## Controlled comparison design
+
+Across model families, the following components are kept fixed:
 
 - dataset and exported feature representation,
-- master split definitions,
+- master split construction,
 - q-split subsampling logic,
 - train-only preprocessing,
 - classifier family: `SVC(kernel="precomputed", class_weight="balanced")`,
@@ -50,12 +50,14 @@ same repeated-run design
 different kernel
 ```
 
+That protocol-level fairness is the main organizing principle of this repository.
+
 ---
 
-## Case study implemented in this release
+## Case study included in this release
 
 ### Dataset
-- **EMBER** static PE malware dataset.
+- **EMBER** static PE malware dataset
 
 ### Exported representation
 The export stage builds a fixed **524-dimensional** representation composed of:
@@ -68,8 +70,8 @@ The export stage builds a fixed **524-dimensional** representation composed of:
 ### Shift variants
 Two explicit OOD protocols are implemented:
 
-- **`m1_hist_byteent`**: OOD from within-class score extremes over histogram + byte-entropy features.
-- **`m2_hist_byteent`**: OOD from within-class distance-to-train extremes anchored on the final training split.
+- **`m1_hist_byteent`**: OOD from within-class score extremes over histogram + byte-entropy features
+- **`m2_hist_byteent`**: OOD from within-class distance-to-train extremes anchored on the final training split
 
 ### Shared learning setup
 - **classifier:** `SVC(kernel="precomputed", class_weight="balanced")`
@@ -100,11 +102,11 @@ Two explicit OOD protocols are implemented:
 This yields:
 
 - **18 principal settings** = `2 variants × 3 master seeds × 3 sizes`
-- **90 setting-dimension cells** = `18 × 5 dimensions`
+- **90 setting–dimension cells** = `18 × 5 dimensions`
 
 ---
 
-## Headline results included in this release
+## Snapshot results included in this release
 
 Under the robustness-oriented **Best-by-OOD** view, the selected quantum model achieves higher OOD balanced accuracy in **14 / 18** principal settings, with:
 
@@ -117,55 +119,9 @@ Under the separability-oriented **Best-by-ID** view, the selected quantum model 
 - **mean ID gain:** `+0.0737`
 - **median ID gain:** `+0.0788`
 
-At the finer dimension level, quantum kernels are favorable in **78 / 90** setting-dimension cells under Best-by-OOD selection.
+At the finer dimension level, quantum kernels are favorable in **78 / 90** setting–dimension cells under Best-by-OOD selection.
 
-**Interpretation.** The results support a **regime-dependent** and **conservative** conclusion: under a fair, shift-aware, and reproducible kernel-family comparison, quantum kernels emerge as a competitive and often advantageous family for OOD-sensitive evaluation, while still exhibiting identifiable regimes in which classical kernels remain preferable.
-
-**Important note.** The paper-scale claims above refer to the full aggregated release artifacts in `results/aggregated/` and `results/tables/`. Reduced outputs produced during local validation (for example under `results/pipeline_validation/`) are intended to validate the pipeline, not to replace the manuscript-facing results.
-
----
-
-## Repository layout
-
-```text
-.
-├── README.md
-├── LICENSE
-├── CITATION.cff
-├── requirements.txt
-├── requirements-compat.txt
-├── environment.yml
-├── pyproject.toml
-├── .gitignore
-├── src/
-│   ├── utils/ember/
-│   │   ├── extract_ember_raw.py
-│   │   ├── export_ember_jsonl_to_Xy.py
-│   │   ├── make_splits_ember_sparsity.py
-│   │   └── make_qsplits_from_master.py
-│   └── experiments/ember/
-│       ├── classical/run_ember_classical_kernel_sparsity_shift_qsplits.py
-│       └── quantum/run_ember_quantum_kernel_sparsity_shift_qsplits.py
-├── scripts/
-│   ├── ember/run_compare_q_vs_c_full.py
-│   ├── reporting/make_summary_tables.py
-│   └── smoke/smoke_test_cli.py
-├── paper/
-│   ├── sn-article.tex
-│   └── sn-bibliography.bib
-├── results/
-│   ├── aggregated/
-│   └── tables/
-├── data/
-│   ├── raw/ember/
-│   └── processed/ember/
-└── docs/
-    ├── FINAL_RELEASE_CHECKLIST.md
-    ├── REPRODUCIBILITY_NOTES.md
-    ├── VALIDATION_STATUS.md
-    ├── LEGAL_RELEASE_NOTE.md
-    └── smoke_test_report.json
-```
+**Important note.** The paper-scale claims above refer to the full aggregated release artifacts in `results/aggregated/` and `results/tables/`. Reduced outputs produced during local validation, such as `results/pipeline_validation/...`, are intended to validate the pipeline and should not be treated as replacements for the manuscript-facing tables.
 
 ---
 
@@ -173,7 +129,7 @@ At the finer dimension level, quantum kernels are favorable in **78 / 90** setti
 
 ### Recommended path: Conda
 
-This release targets a **clean Python 3.12 environment**.
+This repository targets a clean **Python 3.12** environment for the recommended local setup.
 
 ```bash
 conda env create -f environment.yml
@@ -187,16 +143,50 @@ python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install --upgrade pip
 pip install -r requirements.txt
-pip install -e .
+pip install .
 ```
 
-### Dependency views shipped with this repository
+---
 
-- `environment.yml` — recommended Conda environment for this release.
-- `requirements.txt` — pinned pip environment.
-- `requirements-compat.txt` — looser compatibility envelope for users who need a less restrictive install.
+## Dependency files at a glance
 
-If your repository snapshot also includes archival lockfiles such as `environment.lock.yml` or `requirements.lock.txt`, those should be preferred for exact reruns of the release snapshot.
+This repository intentionally ships multiple dependency views, each for a different purpose:
+
+- `environment.yml`  
+  Recommended **Conda** environment for typical use of this release.
+
+- `requirements.txt`  
+  Pinned **top-level pip environment** for this release.
+
+- `requirements-compat.txt`  
+  Looser compatibility envelope for users who need a less restrictive install.
+
+- `environment.lock.yml`  
+  More explicit Conda environment snapshot for archival or exact reruns, when needed.
+
+- `requirements.lock.txt`  
+  More explicit pip environment snapshot for archival or exact reruns, when needed.
+
+In short:
+
+- use **`environment.yml`** for the normal Conda path,
+- use **`requirements.txt`** for the normal pip path,
+- use the **lockfiles** when you specifically want a closer archival rerun of the recorded software snapshot.
+
+---
+
+## Package installation and CI coverage
+
+The repository is structured as an installable Python package via `pyproject.toml`.
+
+Current CI validates:
+
+- package installation via `pip install .`,
+- CLI smoke-test execution,
+- reporting on versioned aggregated outputs,
+- compatibility on **Python 3.11 and 3.12**.
+
+This means the public automation now validates the **package**, not just a manually assembled local environment.
 
 ---
 
@@ -211,6 +201,50 @@ data/
 ```
 
 This repository does **not** redistribute the EMBER dataset itself. The intended workflow is to obtain the raw archive externally and run the preparation pipeline locally.
+
+---
+
+## Repository layout
+
+```text
+.
+├── README.md
+├── LICENSE
+├── CITATION.cff
+├── pyproject.toml
+├── environment.yml
+├── environment.lock.yml
+├── requirements.txt
+├── requirements.lock.txt
+├── requirements-compat.txt
+├── src/
+│   ├── utils/ember/
+│   └── experiments/ember/
+├── scripts/
+│   ├── ember/
+│   ├── reporting/
+│   └── smoke/
+├── results/
+│   ├── aggregated/
+│   └── tables/
+├── paper/
+│   ├── sn-article.tex
+│   └── sn-bibliography.bib
+├── docs/
+│   ├── FINAL_RELEASE_CHECKLIST.md
+│   ├── REPRODUCIBILITY_NOTES.md
+│   ├── VALIDATION_STATUS.md
+│   └── LEGAL_RELEASE_NOTE.md
+└── data/
+```
+
+Top-level intent:
+
+- `src/` contains reusable code and experiment logic
+- `scripts/` contains runnable orchestration and reporting entry points
+- `results/` contains aggregated outputs and manuscript-facing tables
+- `paper/` contains the manuscript source
+- `docs/` contains supporting release and reproducibility notes
 
 ---
 
@@ -247,20 +281,21 @@ docs/smoke_test_report.json
 
 In addition to CLI validation, the repository has been manually validated on a reduced but real end-to-end run:
 
-- EMBER raw extraction succeeded.
-- JSONL -> `X.npy / y.npy` export succeeded.
-- Both master split variants (`m1_hist_byteent`, `m2_hist_byteent`) succeeded.
-- Small q-splits were generated successfully.
-- Classical and quantum sanity runs both completed successfully.
-- The comparison orchestrator completed a reduced real run successfully.
-- The orchestrator `--dry-run` mode behaves as a true preview mode.
-- The summary-table generator completed successfully on validation aggregates.
+- EMBER raw extraction succeeded
+- JSONL → `X.npy / y.npy` export succeeded
+- both master split variants (`m1_hist_byteent`, `m2_hist_byteent`) succeeded
+- q-splits were generated successfully
+- classical and quantum sanity runs completed successfully
+- the comparison orchestrator completed a reduced real run successfully
+- `--dry-run` behaves as a true preview mode
+- the summary-table generator completed successfully on validation aggregates
 
-This means the repository has been validated at three levels:
+Taken together, the repository is validated at four levels:
 
-1. **CLI level** — entry points and module layout,
-2. **runtime sanity level** — reduced real classical and quantum execution,
-3. **orchestration/reporting level** — reduced end-to-end pipeline including table generation.
+1. **package level** — installable via `pip install .`
+2. **CLI level** — entry points and module layout
+3. **runtime sanity level** — reduced real classical and quantum execution
+4. **orchestration/reporting level** — reduced end-to-end pipeline including table generation
 
 ---
 
@@ -378,7 +413,7 @@ The `--dry-run` mode is a **pipeline preview**, not a substitute for real numeri
 
 ## Reporting and manuscript-facing tables
 
-Once root-level aggregated CSVs are available, generate manuscript-ready tables with:
+Once root-level aggregated CSVs are available, generate manuscript-facing tables with:
 
 ```bash
 python scripts/reporting/make_summary_tables.py \
@@ -397,7 +432,7 @@ This writes:
 - `results/tables/table_90cells_dimlevel_best_ood__with_std.csv`
 - `results/tables/table_top10_cases_ood__with_std.csv`
 
-For local sanity validation, the same script can also be run on reduced validation aggregates such as `results/pipeline_validation/...`, but those outputs should be read as **sanity tables**, not as replacements for the paper-scale results.
+For local sanity validation, you may also run the same script on reduced validation aggregates such as `results/pipeline_validation/...`, but those outputs should be read as **sanity tables**, not as replacements for the paper-scale results.
 
 ---
 
@@ -405,25 +440,25 @@ For local sanity validation, the same script can also be run on reduced validati
 
 ### Aggregated outputs
 - `results/aggregated/AGG_ROOT_mean_std_metrics__by_variant_seed_and_size.csv`  
-  Principal-setting mean/std metrics.
+  principal-setting mean/std metrics
 - `results/aggregated/AGG_ROOT_mean_std_drop__by_variant_seed_and_size.csv`  
-  Robustness-drop summaries by variant, seed, and size.
+  robustness-drop summaries by variant, seed, and size
 - `results/aggregated/AGG_ROOT_ranking_tradeoff__by_variant_seed_and_size.csv`  
-  Family-level ranking summaries under the tradeoff view.
+  family-level ranking summaries under the tradeoff view
 - `results/aggregated/AGG_ROOT_topK__by_variant_seed_and_size.txt`  
-  Human-readable top-K ranking summaries.
+  human-readable top-K ranking summaries
 
 ### Manuscript-facing tables
 - `results/tables/table_18settings_best_ood__with_std.csv`  
-  Main Best-by-OOD principal-setting table.
+  main Best-by-OOD principal-setting table
 - `results/tables/table_18settings_best_id__with_std.csv`  
-  Best-by-ID principal-setting table.
+  Best-by-ID principal-setting table
 - `results/tables/table_18settings_best_drop__with_std.csv`  
-  Principal-setting robustness-drop table.
+  principal-setting robustness-drop table
 - `results/tables/table_90cells_dimlevel_best_ood__with_std.csv`  
-  Dimension-level Best-by-OOD table.
+  dimension-level Best-by-OOD table
 - `results/tables/table_top10_cases_ood__with_std.csv`  
-  Top OOD cases.
+  top OOD cases
 
 ---
 
@@ -441,23 +476,17 @@ Keeping both views explicit prevents robustness claims from being smuggled in th
 
 ---
 
-## Reproducibility status of this snapshot
+## Reproducibility status
 
 This repository snapshot is suitable for:
 
 - methodology inspection,
 - result traceability,
 - reduced real execution validation,
+- package-level installation checks,
 - manuscript-facing reporting.
 
-Any remaining publication-grade work is packaging-related rather than scientific, such as:
-
-- final release tagging,
-- DOI archiving,
-- optional archival lockfile export,
-- release-note polishing.
-
-These tasks do **not** change the validated scientific pipeline described here.
+The core scientific pipeline is already released and archived. Any future refinements should be interpreted as metadata, packaging, or presentation improvements rather than changes to the validated experimental design.
 
 ---
 
@@ -474,13 +503,13 @@ These tasks do **not** change the validated scientific pipeline described here.
 
 Software citation metadata is provided in `CITATION.cff`.
 
-If you use this repository, please cite the archived software release associated with this version.
+If you use this repository, please cite the archived software release associated with the public Zenodo record below.
 
 ### Archived software release
-- Version DOI: `10.5281/zenodo.19147650`
-- Record URL: `https://doi.org/10.5281/zenodo.19147650`
+- DOI: `10.5281/zenodo.19147650`
 
 ### Recommended software citation
+
 ```bibtex
 @software{fernandez_barrios_2026_kernel_shift_framework,
   author  = {Fernández-Barrios, Roberto and Pastor-López, Iker and González-Santocildes, Asier and Garcia Bringas, Pablo},
@@ -495,8 +524,6 @@ If you use this repository, please cite the archived software release associated
 If relevant to your work, please also cite the accompanying manuscript:
 
 **_Comparing Quantum and Classical Kernels under Distribution Shift: A Controlled Kernel-Swap Study on EMBER Malware Detection_**
-
-> If you publish a follow-up GitHub release containing DOI-aware metadata updates, update the version and DOI in both `README.md` and `CITATION.cff` so that the repository metadata matches the archived Zenodo snapshot exactly.
 
 ---
 

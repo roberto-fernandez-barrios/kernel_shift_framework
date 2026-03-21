@@ -1,83 +1,79 @@
-# Reproducibility Notes
+# Reproducibility notes
 
-This repository includes both the **code required to execute the experimental pipeline** and the **canonical final result artifacts** used to support the manuscript-level claims.
+This repository contains the manuscript-facing aggregated CSV files and table exports used to support the main empirical claims, together with the code paths needed to inspect, validate, and rerun the experimental pipeline in reduced form.
 
-## Reproducibility level achieved in this release
+## What is reproducible from this snapshot
 
-This release has been validated through a **reduced end-to-end execution** of the workflow, including:
+From this repository snapshot, a reader can reproduce or directly inspect:
 
-- EMBER extraction
-- JSONL export to `X.npy / y.npy`
-- master split generation
-- q-split generation
-- reduced classical execution
-- reduced quantum execution
-- reduced end-to-end orchestration
-- final table generation from aggregated root-level CSVs
+- the repository structure and CLI entry points,
+- the controlled kernel-swap methodology,
+- the mapping between included result artifacts and manuscript-facing tables,
+- the package-installation path defined by `pyproject.toml`,
+- the recommended environment setup via `environment.yml`,
+- the pinned top-level pip setup via `requirements.txt`,
+- reduced real end-to-end validation of the pipeline,
+- reporting-table regeneration from included aggregate artifacts.
 
-This is sufficient to demonstrate that the repository is operational as a reproducible research artifact.
+## Why this snapshot is stronger than a minimal code supplement
 
-## Canonical versioned outputs
+Compared with a bare paper supplement, this release includes:
 
-The repository should treat the following as the **canonical final result artifacts**:
+- explicit environment files,
+- reusable scripts for extraction, export, split generation, orchestration, and reporting,
+- smoke-test support,
+- package-installation validation in CI,
+- CI coverage on **Python 3.11 and 3.12**,
+- manuscript-facing aggregate and table artifacts already organized in dedicated result folders.
 
-- `results/aggregated/`
-- `results/tables/`
+## Dependency views in this repository
 
-These are the outputs that should remain under version control because they are compact, interpretable, and directly useful for readers and reviewers.
+This repository intentionally ships multiple dependency views because they serve different reproducibility goals:
 
-## Intentionally excluded artifacts
-
-The following classes of artifacts are intentionally excluded from version control because they are large, local, regenerable, or debug-oriented:
-
-- extracted EMBER raw data
-- processed `X.npy / y.npy` arrays
-- generated split directories
-- sanity validation directories
-- local pipeline-validation internals
-- memmaps
-- local logs
-- regenerable smoke-test reports
-
-This separation is deliberate: it keeps the public repository focused on **reproducibility, readability, and auditability**, not on storing every intermediate runtime artifact.
-
-## Environment files provided
-
-The repository provides three complementary environment descriptions:
-
-- `requirements.txt` — pinned top-level environment
+- `environment.yml` — recommended Conda environment for normal use
+- `requirements.txt` — pinned top-level pip environment
 - `requirements-compat.txt` — looser compatibility envelope
-- `environment.yml` — Conda environment entry point
+- `environment.lock.yml` — more explicit Conda snapshot, if needed
+- `requirements.lock.txt` — more explicit pip snapshot, if needed
 
-These are sufficient for practical reproducibility.
+Normal use:
 
-## Optional stronger closure
+- use `environment.yml` for the standard Conda path,
+- use `requirements.txt` for the standard pip path,
+- use the lockfiles only when you specifically want a closer archival rerun.
 
-For an archival-grade release, the following optional additions would further strengthen reproducibility:
+## What still remains outside strict archival reproducibility
 
-- `environment.lock.yml` exported from the validated machine
-- `requirements.lock.txt` from `pip freeze`
-- brief hardware/runtime notes for the quantum branch
-- archival DOI and release tag metadata
+The following would strengthen *exact* archival reruns further, but are not required for this repository to function as a reproducible public software artifact:
 
-These are improvements, not blockers.
+- a fully hashed transitive pip lock generated from the exact machine used for the manuscript-facing runs,
+- a fully explicit Conda export from that same final environment,
+- detailed hardware/runtime notes for readers who want stricter comparison of the quantum branch runtime context,
+- final legal confirmation that the chosen open-source license matches the actual rights holder.
 
-## Dry-run note
+## Important note on release archives and DOI records
 
-The `--dry-run` mode of `scripts/ember/run_compare_q_vs_c_full.py` should be understood as a **preview of the execution plan**, not as a substitute for a real reduced run.
+The repository may evolve after a public archival release. Zenodo DOIs refer to specific archived release snapshots, not to the moving `main` branch.
 
-In this repository state, both have been validated:
+That means:
 
-- the reduced real run confirms operational behavior
-- the corrected `--dry-run` confirms preview integrity
+- the GitHub default branch may contain newer documentation or metadata than an older archived DOI snapshot,
+- readers seeking exact software citation should use the DOI associated with the specific public release they are citing.
+
+## Important note on `--dry-run`
+
+The `--dry-run` mode of `scripts/ember/run_compare_q_vs_c_full.py` should be understood as a **pipeline preview mode**.
+
+It is useful for checking orchestration intent and command generation, but it is not a replacement for reduced real execution on prepared data.
+
+## Python-version note
+
+The recommended local setup is centered on **Python 3.12** for simplicity and consistency.
+
+At the same time, public CI validates package installation and smoke/reporting paths on **Python 3.11 and 3.12**, which provides a stronger public compatibility signal than a single-version local recommendation.
 
 ## Practical conclusion
 
-The repository now offers a sound level of practical reproducibility for public release:
+This repository should be understood as a **reproducible research framework with reduced end-to-end validation and release-grade reporting artifacts**, rather than as an exact machine-image capture of the original full paper-scale runtime environment.
 
-- the workflow is executable
-- the final reporting stage is executable
-- the canonical outputs are preserved
-- non-essential runtime internals are excluded
-
-That is the right balance for a publication-facing research repository.
+That level of reproducibility is appropriate for a public research release and materially stronger than a repository that provides only code without validated execution paths or organized result artifacts.
