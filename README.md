@@ -9,7 +9,7 @@ A reproducible experimental framework for **controlled kernel comparison under d
 
 **Case study implemented in this release:** EMBER static malware detection  
 **Associated manuscript:**  
-**_Comparing Quantum and Classical Kernels under Distribution Shift: A Controlled Kernel-Swap Study on EMBER Malware Detection_**
+**_Quantum and Classical Kernels under Distribution Shift: A Controlled Kernel-Swap Study on EMBER Malware Detection_**
 
 This repository should be read as a **reproducible experimental framework**, not as a flat code supplement. Its central design principle is a **controlled kernel-swap protocol** in which the dataset, split logic, preprocessing, classifier family, repeated-run structure, and reporting views are held fixed while only the **kernel** changes.
 
