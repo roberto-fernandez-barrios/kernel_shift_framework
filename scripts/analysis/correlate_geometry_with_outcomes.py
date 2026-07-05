@@ -44,6 +44,7 @@ def load_geometry(grid_dir: Path) -> pd.DataFrame:
         df["variant_name"] = m.group("variant")
         df["master_seed"] = int(m.group("ms"))
         df["size_tag"] = "size_q" + m.group("qtag")
+        df["qsplit_seed"] = int(m.group("qs"))
         frames.append(df)
     return pd.concat(frames, ignore_index=True)
 
@@ -86,6 +87,14 @@ def setting_features(geo: pd.DataFrame, out_row: pd.Series) -> Dict[str, float]:
     )
     f["fam_eff_rank_max_q"] = float(gq.spec_train_eff_rank.max())
     f["fam_novelty_ratio_mean_q_minus_c"] = float(gq.ood_novelty_ratio.mean() - gc.ood_novelty_ratio.mean())
+
+    # Fully a-priori variant: select the quantum config by TRAIN kernel-target
+    # alignment only (no ID/OOD information), then read off its effective rank.
+    # If this discriminates the classical-favorable settings, the criterion is
+    # computable before deployment.
+    q_by_train_kta = gq.loc[gq.kta_train.idxmax()]
+    f["apriori_eff_rank_q_at_best_train_kta"] = float(q_by_train_kta["spec_train_eff_rank"])
+    f["apriori_gd1e-2_vs_rbf_at_best_train_kta"] = float(q_by_train_kta["gd_vs_rbf_gscale_lam0.01"])
     return f
 
 
@@ -98,27 +107,38 @@ def main() -> None:
 
     geo_all = load_geometry(args.grid_dir)
     outcomes = pd.read_csv(args.outcomes)
+    qsplit_seeds = sorted(geo_all.qsplit_seed.unique())
 
-    rows: List[Dict[str, float]] = []
+    # Features per (setting, qsplit seed).
+    per_seed_rows: List[Dict[str, float]] = []
     for _, out_row in outcomes.iterrows():
         key = (out_row["variant_name"], int(out_row["master_seed"]), out_row["size_tag"])
-        geo = geo_all[
-            (geo_all.variant_name == key[0])
-            & (geo_all.master_seed == key[1])
-            & (geo_all.size_tag == key[2])
-        ]
-        if geo.empty:
-            raise RuntimeError(f"No geometry rows for setting {key}")
-        f = setting_features(geo, out_row)
-        f.update(
-            variant=key[0], master_seed=key[1], size_tag=key[2],
-            delta_ood=float(out_row["delta_ood_bal_acc_mean"]),
-            winner=str(out_row["winner_ood_bal_acc_mean"]),
-        )
-        rows.append(f)
+        for qs in qsplit_seeds:
+            geo = geo_all[
+                (geo_all.variant_name == key[0])
+                & (geo_all.master_seed == key[1])
+                & (geo_all.size_tag == key[2])
+                & (geo_all.qsplit_seed == qs)
+            ]
+            if geo.empty:
+                raise RuntimeError(f"No geometry rows for setting {key} qs={qs}")
+            f = setting_features(geo, out_row)
+            f.update(
+                variant=key[0], master_seed=key[1], size_tag=key[2], qsplit_seed=qs,
+                delta_ood=float(out_row["delta_ood_bal_acc_mean"]),
+                winner=str(out_row["winner_ood_bal_acc_mean"]),
+            )
+            per_seed_rows.append(f)
 
-    df = pd.DataFrame(rows)
-    feature_cols = [c for c in df.columns if c.startswith(("sel_", "fam_"))]
+    df_seeds = pd.DataFrame(per_seed_rows)
+    feature_cols = [c for c in df_seeds.columns if c.startswith(("sel_", "fam_", "apriori_"))]
+
+    # Main analysis on the qsplit-seed mean (variability-aware, one point per setting).
+    keys = ["variant", "master_seed", "size_tag"]
+    df = (
+        df_seeds.groupby(keys, as_index=False)
+        .agg({**{c: "mean" for c in feature_cols}, "delta_ood": "first", "winner": "first"})
+    )
 
     # 1) correlation with the continuous OOD delta
     corr_rows = []
@@ -147,18 +167,44 @@ def main() -> None:
         })
 
     corr = pd.DataFrame(corr_rows).sort_values("mannwhitney_p")
+
+    # Per-qsplit-seed stability of the separation (AUC per seed, per feature).
+    stab_rows = []
+    for c in feature_cols:
+        aucs = []
+        for qs in qsplit_seeds:
+            sub = df_seeds[df_seeds.qsplit_seed == qs]
+            x = sub[c].to_numpy()
+            cls = (sub["winner"] == "classical").to_numpy()
+            u = stats.mannwhitneyu(x[~cls], x[cls], alternative="two-sided")
+            aucs.append(u.statistic / (np.sum(~cls) * np.sum(cls)))
+        stab_rows.append({
+            "feature": c,
+            "auc_mean_across_seeds": round(float(np.mean(aucs)), 3),
+            "auc_min": round(float(np.min(aucs)), 3),
+            "auc_max": round(float(np.max(aucs)), 3),
+            "n_seeds": len(aucs),
+        })
+    stab = pd.DataFrame(stab_rows).sort_values("auc_mean_across_seeds", ascending=False)
+
     args.out_dir.mkdir(parents=True, exist_ok=True)
     df.to_csv(args.out_dir / "geometry_features_by_setting.csv", index=False)
+    df_seeds.to_csv(args.out_dir / "geometry_features_by_setting_and_qsplit.csv", index=False)
     corr.to_csv(args.out_dir / "geometry_outcome_correlations.csv", index=False)
+    stab.to_csv(args.out_dir / "geometry_outcome_auc_stability.csv", index=False)
 
     pd.set_option("display.width", 250)
-    print("=== Per-setting features (18 principal settings) ===")
+    print(f"=== Per-setting features (18 principal settings, mean over qsplit seeds {qsplit_seeds}) ===")
     show = ["variant", "master_seed", "size_tag", "winner", "delta_ood"] + feature_cols
     print(df[show].round(3).to_string(index=False))
-    print("\n=== Correlations & separation ===")
+    print("\n=== Correlations & separation (on qsplit-seed means) ===")
     print(corr.to_string(index=False))
+    print("\n=== AUC stability across individual qsplit seeds ===")
+    print(stab.to_string(index=False))
     print(f"\n[✓] Wrote {args.out_dir / 'geometry_features_by_setting.csv'}")
+    print(f"[✓] Wrote {args.out_dir / 'geometry_features_by_setting_and_qsplit.csv'}")
     print(f"[✓] Wrote {args.out_dir / 'geometry_outcome_correlations.csv'}")
+    print(f"[✓] Wrote {args.out_dir / 'geometry_outcome_auc_stability.csv'}")
 
 
 if __name__ == "__main__":

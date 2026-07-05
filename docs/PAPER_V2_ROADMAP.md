@@ -32,10 +32,17 @@ los regímenes clásico-favorables ya observados (concentrados en m2 / seed 42):
       asociados a los settings clásico-favorables. Los 3 settings m2/ms42
       corresponden a PauliXZ con rango efectivo colapsado (9–15), geometría
       casi clásica. Código: `src/analysis/` + `scripts/analysis/`.
-- [ ] Robustez: repetir geometría con los 5 qsplit seeds (42,123,999,7,2024).
-- [ ] Variante a priori: seleccionar config por KTA de train (sin mirar OOD) y
-      testear si su rango efectivo predice el ganador — cierra el argumento
-      "computable antes de desplegar".
+- [x] Robustez: geometría con los 5 qsplit seeds (90 combos). El rango efectivo
+      del kernel cuántico seleccionado se REFUERZA: AUC 0.929 (p=0.008) sobre
+      medias entre seeds, rango por seed [0.84, 0.95]. El drop de KTA se
+      debilita (AUC ~0.73 en dirección consistente, no significativo). La
+      geometric difference a λ=0.01 correlaciona NEGATIVAMENTE con ΔOOD
+      (r=−0.52, p=0.026): grande-g es necesario pero no suficiente (consistente
+      con Huang et al.).
+- [x] Variante a priori (selección por KTA de train): NO predice (AUC 0.38-0.46).
+      Resultado negativo honesto — el mecanismo es diagnóstico/explicativo, no
+      un criterio de despliegue. Encaja con la lección del Paper 2 (la señal
+      pre-despliegue barata no existe; hace falta validación).
 
 Insumo: matrices de kernel ya generadas por el pipeline existente (results/).
 
