@@ -21,13 +21,21 @@ outperform classical kernels under distribution shift"*.
 No se busca un teorema, sino cantidades geométricas computables que **predigan**
 los regímenes clásico-favorables ya observados (concentrados en m2 / seed 42):
 
-- [ ] Geometric difference g(K_C, K_Q) de Huang et al. (2021), por setting y dimensión.
-- [ ] Espectro de las matrices de kernel (decaimiento de autovalores) en ID vs OOD.
-- [ ] Concentración del kernel (media/varianza de entradas off-diagonal, efecto
+- [x] Geometric difference g(K_C, K_Q) de Huang et al. (2021), por setting y dimensión.
+- [x] Espectro de las matrices de kernel (decaimiento de autovalores) en ID vs OOD.
+- [x] Concentración del kernel (media/varianza de entradas off-diagonal, efecto
       bandwidth) en ID vs OOD, por familia.
-- [ ] Kernel–target alignment en ID vs OOD.
-- [ ] Test de la hipótesis: ¿alguna de estas cantidades, computada a priori,
-      separa los 4 settings donde gana el clásico de los 14 donde gana el cuántico?
+- [x] Kernel–target alignment en ID vs OOD.
+- [x] Test de la hipótesis sobre el grid (qsplit seed 42): el rango efectivo del
+      kernel cuántico seleccionado (AUC 0.89, MW p=0.018, Pearson r=0.61 con
+      ΔOOD) y el drop relativo de alignment ID→OOD (AUC 0.14, p=0.035) están
+      asociados a los settings clásico-favorables. Los 3 settings m2/ms42
+      corresponden a PauliXZ con rango efectivo colapsado (9–15), geometría
+      casi clásica. Código: `src/analysis/` + `scripts/analysis/`.
+- [ ] Robustez: repetir geometría con los 5 qsplit seeds (42,123,999,7,2024).
+- [ ] Variante a priori: seleccionar config por KTA de train (sin mirar OOD) y
+      testear si su rango efectivo predice el ganador — cierra el argumento
+      "computable antes de desplegar".
 
 Insumo: matrices de kernel ya generadas por el pipeline existente (results/).
 
