@@ -63,9 +63,9 @@ consistente con el framing conservador de la v1.
 
 ## Checklist arXiv (v1, previo a todo lo anterior)
 
-- [ ] Recuperar el proyecto compilable completo (Overleaf): `sn-jnl.cls` y familia,
-      `paper_assets/fig_*.png` (3 figuras). En este repo solo están
-      `paper/sn-article.tex` y `paper/sn-bibliography.bib`.
+- [x] Recuperar el proyecto compilable completo: ahora en `manuscript/`
+      (`sn-article.tex`, `sn-bibliography.bib`, `sn-jnl.cls`, `sn-mathphys-ay.bst`,
+      3 figuras `fig_*.png` y el PDF compilado).
 - [ ] Compilar y añadir el `.bbl` (arXiv no ejecuta BibTeX).
 - [ ] Subir a arXiv: categoría primaria `quant-ph`, cross-list `cs.LG` (y opcional
       `cs.CR`). Licencia recomendada: arXiv non-exclusive license.

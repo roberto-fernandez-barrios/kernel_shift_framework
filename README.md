@@ -227,9 +227,13 @@ This repository does **not** redistribute the EMBER dataset itself. The intended
 ├── results/
 │   ├── aggregated/
 │   └── tables/
-├── paper/
+├── manuscript/
 │   ├── sn-article.tex
-│   └── sn-bibliography.bib
+│   ├── sn-bibliography.bib
+│   ├── sn-jnl.cls
+│   ├── sn-mathphys-ay.bst
+│   ├── fig_*.png
+│   └── Manuscript.pdf
 ├── docs/
 │   ├── FINAL_RELEASE_CHECKLIST.md
 │   ├── REPRODUCIBILITY_NOTES.md
@@ -243,7 +247,7 @@ Top-level intent:
 - `src/` contains reusable code and experiment logic
 - `scripts/` contains runnable orchestration and reporting entry points
 - `results/` contains aggregated outputs and manuscript-facing tables
-- `paper/` contains the manuscript source
+- `manuscript/` contains the complete manuscript source (LaTeX project, figures, and compiled PDF)
 - `docs/` contains supporting release and reproducibility notes
 
 ---
