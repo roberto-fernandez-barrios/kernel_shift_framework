@@ -51,12 +51,22 @@ Insumo: matrices de kernel ya generadas por el pipeline existente (results/).
 Responde a: *"probabilistic approaches (GPs, DKL, Bayesian SVMs) entirely absent;
 gains over two narrow classical baselines"*.
 
-- [ ] Gaussian Process classifier con kernel precomputado, mismo protocolo
-      kernel-swap (mismo preprocesado, mismos splits). Aporta además
-      incertidumbre bajo shift (calibración ID vs OOD como métrica secundaria).
-- [ ] Kernels clásicos adicionales: polinomial, Laplaciano, Matérn (ν = 1/2, 3/2, 5/2).
-- [ ] Opcional (si hay tiempo): SVM bayesiano o DKL pequeño; si no, justificar
-      por qué GPC cubre la objeción de cuantificación de incertidumbre.
+- [x] Gaussian Process classifier (Laplace, R&W Alg. 3.1/3.2) con kernel
+      precomputado, mismo protocolo. Métricas: log-loss, Brier, ECE, entropía
+      predictiva ID vs OOD. Runner: `src/experiments/ember/extended/`.
+- [x] Kernels clásicos adicionales: poly 2/3, Laplaciano, Matérn 3/2 y 5/2
+      (median heuristic train-only).
+- [x] Resultado (18 settings, 1 run/celda, qs42/ms42): la ventaja OOD cuántica
+      se sostiene vs linear+RBF (SVC 15/18 +0.035; GPC 16/18 +0.031) pero vs la
+      familia ampliada queda en tablas con SVC (7/18, −0.002) y en mayoría débil
+      con GPC (12/18, +0.005). El challenger es el Laplaciano (seleccionado
+      ~13/18). La ventaja ID sobrevive a todo (16-18/18). Geometría: gradiente
+      monótono rango efectivo ↔ supervivencia del KTA dentro de la familia
+      clásica (linear 1.2/−0.017 → Laplaciano 17.7/+0.019) — el mecanismo del
+      workstream A explica el resultado del B.
+- [ ] Runs repetidos (5 qsplit × 3 model seeds) para los números de cabecera.
+- [ ] Opcional: justificar en el paper por qué GPC-Laplace cubre la objeción de
+      incertidumbre (no hace falta DKL/SVM bayesiano).
 
 ## Workstream C — Datasets adicionales (prioridad 3, mayor riesgo)
 
