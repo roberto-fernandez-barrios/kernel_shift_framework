@@ -64,7 +64,15 @@ gains over two narrow classical baselines"*.
       monótono rango efectivo ↔ supervivencia del KTA dentro de la familia
       clásica (linear 1.2/−0.017 → Laplaciano 17.7/+0.019) — el mecanismo del
       workstream A explica el resultado del B.
-- [ ] Runs repetidos (5 qsplit × 3 model seeds) para los números de cabecera.
+- [x] Runs repetidos completados (18 settings × 15 runs = 270). Números finales
+      (Best-by-OOD, medias de 15 runs): cuántico vs linear+RBF gana 17/18 (SVC,
+      Δ+0.037, effect>1 en 12) y 15/18 (GPC, Δ+0.028, effect>1 en 11); vs
+      familia ampliada mantiene mayoría de wins (SVC 15/18, GPC 11/18) pero el
+      Δ medio colapsa a +0.002/+0.004 y el effect>1 desaparece (0-1/18) — la
+      ventaja OOD es estadísticamente indistinguible del ruido contra el
+      Laplaciano (seleccionado 13-14/18, casi siempre d12). Best-by-ID:
+      cuántico 18/18 contra AMBAS familias, effect>1 en 11-18 — la ventaja de
+      separabilidad ID es el resultado robusto.
 - [ ] Opcional: justificar en el paper por qué GPC-Laplace cubre la objeción de
       incertidumbre (no hace falta DKL/SVM bayesiano).
 
