@@ -29,10 +29,9 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pandas as pd
 
-from src.experiments.ember.classical.run_ember_classical_kernel_sparsity_shift_qsplits import (
-    gamma_scale_from_X,
-    kernel_linear,
-    kernel_rbf,
+from src.experiments.ember.extended.run_ember_extended_kernels_qsplits import (
+    CLASSICAL_KERNELS as EXTENDED_CLASSICAL_KERNELS,
+    ClassicalKernelFactory,
 )
 from src.experiments.ember.quantum.run_ember_quantum_kernel_sparsity_shift_qsplits import (
     DEFAULT_QUANTUM_CONFIGS,
@@ -52,44 +51,23 @@ DEFAULT_GD_LAMBDAS = [1e-6, 1e-4, 1e-2]
 # ----------------------------
 # Kernel construction (mirrors the runners)
 # ----------------------------
-def cosine_normalize(K: np.ndarray, diag_a: np.ndarray, diag_b: np.ndarray, eps: float = 1e-12) -> np.ndarray:
-    inv_a = 1.0 / np.sqrt(np.maximum(diag_a, eps))
-    inv_b = 1.0 / np.sqrt(np.maximum(diag_b, eps))
-    return K * inv_a[:, None] * inv_b[None, :]
-
-
 def classical_kernel_blocks(
+    factory: ClassicalKernelFactory,
     name: str,
     X_tr: np.ndarray,
     X_id: np.ndarray,
     X_ood: np.ndarray,
 ) -> Dict[str, np.ndarray]:
-    """Returns unit-diagonal kernel blocks for a classical kernel.
-
-    Linear kernels are cosine-normalized (as in the classical runner with
-    kernel normalization enabled); RBF already has unit diagonal.
-    """
-    if name == "linear":
-        d_tr = np.einsum("ij,ij->i", X_tr, X_tr)
-        d_id = np.einsum("ij,ij->i", X_id, X_id)
-        d_ood = np.einsum("ij,ij->i", X_ood, X_ood)
-        return {
-            "train": cosine_normalize(kernel_linear(X_tr, X_tr), d_tr, d_tr),
-            "id_cross": cosine_normalize(kernel_linear(X_id, X_tr), d_id, d_tr),
-            "ood_cross": cosine_normalize(kernel_linear(X_ood, X_tr), d_ood, d_tr),
-            "id_within": cosine_normalize(kernel_linear(X_id, X_id), d_id, d_id),
-            "ood_within": cosine_normalize(kernel_linear(X_ood, X_ood), d_ood, d_ood),
-        }
-    if name == "rbf_gscale":
-        gamma = gamma_scale_from_X(X_tr)
-        return {
-            "train": kernel_rbf(X_tr, X_tr, gamma),
-            "id_cross": kernel_rbf(X_id, X_tr, gamma),
-            "ood_cross": kernel_rbf(X_ood, X_tr, gamma),
-            "id_within": kernel_rbf(X_id, X_id, gamma),
-            "ood_within": kernel_rbf(X_ood, X_ood, gamma),
-        }
-    raise ValueError(f"Unknown classical kernel: {name}")
+    """Unit-diagonal kernel blocks for a classical kernel, delegating to the
+    extended-runner factory so both analyses share one construction (all
+    hyperparameters are fit on train only)."""
+    return {
+        "train": factory.block(name, X_tr, X_tr),
+        "id_cross": factory.block(name, X_id, X_tr),
+        "ood_cross": factory.block(name, X_ood, X_tr),
+        "id_within": factory.block(name, X_id, X_id),
+        "ood_within": factory.block(name, X_ood, X_ood),
+    }
 
 
 def quantum_kernel_blocks(
@@ -193,6 +171,8 @@ def geometric_differences(
     Eigendecompositions are computed once per kernel and reused across the
     (classical, quantum, lambda) grid. Returns {q_name: {column: g}}.
     """
+    if not quantum_train:
+        return {}
     n = next(iter(classical_train.values())).shape[0]
 
     sqrt_q: Dict[str, np.ndarray] = {}
@@ -250,7 +230,10 @@ def main() -> None:
     ap.add_argument("--dims", type=int, nargs="+", default=DEFAULT_DIMS)
     ap.add_argument("--gd-lambdas", type=float, nargs="+", default=DEFAULT_GD_LAMBDAS)
     ap.add_argument("--setting-label", type=str, default="", help="Free-form label (variant/master-seed/size) stored in the output rows.")
-    ap.add_argument("--quantum-configs-json", type=str, default="")
+    ap.add_argument("--classical-kernels", type=str, nargs="+", default=["linear", "rbf_gscale"],
+                    choices=EXTENDED_CLASSICAL_KERNELS)
+    ap.add_argument("--quantum-configs-json", type=str, default="",
+                    help="JSON list of quantum configs; pass a file containing [] to skip quantum kernels.")
     ap.add_argument("--save-spectra", action="store_true", help="Also store full train-kernel spectra as .npz.")
     ap.add_argument("--mmap", action="store_true")
     args = ap.parse_args()
@@ -291,8 +274,9 @@ def main() -> None:
         classical_train_blocks: Dict[str, np.ndarray] = {}
         all_blocks: Dict[str, Dict[str, np.ndarray]] = {}
 
-        for cname in ["linear", "rbf_gscale"]:
-            blocks = classical_kernel_blocks(cname, X_tr, X_id, X_ood)
+        factory = ClassicalKernelFactory(X_tr, seed=int(args.seed))
+        for cname in args.classical_kernels:
+            blocks = classical_kernel_blocks(factory, cname, X_tr, X_id, X_ood)
             all_blocks[cname] = blocks
             classical_train_blocks[cname] = blocks["train"]
 
@@ -307,7 +291,7 @@ def main() -> None:
         )
 
         for kname, blocks in all_blocks.items():
-            family = "classical" if kname in ("linear", "rbf_gscale") else "quantum"
+            family = "classical" if kname in classical_train_blocks else "quantum"
             row: Dict[str, Any] = {
                 "setting_label": args.setting_label or splits_dir.name,
                 "splits_dir": str(splits_dir),

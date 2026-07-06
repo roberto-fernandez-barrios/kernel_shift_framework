@@ -61,6 +61,10 @@ def main() -> None:
                     help="Triples n_train,n_id,n_ood")
     ap.add_argument("--skip-masters", action="store_true", help="Assume master splits already exist.")
     ap.add_argument("--save-spectra", action="store_true")
+    ap.add_argument("--classical-kernels", nargs="+", default=None,
+                    help="Pass through to the analysis module (default: its own default).")
+    ap.add_argument("--quantum-configs-json", type=str, default="",
+                    help="Pass through; a file containing [] skips quantum kernels.")
     args = ap.parse_args()
 
     sizes = []
@@ -123,6 +127,10 @@ def main() -> None:
                            "--mmap"]
                     if args.save_spectra:
                         cmd.append("--save-spectra")
+                    if args.classical_kernels:
+                        cmd += ["--classical-kernels", *args.classical_kernels]
+                    if args.quantum_configs_json:
+                        cmd += ["--quantum-configs-json", args.quantum_configs_json]
                     run(cmd, args.log_dir / f"geometry__{label}.log")
                     n_settings += 1
                     print(f"[OK] {label} in {time.time() - t0:.0f}s "
