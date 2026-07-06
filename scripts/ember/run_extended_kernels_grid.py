@@ -41,7 +41,7 @@ def main() -> None:
     ap.add_argument("--variants", nargs="+", default=DEFAULT_VARIANTS)
     ap.add_argument("--master-seeds", nargs="+", type=int, default=DEFAULT_MASTER_SEEDS)
     ap.add_argument("--qsplit-seeds", nargs="+", type=int, default=[42])
-    ap.add_argument("--model-seed", type=int, default=42)
+    ap.add_argument("--model-seeds", nargs="+", type=int, default=[42])
     ap.add_argument("--dims", nargs="+", type=int, default=DEFAULT_DIMS)
     ap.add_argument("--sizes", nargs="+", default=[f"{a},{b},{c}" for a, b, c in PAPER_SIZES])
     args = ap.parse_args()
@@ -64,27 +64,28 @@ def main() -> None:
                     if not (qdir / "train_idx.npy").exists():
                         raise RuntimeError(f"Missing q-split (run the geometry grid driver first): {qdir}")
 
-                    label = f"{variant}__ms{ms}__q{n_train}_id{n_id}_ood{n_ood}__qs{qs}"
-                    out_dir = args.out_root / label
-                    if (out_dir / "extended_kernels_qsplits__summary.csv").exists():
-                        print(f"[SKIP] {label}")
-                        n_done += 1
-                        continue
+                    for mseed in args.model_seeds:
+                        label = f"{variant}__ms{ms}__q{n_train}_id{n_id}_ood{n_ood}__qs{qs}__s{mseed}"
+                        out_dir = args.out_root / label
+                        if (out_dir / "extended_kernels_qsplits__summary.csv").exists():
+                            print(f"[SKIP] {label}")
+                            n_done += 1
+                            continue
 
-                    t0 = time.time()
-                    run(
-                        [py, "-m", "src.experiments.ember.extended.run_ember_extended_kernels_qsplits",
-                         "--splits-dir", str(qdir),
-                         "--out-dir", str(out_dir),
-                         "--seed", str(args.model_seed),
-                         "--dims", *[str(d) for d in args.dims],
-                         "--include-quantum",
-                         "--mmap"],
-                        args.log_dir / f"extended__{label}.log",
-                    )
-                    n_done += 1
-                    print(f"[OK] {label} in {time.time() - t0:.0f}s "
-                          f"({n_done} done, {(time.time() - t_start) / 60:.1f} min total)")
+                        t0 = time.time()
+                        run(
+                            [py, "-m", "src.experiments.ember.extended.run_ember_extended_kernels_qsplits",
+                             "--splits-dir", str(qdir),
+                             "--out-dir", str(out_dir),
+                             "--seed", str(mseed),
+                             "--dims", *[str(d) for d in args.dims],
+                             "--include-quantum",
+                             "--mmap"],
+                            args.log_dir / f"extended__{label}.log",
+                        )
+                        n_done += 1
+                        print(f"[OK] {label} in {time.time() - t0:.0f}s "
+                              f"({n_done} done, {(time.time() - t_start) / 60:.1f} min total)")
 
     print(f"[✓] Extended grid complete: {n_done} combos in {(time.time() - t_start) / 60:.1f} min")
 
