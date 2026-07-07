@@ -55,6 +55,8 @@ def main() -> None:
     ap.add_argument("--sizes", nargs="+", default=[f"{a},{b},{c}" for a, b, c in PAPER_SIZES])
     ap.add_argument("--skip-geometry", action="store_true")
     ap.add_argument("--skip-extended", action="store_true")
+    ap.add_argument("--rbf-gamma-factors", nargs="+", type=float, default=[])
+    ap.add_argument("--quantum-angle-scales", nargs="+", type=float, default=[])
     args = ap.parse_args()
 
     sizes = [tuple(int(x) for x in s.split(",")) for s in args.sizes]
@@ -122,17 +124,19 @@ def main() -> None:
                                 out_dir = args.results_root / "extended_kernels" / label
                                 if not (out_dir / "extended_kernels_qsplits__summary.csv").exists():
                                     t0 = time.time()
-                                    run(
-                                        [py, "-m", "src.experiments.ember.extended.run_ember_extended_kernels_qsplits",
-                                         "--in-dir", str(data_dir),
-                                         "--splits-dir", str(qdir),
-                                         "--out-dir", str(out_dir),
-                                         "--seed", str(mseed),
-                                         "--dims", *[str(d) for d in args.dims],
-                                         "--include-quantum",
-                                         "--mmap"],
-                                        log_dir / f"extended__{label}.log",
-                                    )
+                                    cmd = [py, "-m", "src.experiments.ember.extended.run_ember_extended_kernels_qsplits",
+                                           "--in-dir", str(data_dir),
+                                           "--splits-dir", str(qdir),
+                                           "--out-dir", str(out_dir),
+                                           "--seed", str(mseed),
+                                           "--dims", *[str(d) for d in args.dims],
+                                           "--include-quantum",
+                                           "--mmap"]
+                                    if args.rbf_gamma_factors:
+                                        cmd += ["--rbf-gamma-factors", *[f"{f:g}" for f in args.rbf_gamma_factors]]
+                                    if args.quantum_angle_scales:
+                                        cmd += ["--quantum-angle-scales", *[f"{s:g}" for s in args.quantum_angle_scales]]
+                                    run(cmd, log_dir / f"extended__{label}.log")
                                     print(f"[OK] extended {label} in {time.time() - t0:.0f}s")
 
                             if not args.skip_geometry and mseed == args.model_seeds[0]:

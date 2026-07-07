@@ -44,6 +44,8 @@ def main() -> None:
     ap.add_argument("--model-seeds", nargs="+", type=int, default=[42])
     ap.add_argument("--dims", nargs="+", type=int, default=DEFAULT_DIMS)
     ap.add_argument("--sizes", nargs="+", default=[f"{a},{b},{c}" for a, b, c in PAPER_SIZES])
+    ap.add_argument("--rbf-gamma-factors", nargs="+", type=float, default=[])
+    ap.add_argument("--quantum-angle-scales", nargs="+", type=float, default=[])
     args = ap.parse_args()
 
     sizes = [tuple(int(x) for x in s.split(",")) for s in args.sizes]
@@ -73,16 +75,18 @@ def main() -> None:
                             continue
 
                         t0 = time.time()
-                        run(
-                            [py, "-m", "src.experiments.ember.extended.run_ember_extended_kernels_qsplits",
-                             "--splits-dir", str(qdir),
-                             "--out-dir", str(out_dir),
-                             "--seed", str(mseed),
-                             "--dims", *[str(d) for d in args.dims],
-                             "--include-quantum",
-                             "--mmap"],
-                            args.log_dir / f"extended__{label}.log",
-                        )
+                        cmd = [py, "-m", "src.experiments.ember.extended.run_ember_extended_kernels_qsplits",
+                               "--splits-dir", str(qdir),
+                               "--out-dir", str(out_dir),
+                               "--seed", str(mseed),
+                               "--dims", *[str(d) for d in args.dims],
+                               "--include-quantum",
+                               "--mmap"]
+                        if args.rbf_gamma_factors:
+                            cmd += ["--rbf-gamma-factors", *[f"{f:g}" for f in args.rbf_gamma_factors]]
+                        if args.quantum_angle_scales:
+                            cmd += ["--quantum-angle-scales", *[f"{s:g}" for s in args.quantum_angle_scales]]
+                        run(cmd, args.log_dir / f"extended__{label}.log")
                         n_done += 1
                         print(f"[OK] {label} in {time.time() - t0:.0f}s "
                               f"({n_done} done, {(time.time() - t_start) / 60:.1f} min total)")

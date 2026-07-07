@@ -27,6 +27,7 @@ from typing import Dict, List
 
 import numpy as np
 import pandas as pd
+from scipy import stats
 
 CLASSICAL_ORIG = ["linear", "rbf_gscale"]
 CLASSICAL_EXT = ["linear", "rbf_gscale", "poly2", "poly3", "laplacian_med", "matern15_med", "matern25_med"]
@@ -69,8 +70,21 @@ def aggregate_runs(data: pd.DataFrame) -> pd.DataFrame:
     return agg
 
 
-def best_by(g: pd.DataFrame, kernels: List[str], select_split: str) -> pd.Series:
-    sub = g[(g.kernel.isin(kernels)) & (g.split == select_split)]
+def family_mask(g: pd.DataFrame, family: str) -> pd.Series:
+    """Family membership by kernel-name prefix, so bandwidth-sweep variants
+    (rbf_gscale_x*, <map>__as*) land in the right family."""
+    is_quantum = g.kernel.map(lambda k: any(k.startswith(q) for q in QUANTUM))
+    if family == "quantum":
+        return is_quantum
+    if family == "classical_orig":
+        return g.kernel.isin(CLASSICAL_ORIG)
+    if family == "classical_ext":
+        return ~is_quantum
+    raise ValueError(family)
+
+
+def best_by(g: pd.DataFrame, family: str, select_split: str) -> pd.Series:
+    sub = g[family_mask(g, family) & (g.split == select_split)]
     return sub.loc[sub.bacc_mean.idxmax()]
 
 
@@ -101,9 +115,8 @@ def main() -> None:
             }
             for view, sel_split in [("ood", "ood_test"), ("id", "id_test")]:
                 fams = {
-                    "classical_orig": best_by(g, CLASSICAL_ORIG, sel_split),
-                    "classical_ext": best_by(g, CLASSICAL_EXT, sel_split),
-                    "quantum": best_by(g, QUANTUM, sel_split),
+                    fam: best_by(g, fam, sel_split)
+                    for fam in ["classical_orig", "classical_ext", "quantum"]
                 }
                 for fam, b in fams.items():
                     row[f"{view}_best_{fam}_cfg"] = b.cfg
@@ -131,19 +144,50 @@ def main() -> None:
     pd.set_option("display.width", 250)
     print(f"Runs per setting: min={res.n_runs.min()}, max={res.n_runs.max()}\n")
 
+    # Paired Wilcoxon signed-rank tests over settings, Holm-corrected within
+    # each classifier across the four (view, reference-family) comparisons.
+    wilcoxon_rows: List[Dict] = []
     for model in sorted(res.model.unique()):
         r = res[res.model == model]
         n = len(r)
         print(f"=== {model.upper()} (n={n} settings) ===")
+        pvals = []
         for view in ["ood", "id"]:
             for short, ref in [("orig", "classical_orig"), ("ext", "classical_ext")]:
                 d = r[f"{view}_delta_q_vs_{short}"]
                 e = r[f"{view}_effect_q_vs_{short}"]
+                try:
+                    w = stats.wilcoxon(d, alternative="two-sided")
+                    p_w = float(w.pvalue)
+                except ValueError:
+                    p_w = float("nan")
+                pvals.append(p_w)
+                wilcoxon_rows.append({
+                    "model": model, "view": view, "reference": ref, "n_settings": n,
+                    "wins": int((d > 0).sum()), "mean_delta": float(d.mean()),
+                    "median_delta": float(d.median()), "wilcoxon_p": p_w,
+                    "effect_gt1": int((e.abs() > 1).sum()),
+                    "effect_gt1_quantum": int((e > 1).sum()),
+                })
                 print(
                     f"  Best-by-{view.upper()} quantum vs {ref:15s}: wins {int((d > 0).sum())}/{n} | "
-                    f"mean Δ {d.mean():+.4f} | median Δ {d.median():+.4f} | effect>1 in {int((e.abs() > 1).sum())} "
+                    f"mean Δ {d.mean():+.4f} | median Δ {d.median():+.4f} | Wilcoxon p={p_w:.2e} | "
+                    f"effect>1 in {int((e.abs() > 1).sum())} "
                     f"(of which quantum-favorable {int((e > 1).sum())})"
                 )
+        # Holm correction within this classifier's four comparisons
+        order = np.argsort(pvals)
+        m_tests = len(pvals)
+        holm = [np.nan] * m_tests
+        running_max = 0.0
+        for rank, idx_p in enumerate(order):
+            adj = min(1.0, (m_tests - rank) * pvals[idx_p])
+            running_max = max(running_max, adj)
+            holm[idx_p] = running_max
+        for k, row in enumerate(wilcoxon_rows[-m_tests:]):
+            row["wilcoxon_p_holm"] = float(holm[k])
+        print(f"  (Holm-adjusted p over the 4 comparisons: "
+              f"{', '.join(f'{h:.2e}' for h in holm)})")
         if model == "gpc":
             print("  GPC uncertainty (Best-by-OOD configs, mean over settings):")
             for fam in ["classical_orig", "classical_ext", "quantum"]:
@@ -154,7 +198,10 @@ def main() -> None:
 
     print("=== Best-by-OOD selected kernels (classical_ext family) ===")
     print(res.groupby("model")["ood_best_classical_ext_cfg"].value_counts().to_string())
+
+    pd.DataFrame(wilcoxon_rows).to_csv(args.out_dir / "family_comparison_wilcoxon.csv", index=False)
     print(f"\n[✓] Wrote {args.out_dir / 'family_comparison_by_setting.csv'}")
+    print(f"[✓] Wrote {args.out_dir / 'family_comparison_wilcoxon.csv'}")
 
 
 if __name__ == "__main__":

@@ -111,6 +111,10 @@ class ClassicalKernelFactory:
 
     def block(self, name: str, A: np.ndarray, B: np.ndarray) -> np.ndarray:
         hp = self.hp
+        if name.startswith("rbf_gscale_x"):
+            # Bandwidth-sweep variant: gamma = scale-gamma * factor.
+            factor = float(name.rsplit("x", 1)[-1])
+            return kernel_rbf(A, B, hp["rbf_gamma"] * factor)
         if name == "linear":
             K = kernel_linear(A, B)
             da = np.einsum("ij,ij->i", A, A)
@@ -230,6 +234,10 @@ def main() -> None:
     ap.add_argument("--classical-kernels", type=str, nargs="+", default=CLASSICAL_KERNELS)
     ap.add_argument("--include-quantum", action="store_true",
                     help="Also evaluate the four paper quantum kernels under the same models.")
+    ap.add_argument("--rbf-gamma-factors", type=float, nargs="+", default=[],
+                    help="Extra RBF variants with gamma = scale-gamma * factor (classical bandwidth sweep).")
+    ap.add_argument("--quantum-angle-scales", type=float, nargs="+", default=[1.0],
+                    help="Angle-scaling factors for the quantum feature maps (quantum bandwidth sweep).")
     ap.add_argument("--svc-c", type=float, default=DEFAULT_SVC_C)
     ap.add_argument("--mmap", action="store_true")
     args = ap.parse_args()
@@ -268,7 +276,10 @@ def main() -> None:
         kernel_sets: Dict[str, Dict[str, Any]] = {}
 
         factory = ClassicalKernelFactory(X_emb["train"], seed=int(args.seed))
-        for kname in args.classical_kernels:
+        classical_names = list(args.classical_kernels) + [
+            f"rbf_gscale_x{f:g}" for f in args.rbf_gamma_factors
+        ]
+        for kname in classical_names:
             blocks = {
                 "family": "classical_ext",
                 "train": factory.block(kname, X_emb["train"], X_emb["train"]),
@@ -278,16 +289,19 @@ def main() -> None:
             kernel_sets[kname] = blocks
 
         if args.include_quantum:
-            for qcfg in DEFAULT_QUANTUM_CONFIGS:
-                fmap = build_feature_map(qcfg, feature_dim=dim)
-                sv = {k: compute_statevectors_batch(X_emb[k], fmap, dtype=np.complex64) for k in X_emb}
-                blocks = {
-                    "family": "quantum",
-                    "train": kernel_block_abs2(sv["train"], sv["train"], out_dtype=np.float64),
-                }
-                for split in ["id_test", "ood_test"]:
-                    blocks[split] = kernel_block_abs2(sv[split], sv["train"], out_dtype=np.float64)
-                kernel_sets[qcfg["id"]] = blocks
+            for scale in [float(s) for s in args.quantum_angle_scales]:
+                X_q = X_emb if scale == 1.0 else {k: v * scale for k, v in X_emb.items()}
+                suffix = "" if scale == 1.0 else f"__as{scale:g}"
+                for qcfg in DEFAULT_QUANTUM_CONFIGS:
+                    fmap = build_feature_map(qcfg, feature_dim=dim)
+                    sv = {k: compute_statevectors_batch(X_q[k], fmap, dtype=np.complex64) for k in X_q}
+                    blocks = {
+                        "family": "quantum",
+                        "train": kernel_block_abs2(sv["train"], sv["train"], out_dtype=np.float64),
+                    }
+                    for split in ["id_test", "ood_test"]:
+                        blocks[split] = kernel_block_abs2(sv[split], sv["train"], out_dtype=np.float64)
+                    kernel_sets[qcfg["id"] + suffix] = blocks
 
         for kname, blocks in kernel_sets.items():
             K_tr = blocks["train"]
