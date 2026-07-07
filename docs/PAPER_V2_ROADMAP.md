@@ -83,11 +83,24 @@ Responde a: *"empirical scope confined to a single dataset family (EMBER)"*.
 Reutilizar los pipelines del Paper 2 (features numéricas estandarizadas + reducción
 a baja dimensión, formato ya compatible con el kernel-swap):
 
-- [ ] CICIDS2017 (flujos de red).
-- [ ] UNSW-NB15 (flujos de red).
-- [ ] Definir mecanismos de shift análogos a m1/m2 sobre estos datasets
-      (extremos de sparsity / distancia a centroide de train) + si es posible un
-      split temporal natural.
+- [x] UNSW-NB15 (DoS, Reconnaissance) y ToN-IoT (Scanning) desde los pools
+      ref/cur del Paper 2. Pipeline: `src/utils/netflow/` + `scripts/netflow/`.
+- [x] Mecanismos de shift: `m2_centroid` (análogo fiel del m2) y `natural_cur`
+      (drift natural ref→cur, mecanismo nuevo que EMBER no tenía).
+- [x] Grid 54 settings (3 escenarios × 2 shifts × 3 ms × 3 tamaños, 1 run/celda):
+      cuántico vs linear+RBF OOD 51-52/54; **vs familia ampliada 40/54 (SVC,
+      Δ+0.009) y 51/54 (GPC, Δ+0.022)** — en flujos de red la ventaja sobrevive
+      a la familia ampliada, al contrario que en EMBER. Con SVC el drift natural
+      favorece más al cuántico (23/27) que el sintético (17/27).
+- [x] Test cross-dataset del mecanismo (correlaciones dentro de setting entre
+      geometría y OOD bacc, ~70 settings, 40-55 celdas c/u): **kta_ood es el
+      predictor universal** (mediana ρ 0.46-0.74, positivo en 94-100% de
+      settings en los 4 datasets y ambos clasificadores); eff_rank es fuerte en
+      EMBER/ToN-IoT (ρ~0.8) y débil en UNSW (ρ 0.14-0.38). Refinamiento: rango
+      alto = capacidad estructural (a priori), supervivencia del alignment =
+      predictor próximo (diagnóstico). `scripts/analysis/mechanism_generalization.py`.
+- [ ] Pendiente opcional: CICIDS2017 (requiere prep desde raw), runs repetidos
+      del grid netflow.
 
 Riesgo asumido: la ventaja cuántica puede no replicar fuera de EMBER (el Paper 2
 sugiere escepticismo en la tarea de monitorización). Si no replica, el titular pasa

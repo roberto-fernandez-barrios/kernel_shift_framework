@@ -33,7 +33,7 @@ CLASSICAL_EXT = ["linear", "rbf_gscale", "poly2", "poly3", "laplacian_med", "mat
 QUANTUM = ["zz_r1_full", "zz_r2_full", "pauli_xz_r1_full", "zmap_r2"]
 
 RX_LABEL = re.compile(
-    r"^(?P<variant>m\d_.+?)__ms(?P<ms>\d+)__q(?P<qtag>\d+_id\d+_ood\d+)__qs(?P<qs>\d+)(?:__s(?P<mseed>\d+))?$"
+    r"^(?P<variant>.+?)__ms(?P<ms>\d+)__q(?P<qtag>\d+_id\d+_ood\d+)__qs(?P<qs>\d+)(?:__s(?P<mseed>\d+))?$"
 )
 
 PROB_METRICS = ["log_loss", "brier", "ece", "mean_predictive_entropy"]
