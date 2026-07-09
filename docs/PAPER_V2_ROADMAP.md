@@ -99,8 +99,18 @@ a baja dimensión, formato ya compatible con el kernel-swap):
       EMBER/ToN-IoT (ρ~0.8) y débil en UNSW (ρ 0.14-0.38). Refinamiento: rango
       alto = capacidad estructural (a priori), supervivencia del alignment =
       predictor próximo (diagnóstico). `scripts/analysis/mechanism_generalization.py`.
-- [ ] Pendiente opcional: CICIDS2017 (requiere prep desde raw), runs repetidos
-      del grid netflow.
+- [ ] Pendiente opcional: CICIDS2017 (requiere prep desde raw).
+- [~] Runs repetidos netflow en curso (419/810 a 2026-07-09).
+- [x] **Sweep de bandwidth (respuesta a la objeción "¿RBF con gamma barrido
+      cerraría el gap?"): la respuesta es NO — es al revés.** Con el mismo eje
+      de tuning en ambas familias (RBF gamma ×{0.1..10}, ángulos cuánticos
+      ×{0.5,1,2}), la ventaja OOD cuántica en EMBER se RECUPERA (GPC: 16/18,
+      Δ+0.012, p=1.1e-4 vs 11/18 n.s. sin sweep; SVC 12/18 p=0.14) y en
+      netflow natural_cur se consolida (GPC 24/27 p=2.6e-5; SVC 19/27 p=4.9e-4).
+      Las variantes con escala angular (as0.5/as2) dominan la selección
+      cuántica: el bandwidth es crítico para los mapas de fidelidad, y la
+      comparación solo es justa cuando ambas familias lo reciben.
+- [x] Wilcoxon pareados + Holm en todas las tablas (family_comparison_wilcoxon.csv).
 
 Riesgo asumido: la ventaja cuántica puede no replicar fuera de EMBER (el Paper 2
 sugiere escepticismo en la tarea de monitorización). Si no replica, el titular pasa
