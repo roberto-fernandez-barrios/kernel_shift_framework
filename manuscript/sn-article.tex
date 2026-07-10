@@ -209,13 +209,13 @@ Our study is positioned at the intersection of these three literatures. From the
 
 \subsection{Problem setting}
 
-We study binary malware classification under distribution shift. Let $D_{\mathrm{ID}}$ denote the in-distribution data-generating process and $D_{\mathrm{OOD}}$ an out-of-distribution process induced by a controlled shift mechanism. Given a training set $T \sim D_{\mathrm{ID}}$, we evaluate the learned classifier on both an ID test set $S_{\mathrm{ID}}$ and an OOD test set $S_{\mathrm{OOD}}$. Our objective is not only to measure separability under the i.i.d.\ assumption, but to compare how kernel families behave when generalization is evaluated explicitly under shift.
+We study binary security classification---malware versus benign software, and attack versus benign traffic---under distribution shift. Let $D_{\mathrm{ID}}$ denote the in-distribution data-generating process and $D_{\mathrm{OOD}}$ an out-of-distribution process induced by a shift mechanism, which may be synthetically constructed or naturally occurring. Given a training set $T \sim D_{\mathrm{ID}}$, we evaluate the learned classifier on both an ID test set $S_{\mathrm{ID}}$ and an OOD test set $S_{\mathrm{OOD}}$. Our objective is not only to measure separability under the i.i.d.\ assumption, but to compare how kernel families behave when generalization is evaluated explicitly under shift.
 
 The central methodological requirement of the study is attribution. Because the scientific question concerns the effect of the kernel, comparisons must avoid confounds from changes in classifier family, preprocessing, optimization protocol, or split design. We therefore adopt a strictly controlled \emph{kernel-swap} protocol in which all components of the pipeline are held fixed except the kernel function itself. This design follows the same evaluation logic that motivates rigorous OOD benchmarking in the broader distribution-shift literature: when the target of inference is robustness, protocol control is not an implementation detail but part of the contribution.
 
-\subsection{Dataset and split construction}
+\subsection{Datasets and split construction}
 
-We use EMBER as the base dataset for static PE malware detection \cite{anderson2018ember}. EMBER is a natural choice for this study because it is widely used in static malware classification, supports reproducible feature-based experimentation, and has also motivated later benchmark extensions such as EMBER2024 \cite{joyce2025ember2024}. Our goal, however, is not to benchmark absolute malware-detection performance on a single standard split, but to construct controlled ID/OOD regimes that allow kernel-family comparisons under distribution shift.
+The protocol is instantiated on four benchmark scenarios spanning two data modalities. The first is EMBER, the standard public benchmark for static PE malware detection \cite{anderson2018ember}, which is widely used, supports reproducible feature-based experimentation, and has motivated later benchmark extensions such as EMBER2024 \cite{joyce2025ember2024}. The remaining three are network-flow intrusion scenarios: two derived from UNSW-NB15 (with DoS and Reconnaissance, respectively, as the drifting attack category) \cite{moustafa2015unsw} and one from ToN-IoT (Scanning) \cite{alsaedi2020toniot}. In all cases our goal is not to benchmark absolute detection performance on a standard split, but to construct controlled ID/OOD regimes that allow kernel-family comparisons under distribution shift.
 
 For each experimental setting, we adopt a fixed three-way split design:
 \[
@@ -223,7 +223,8 @@ T,\quad S_{\mathrm{ID}},\quad S_{\mathrm{OOD}},
 \]
 where $T$ is used for training, $S_{\mathrm{ID}}$ measures in-distribution performance, and $S_{\mathrm{OOD}}$ measures robustness under the induced shift. All models compared within a setting use exactly the same split definitions. This point is essential: a classical and a quantum model are never compared on different train/test partitions.
 
-We operationalize shift through two controlled OOD-construction variants, denoted $m1$ and $m2$, both built on the histogram + byte-entropy feature blocks and both designed to preserve class balance across splits.
+\paragraph{EMBER shift constructions.}
+On EMBER we operationalize shift through two controlled OOD-construction variants, denoted $m1$ and $m2$, both built on the histogram + byte-entropy feature blocks and both designed to preserve class balance across splits.
 
 \paragraph{Variant $m1$: sparsity-score extremes within class.}
 For each sample, we compute a sparsity-related score on a predefined feature block. In the main configuration used in the experiments, this score corresponds to the number of non-zero entries within the selected block. The OOD set is formed by taking, within each class separately, the low-score and high-score extremes, i.e., the two tails of the within-class score distribution. The remaining samples form an ID pool from which the training and ID test sets are obtained by stratified sampling. Intuitively, this construction creates an OOD regime driven by atypical sparsity structure while keeping the label distribution under control.
@@ -231,26 +232,31 @@ For each sample, we compute a sparsity-related score on a predefined feature blo
 \paragraph{Variant $m2$: distance-to-train extremes within class.}
 We first fix the final training set at an exact target size. Using only this training set, we compute class-conditional centroids and assign each non-training sample a score equal to its Euclidean distance to the centroid of its own class. To reduce noise and avoid leakage, this distance can be computed in a TruncatedSVD-projected space fitted on the training set only. The OOD set is then defined, again within each class separately, by the low- and high-distance extremes from the non-training pool, with exact target OOD size and proportional class allocation. The ID test set is drawn from the remainder. This produces a complementary shift regime in which OOD samples are unusual relative to the final training geometry rather than to a sparsity statistic alone.
 
-These two constructions are not intended as universal models of real-world malware drift. Rather, they provide controlled and reproducible shift mechanisms that are sufficiently different to support regime-level conclusions while preserving comparability across kernel families.
+\paragraph{Network-flow scenarios and shift constructions.}
+Each network scenario is defined by a \emph{reference} pool (traffic from the pre-drift regime) and a \emph{current} pool (traffic containing the drifted attack campaign), prepared with a numeric-only feature policy that removes identifiers, label-derived columns, and categorical protocol fields; UNSW-NB15 scenarios retain 39 flow features and ToN-IoT 89. We verified explicitly that no feature is label-derived: the maximum feature--label correlation across scenarios is $0.62$ (attained by well-known legitimate features such as \texttt{sttl}), far from the near-perfect correlation that would signal leakage, and the verification script is part of the public artifact. On these pools we instantiate two shift mechanisms. The first, \emph{m2-centroid}, is the direct analog of EMBER's $m2$: within the class-balanced reference pool, a provisional training pool is fixed, class-conditional centroids are computed in a train-only MaxAbs+TruncatedSVD space, and the OOD pool consists of the within-class low- and high-distance tails. The second, \emph{natural drift}, uses no synthetic construction at all: the training and ID pools are drawn from the reference regime and the OOD pool from the class-balanced current regime, so the evaluation measures robustness to genuinely drifted traffic rather than to constructed covariate extremes.
+
+Together, these constructions are not intended as universal models of real-world drift. Rather, they provide reproducible shift mechanisms of three distinct kinds---atypical-sparsity extremes, train-geometry extremes, and natural regime drift---that are sufficiently different to support regime-level conclusions while preserving comparability across kernel families. In every setting, all models are compared on exactly the same $T$, $S_{\mathrm{ID}}$, and $S_{\mathrm{OOD}}$.
 
 \subsection{Controlled kernel-swap protocol}
 
 Our core experimental principle is to isolate the kernel as the only variable of interest. Accordingly, all compared models share the following components:
 
 \begin{itemize}
-    \item \textbf{Classifier:} Support Vector Classification with \texttt{kernel="precomputed"}.
+    \item \textbf{Classifier:} within each comparison, a single classifier consuming precomputed Gram matrices. Two classifier families are studied in parallel: Support Vector Classification with \texttt{kernel="precomputed"}, and a binary Gaussian process classifier under the Laplace approximation.
     \item \textbf{Preprocessing:} the same scaling and dimensionality-reduction pipeline for all classical and quantum models.
     \item \textbf{Split design:} identical $T$, $S_{\mathrm{ID}}$, and $S_{\mathrm{OOD}}$ within each setting.
     \item \textbf{Selection logic:} the same family-internal model-selection principle applied consistently to classical and quantum candidates.
 \end{itemize}
 
-This yields a comparison between kernel families rather than between heterogeneous model pipelines. In particular, it prevents observed OOD differences from being attributed to changes in classifier architecture, feature engineering, or split construction. The choice of precomputed-kernel SVC is deliberate: it allows both classical and quantum similarities to be consumed by exactly the same decision rule, thereby making the comparison interpretable in kernel-method terms \cite{cortes1995svm,scholkopf2002learningwithkernels}.
+This yields a comparison between kernel families rather than between heterogeneous model pipelines. In particular, it prevents observed OOD differences from being attributed to changes in classifier architecture, feature engineering, or split construction. The choice of precomputed-kernel classifiers is deliberate: it allows both classical and quantum similarities to be consumed by exactly the same decision rule, thereby making the comparison interpretable in kernel-method terms \cite{cortes1995svm,scholkopf2002learningwithkernels}.
+
+The Gaussian process classifier implements the standard binary Laplace approximation with a logistic link (Algorithms~3.1 and~3.2 in \cite{rasmussen2006gpml}), applied directly to the same unit-diagonal precomputed kernels as the SVC. Its role in the study is twofold. Methodologically, it tests whether the kernel-family conclusions are classifier-specific or transfer across learning machinery. Substantively, it produces calibrated predictive probabilities, which allows robustness under shift to be examined through the lens of uncertainty quantification---log-loss, Brier score, expected calibration error, and predictive entropy on ID versus OOD data---rather than through accuracy alone. Kernel-swap comparisons are always performed within a classifier, never across classifiers.
 
 Although the classical and quantum candidate sets are not identical in cardinality, fairness in this study is defined at the protocol level: both families are evaluated under the same classifier, preprocessing, splits, dimensionality sweep, and family-internal selection criterion, so that the effect attributed to the kernel is not confounded by changes elsewhere in the pipeline.
 
 \subsection{Preprocessing and feature representation}
 
-All models use the same preprocessing pipeline. Let $x \in \mathbb{R}^p$ denote the original EMBER feature vector. We apply the following steps:
+All models use the same preprocessing pipeline. Let $x \in \mathbb{R}^p$ denote the original feature vector of the dataset at hand. We apply the following steps:
 
 \begin{enumerate}
     \item \textbf{MaxAbs scaling.} We first apply \texttt{MaxAbsScaler} to normalize feature magnitudes while preserving sparsity structure.
@@ -265,13 +271,19 @@ This shared preprocessing serves two purposes. First, it keeps the comparison fa
 
 \subsection{Kernel families}
 
-\paragraph{Classical kernels.}
-We consider two standard classical baselines:
+\paragraph{Baseline classical kernels.}
+The customary reference set consists of two standard baselines:
 \begin{align}
 K_{\mathrm{lin}}(x,x') &= x^\top x',\\
 K_{\mathrm{rbf}}(x,x') &= \exp\left(-\gamma\|x-x'\|_2^2\right),
 \end{align}
-with the RBF kernel evaluated using the standard \texttt{scale} convention for $\gamma$. These kernels are intentionally strong and conventional baselines rather than weak straw-man references.
+with the RBF kernel evaluated using the standard \texttt{scale} convention for $\gamma$ and the linear kernel cosine-normalized to unit diagonal. These are the baselines against which quantum kernels are most commonly compared, and they define our \emph{classical-original} family.
+
+\paragraph{Extended classical family.}
+Because an apparent quantum advantage over two baselines may say more about the baselines than about the quantum family, we additionally evaluate a broader \emph{classical-extended} family: polynomial kernels of degree 2 and 3 (cosine-normalized), the Laplacian kernel $K(x,x')=\exp(-\|x-x'\|_1/\ell_1)$, and Mat\'ern kernels with $\nu \in \{3/2, 5/2\}$, where all length scales $\ell$ are set by the median heuristic---the median pairwise distance on the training set---so that every hyperparameter is determined from training data alone, without access to ID or OOD test information. These kernels were chosen deliberately to span a range of spectral behaviors: the Laplacian and low-$\nu$ Mat\'ern kernels are less smooth than the RBF and induce Gram matrices with substantially heavier eigenvalue tails, which, as the mechanistic analysis will show, is precisely the property at stake under shift.
+
+\paragraph{Bandwidth symmetry.}
+Kernel bandwidth is known to be a decisive hyperparameter for quantum kernels: rescaling the input encoding plays the same role for fidelity kernels that $\gamma$ plays for the RBF kernel, and can qualitatively change generalization \cite{shaydulin2022bandwidth,canatar2023bandwidth}. A comparison in which the classical family may tune its bandwidth while the quantum family is pinned to a fixed encoding scale (or vice versa) is therefore not protocol-fair. In the bandwidth-symmetric portion of the study, both families receive the same tuning axis: the RBF kernel is evaluated at $\gamma = f \cdot \gamma_{\mathrm{scale}}$ for $f \in \{0.1, 0.3, 1, 3, 10\}$, and every quantum feature map is evaluated at angle scalings $\{0.5, 1, 2\}$ of the canonical $[0,\pi]$ encoding. Family-internal selection then operates over the enlarged candidate sets exactly as before.
 
 \paragraph{Quantum kernels.}
 Quantum kernels are defined through an implicit feature map $\phi_Q(\cdot)$ induced by a parameterized quantum circuit, with similarity measured through fidelity-like overlaps \cite{havlicek2019quantumenhanced,schuld2019featurehilbert,schuld2021kernelmethods}. For two inputs $x$ and $x'$, the corresponding kernel entry can be written abstractly as
@@ -303,9 +315,12 @@ In the implementation used for the paper, repeated-run variability is induced by
 configuration under fixed setting definitions. The master setting itself remains defined
 by the shift variant, master seed, and size regime; within that setting, both classical
 and quantum candidates are evaluated on identical split definitions and summarized by
-mean ± standard deviation across the repeated runs. This design makes the reported
+mean $\pm$ standard deviation across the repeated runs. This design makes the reported
 comparisons variability-aware while preserving strict comparability between kernel
 families.
+
+\paragraph{Statistical testing.}
+Family-level comparisons are tested formally with paired two-sided Wilcoxon signed-rank tests over the per-setting deltas (the settings are the paired units), separately for each classifier and selection view, with Holm correction applied within each classifier across the reported comparisons. We complement these tests with the per-setting effect-size proxy defined below, so that both the consistency of the sign pattern and the magnitude relative to run-to-run noise are visible.
 
 \subsection{Evaluation metrics}
 
@@ -335,9 +350,32 @@ Because average gains can be misleading when variability is large, we also repor
 \]
 where $\mu_Q,\mu_C$ and $\sigma_Q,\sigma_C$ are the repeated-run means and standard deviations for the metric of interest. Values greater than 1 indicate that the observed mean gain exceeds the combined variability scale, which provides a simple and interpretable robustness check on whether an apparent gain is large relative to run-to-run noise.
 
+\paragraph{Probabilistic metrics.}
+For the Gaussian process classifier we additionally report, on both ID and OOD splits, the negative log-likelihood (log-loss), the Brier score, the expected calibration error (ECE, 15 equal-width bins), and the mean predictive entropy. These quantities characterize how the quality and honesty of predictive uncertainty change under shift: a well-behaved probabilistic model should become \emph{more} uncertain on drifted inputs (rising entropy) while its calibration degrades as little as possible (bounded ECE increase).
+
+\subsection{Kernel-geometry descriptors}
+\label{sec:geometry_methods}
+
+To move from measuring outcomes to explaining them, we compute geometry descriptors of the Gram matrices that every kernel induces in every setting and dimension. All descriptors are computed from the very kernel matrices consumed by the classifiers (unit diagonal by construction), so the analysis describes exactly the objects the models see.
+
+\paragraph{Effective rank.}
+For the training Gram matrix $K_{\mathrm{tr}}$ with eigenvalues $\lambda_1 \ge \dots \ge \lambda_n \ge 0$ normalized to $p_i = \lambda_i / \sum_j \lambda_j$, the effective rank is $\exp(-\sum_i p_i \log p_i)$ \cite{roy2007effective}. It measures how many directions of feature space the kernel actually uses: a cosine-normalized linear kernel on low-dimensional embeddings is near rank one, while fidelity kernels can spread mass over many directions.
+
+\paragraph{Centered kernel-target alignment.}
+For a kernel block $K$ on a labeled split with labels $y \in \{-1,+1\}^n$, the centered kernel-target alignment (KTA) is $\langle K_c, yy^\top\rangle_F / (n\,\|K_c\|_F)$, where $K_c$ is the doubly centered kernel \cite{cristianini2001kta,cortes2012centeredalignment}. We evaluate KTA on the training, ID, and OOD splits separately; the ID-to-OOD change in alignment measures whether the label structure remains visible to the kernel's geometry after shift---the quantity we will call \emph{alignment survival}.
+
+\paragraph{Concentration and cross-split similarity.}
+We record the mean and standard deviation of off-diagonal kernel entries within the training block and of the cross blocks between each test split and the training set, together with the ratio of mean OOD-to-train and ID-to-train similarities, which measures how novel the OOD inputs look under each kernel's similarity notion.
+
+\paragraph{Geometric difference.}
+Between each classical training kernel $K_C$ and each quantum training kernel $K_Q$ we compute the regularized geometric difference $g(K_C \rightarrow K_Q) = \Vert \sqrt{K_Q}\,(K_C + \lambda n I)^{-1} \sqrt{K_Q} \Vert_\infty^{1/2}$ of Huang et al.\ \cite{huang2021powerofdata}, over a sweep of relative regularizers $\lambda$. Large values indicate that the quantum geometry can deviate substantially from what the classical kernel expresses; the quantity bounds the \emph{potential} for a performance separation but not its sign.
+
+\paragraph{Mechanistic analyses.}
+These descriptors feed two complementary analyses. First, a diagnostic analysis at the setting level asks which descriptors of the Best-by-OOD-selected kernels separate classical-favorable from quantum-favorable settings (Mann--Whitney AUC over settings) and correlate with the observed OOD delta. Second, a within-setting analysis asks whether geometry predicts performance across \emph{all} kernel--dimension cells of a setting: for every setting, classifier, and q-split seed we compute the Spearman rank correlation between a descriptor (effective rank, OOD alignment) and OOD balanced accuracy over the 30--55 evaluated cells, and then examine the distribution of these correlations across settings and datasets. A descriptor that yields consistently positive within-setting correlations across datasets, drift mechanisms, and classifiers constitutes a dataset-general regularity rather than a benchmark artifact.
+
 \subsection{Experimental grid and reporting}
 
-The main evaluation grid comprises 18 principal settings formed by the Cartesian product of:
+The EMBER evaluation grid comprises 18 principal settings formed by the Cartesian product of:
 \begin{itemize}
     \item two shift variants ($m1$, $m2$),
     \item three master seeds,
@@ -349,7 +387,9 @@ The three size regimes are:
 \]
 corresponding to $(n_{\mathrm{train}}, n_{\mathrm{ID}}, n_{\mathrm{OOD}})$.
 
-For clarity and reproducibility, Table~\ref{tab:protocol_summary} summarizes the main experimental protocol used throughout the paper, including the shift variants, controlled seed structure, size regimes, dimensionality sweep, kernel families, and repeated-run design.
+The network-flow grid applies the same structure to the three scenarios (UNSW-DoS, UNSW-Reconnaissance, ToN-IoT-Scanning), each under two shift mechanisms (m2-centroid and natural drift), three master seeds, and the same three size regimes, yielding 54 principal settings. Together the study comprises 72 principal settings, each evaluated across the dimension sweep and repeated over 15 runs, for both classifiers. The bandwidth-symmetric sweep enlarges the kernel candidate sets on the full EMBER grid and on the natural-drift network settings.
+
+For clarity and reproducibility, Table~\ref{tab:protocol_summary} summarizes the main experimental protocol used throughout the paper, including the shift constructions, controlled seed structure, size regimes, dimensionality sweep, kernel families, classifiers, and repeated-run design.
 
 \begin{table}[t]
 \centering
@@ -361,28 +401,30 @@ For clarity and reproducibility, Table~\ref{tab:protocol_summary} summarizes the
 \toprule
 Component & Specification \\
 \midrule
-Shift variants & $m1$, $m2$ \\
+Datasets & EMBER; UNSW-NB15 (DoS, Reconnaissance); ToN-IoT (Scanning) \\
+Shift constructions & EMBER: $m1$, $m2$; network: m2-centroid, natural drift \\
 Master seeds & 42, 123, 999 \\
 Split seeds & 42, 123, 999, 7, 2024 \\
 Model seeds & 42, 123, 999 \\
 Runs per configuration & $5 \times 3 = 15$ \\
-Size regimes & S, M, L \\
-Exact sizes $(n_{\mathrm{train}}, n_{\mathrm{ID}}, n_{\mathrm{OOD}})$ & (1000, 500, 500), (2000, 1000, 1000), (4000, 1800, 1800) \\
+Size regimes $(n_{\mathrm{train}}, n_{\mathrm{ID}}, n_{\mathrm{OOD}})$ & (1000, 500, 500), (2000, 1000, 1000), (4000, 1800, 1800) \\
 Dimensions & $d \in \{4,6,8,10,12\}$ \\
-Classifier & SVC with precomputed kernels \\
-Shared preprocessing & MaxAbsScaler + TruncatedSVD \\
-Classical family & Linear, RBF(scale) \\
+Classifiers & SVC (precomputed); Laplace-GP classifier (precomputed) \\
+Shared preprocessing & MaxAbsScaler + TruncatedSVD + angle mapping \\
+Classical-original family & Linear, RBF(scale) \\
+Classical-extended family & + poly(2,3), Laplacian, Mat\'ern(3/2, 5/2), median heuristic \\
 Quantum family & ZZ (1 rep), ZZ (2 reps), PauliXZ (1 rep), Z-map \\
-Selection views & Best-by-OOD, Best-by-ID \\
-Main setting grid & $2 \times 3 \times 3 = 18$ principal settings \\
-Dimension-level grid & $18 \times 5 = 90$ setting--dimension cells \\
+Bandwidth sweep & RBF $\gamma$ factors $\{0.1,0.3,1,3,10\}$; angle scales $\{0.5,1,2\}$ \\
+Selection views & Best-by-OOD, Best-by-ID (family-internal, on run means) \\
+Statistical testing & Paired Wilcoxon over settings + Holm; effect proxy \\
+Principal settings & EMBER $2{\times}3{\times}3 = 18$; network $3{\times}2{\times}3{\times}3 = 54$; total 72 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 Within each setting, we evaluate both kernel families across the shared preprocessing grid and the dimension sweep $d \in \{4,6,8,10,12\}$. This produces both a setting-level comparison, used for the main Best-by-OOD and Best-by-ID analyses, and a broader dimension-level view used to characterize how representation size interacts with kernel-family behavior.
 
-For reproducibility, split definitions are fixed within each setting, random seeds are controlled, and all key quantities are reported as mean $\pm$ standard deviation across repeated runs. This summary makes explicit that fairness in the study is defined at the protocol level: both kernel families are evaluated under the same classifier, preprocessing, split structure, dimensionality sweep, and repeated-run design, while differing only in the kernel construction itself. Throughout the paper, we deliberately avoid claims of universal dominance or complexity-theoretic quantum advantage. The object of study is narrower and more empirical: under a fixed classifier and a fixed evaluation protocol, does changing only the kernel alter robustness under distribution shift in a security-relevant task?
+For reproducibility, split definitions are fixed within each setting, random seeds are controlled, and all key quantities are reported as mean $\pm$ standard deviation across repeated runs. This summary makes explicit that fairness in the study is defined at the protocol level: both kernel families are evaluated under the same classifier, preprocessing, split structure, dimensionality sweep, bandwidth-tuning freedom, and repeated-run design, while differing only in the kernel construction itself. Throughout the paper, we deliberately avoid claims of universal dominance or complexity-theoretic quantum advantage. The object of study is narrower and more empirical: under a fixed classifier and a fixed evaluation protocol, does changing only the kernel alter robustness under distribution shift in security-relevant tasks---and which property of the kernel is responsible?
 
 \section{Results}
 \label{sec:results}
