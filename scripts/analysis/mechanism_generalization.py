@@ -37,15 +37,15 @@ def load_geometry(dirs: List[Path]) -> pd.DataFrame:
     return geo.drop_duplicates(subset=["setting", "kernel", "dim"], keep="first")
 
 
-def load_extended(root: Path, mseed: int = 42, qs: int = 42) -> pd.DataFrame:
+def load_extended(root: Path, mseed: int = 42) -> pd.DataFrame:
+    """All q-split seeds are used (geometry exists per q-split); the model seed
+    is fixed to the one the geometry embeddings were computed with."""
     frames = []
     for p in sorted(root.glob("*/extended_kernels_qsplits__summary.csv")):
         m = RX_EXT.match(p.parent.name)
         if not m:
             continue
         if m.group("mseed") is not None and int(m.group("mseed")) != mseed:
-            continue
-        if f"__qs{qs}" not in m.group("setting"):
             continue
         df = pd.read_csv(p)
         df = df[df.split == "ood_test"]
