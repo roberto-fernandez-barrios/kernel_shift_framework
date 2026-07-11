@@ -1,154 +1,38 @@
-%Version 3.1 December 2024
-% See section 11 of the User Manual for version history
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%                                                                 %%
-%% Please do not use \input{...} to include other tex files.       %%
-%% Submit your LaTeX manuscript as one .tex document.              %%
-%%                                                                 %%
-%% All additional figures and files should be attached             %%
-%% separately and not embedded in the \TeX\ document itself.       %%
-%%                                                                 %%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%\documentclass[referee,sn-basic]{sn-jnl}% referee option is meant for double line spacing
-
-%%=======================================================%%
-%% to print line numbers in the margin use lineno option %%
-%%=======================================================%%
-
-%%\documentclass[lineno,pdflatex,sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
-
-%%=========================================================================================%%
-%% the documentclass is set to pdflatex as default. You can delete it if not appropriate.  %%
-%%=========================================================================================%%
-
-%%\documentclass[sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
-
-%%Note: the following reference styles support Namedate and Numbered referencing. By default the style follows the most common style. To switch between the options you can add or remove Numbered in the optional parenthesis. 
-%%The option is available for: sn-basic.bst, sn-chicago.bst%  
- 
-%%\documentclass[pdflatex,sn-nature]{sn-jnl}% Style for submissions to Nature Portfolio journals
-%%\documentclass[pdflatex,sn-basic]{sn-jnl}% Basic Springer Nature Reference Style/Chemistry Reference Style
-%%\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}% Math and Physical Sciences Numbered Reference Style
-%%\documentclass[pdflatex,sn-mathphys-ay]{sn-jnl}% Math and Physical Sciences Author Year Reference Style
-%%\documentclass[pdflatex,sn-aps]{sn-jnl}% American Physical Society (APS) Reference Style
-%%\documentclass[pdflatex,sn-vancouver-num]{sn-jnl}% Vancouver Numbered Reference Style
-%%\documentclass[pdflatex,sn-vancouver-ay]{sn-jnl}% Vancouver Author Year Reference Style
-%%\documentclass[pdflatex,sn-apa]{sn-jnl}% APA Reference Style
-%%\documentclass[pdflatex,sn-chicago]{sn-jnl}% Chicago-based Humanities Reference Style
-
-%%%% Standard Packages
-%%<additional latex packages if required can be included here>
-
-%%\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
-
-\documentclass[referee,pdflatex,sn-mathphys-ay]{sn-jnl}
-
-
-\usepackage{graphicx}%
-\usepackage{multirow}%
-\usepackage{amsmath,amssymb,amsfonts}%
-\usepackage{mathrsfs}%
-\usepackage{xcolor}%
-\usepackage{textcomp}%
-\usepackage{manyfoot}%
-\usepackage{booktabs}%
-\usepackage{algorithm}%
-\usepackage{algorithmicx}%
-\usepackage{algpseudocode}%
-\usepackage{listings}%
-\usepackage{array}%
+\documentclass[journal]{IEEEtran}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
 \usepackage{url}
-
-\newcommand{\orcidtext}[1]{\href{https://orcid.org/#1}{\textsuperscript{[ORCID]}}}
-
-%%%%
-
-%%%%%=============================================================================%%%%
-%%%%  Remarks: This template is provided to aid authors with the preparation
-%%%%  of original research articles intended for submission to journals published 
-%%%%  by Springer Nature. The guidance has been prepared in partnership with 
-%%%%  production teams to conform to Springer Nature technical requirements. 
-%%%%  Editorial and presentation requirements differ among journal portfolios and 
-%%%%  research disciplines. You may find sections in this template are irrelevant 
-%%%%  to your work and are empowered to omit any such section if allowed by the 
-%%%%  journal you intend to submit to. The submission guidelines and policies 
-%%%%  of the journal take precedence. A detailed User Manual is available in the 
-%%%%  template package for technical guidance.
-%%%%%=============================================================================%%%%
-
-%% as per the requirement new theorem styles can be included as shown below
-\theoremstyle{thmstyleone}%
-\newtheorem{theorem}{Theorem}%  meant for continuous numbers
-%%\newtheorem{theorem}{Theorem}[section]% meant for sectionwise numbers
-%% optional argument [theorem] produces theorem numbering sequence instead of independent numbers for Proposition
-\newtheorem{proposition}[theorem]{Proposition}% 
-%%\newtheorem{proposition}{Proposition}% to get separate numbers for theorem and proposition etc.
-
-\theoremstyle{thmstyletwo}%
-\newtheorem{example}{Example}%
-\newtheorem{remark}{Remark}%
-
-\theoremstyle{thmstylethree}%
-\newtheorem{definition}{Definition}%
-
-\raggedbottom
-%%\unnumbered% uncomment this for unnumbered level heads
+\usepackage[hidelinks]{hyperref}
 
 \begin{document}
 
-\title[Kernel Geometry Governs Robustness under Shift]{Kernel Geometry Governs Robustness under Distribution Shift: A Controlled Multi-Dataset Study of Quantum and Classical Kernels}
+\title{Kernel Geometry Governs Robustness under Distribution Shift:\\
+A Controlled Multi-Dataset Study of Quantum and Classical Kernels}
 
+\author{Roberto~Fern\'andez-Barrios,
+        Iker~Pastor-L\'opez,
+        Asier~Gonz\'alez-Santocildes,
+        and~Pablo~Garc\'ia~Bringas%
+\thanks{The authors are with the Faculty of Engineering, University of Deusto,
+48007 Bilbao, Spain (e-mail: roberto.fernandez.b@deusto.es;
+iker.pastor@deusto.es; gonzalez.asier@deusto.es;
+pablo.garcia.bringas@deusto.es).}}
 
-%%=============================================================%%
-%% GivenName	-> \fnm{Joergen W.}
-%% Particle	-> \spfx{van der} -> surname prefix
-%% FamilyName	-> \sur{Ploeg}
-%% Suffix	-> \sfx{IV}
-%% \author*[1,2]{\fnm{Joergen W.} \spfx{van der} \sur{Ploeg} 
-%%  \sfx{IV}}\email{iauthor@gmail.com}
-%%=============================================================%%
-
-
-
-\author*[1]{\fnm{Roberto} \sur{Fernández-Barrios}\orcidtext{0009-0003-5312-2634}}\email{roberto.fernandez.b@deusto.es}
-
-\author[1]{\fnm{Iker} \sur{Pastor-López}\orcidtext{0000-0002-3068-6248}}\email{iker.pastor@deusto.es}
-
-\author[1]{\fnm{Asier} \sur{González-Santocildes}\orcidtext{0009-0002-8888-8560}}\email{gonzalez.asier@deusto.es}
-
-\author[1]{\fnm{Pablo} \sur{García Bringas}\orcidtext{0000-0003-3594-9534}}\email{pablo.garcia.bringas@deusto.es}
-
-\affil*[1]{\orgdiv{Faculty of Engineering}, \orgname{University of Deusto}, \orgaddress{\street{Avda. de las Universidades, 24.}, \city{Bilbao}, \postcode{48007}, \country{Spain}}}
-
-%%==================================%%
-%% Sample for unstructured abstract %%
-%%==================================%%
-
-\abstract{Whether quantum kernels improve robustness under distribution shift is usually asked as a quantum-versus-classical question. We argue, and show empirically, that it is more productively asked as a question about kernel geometry. We present a controlled kernel-swap study in which the classifier, preprocessing, split construction, and family-internal model-selection logic are held fixed while only the kernel varies, instantiated on four security benchmarks spanning two modalities and three drift mechanisms (EMBER static malware; UNSW-NB15 and ToN-IoT network flows under synthetic covariate shift and natural regime drift), two classifier families (support vector classification and a Laplace-approximation Gaussian process classifier with calibrated uncertainty), and 72 principal settings with 15 repeated runs each; all quantum kernels are computed by exact statevector simulation, and no hardware claim is made. Against the customary linear and RBF baselines, fidelity-based quantum kernels improve out-of-distribution balanced accuracy nearly uniformly (69--71 of 72 settings; Wilcoxon $p<10^{-9}$ on network data). Against a broader classical family, a median-heuristic Laplacian kernel neutralizes the advantage on EMBER---revealing that the operative property is not quantumness but geometry---yet when both families receive the same bandwidth-tuning freedom the quantum advantage re-emerges on EMBER and remains dominant under natural network drift (54 of 54 settings under the probabilistic classifier, $p=1.6\times10^{-10}$). A mechanistic analysis explains these outcomes: within each setting, out-of-distribution accuracy tracks the survival of centered kernel-target alignment under shift, a regularity that holds in 89--99\% of 360 setting-seed units across all four datasets, with high effective rank of the training kernel as its structural precondition. The classical-favorable exceptions of the original comparison are precisely the settings where the selected quantum kernel collapses to low-rank, classical-like geometry. Beyond the specific quantum-versus-classical verdict, the study contributes a reusable, fully reproducible protocol for attributing robustness effects to kernel geometry, and a design principle---prefer kernels whose label-aligned geometry survives shift---that spans classical and quantum families alike.}
-
-
-
-%%================================%%
-%% Sample for structured abstract %%
-%%================================%%
-
-% \abstract{\textbf{Purpose:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.
-% 
-% \textbf{Methods:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.
-% 
-% \textbf{Results:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.
-% 
-% \textbf{Conclusion:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.}
-
-\keywords{quantum machine learning; quantum kernels; distribution shift; out-of-distribution robustness; kernel methods; kernel-target alignment; Gaussian processes; malware detection; network intrusion detection}
-
-%%\pacs[JEL Classification]{D8, H51}
-
-%%\pacs[MSC Classification]{35A01, 65L10, 65L12, 65L20, 65L70}
+\markboth{IEEE Transactions on Quantum Engineering}%
+{Fern\'andez-Barrios \MakeLowercase{\textit{et al.}}: Kernel Geometry Governs Robustness under Distribution Shift}
 
 \maketitle
+
+\begin{abstract}
+Whether quantum kernels improve robustness under distribution shift is usually asked as a quantum-versus-classical question. We argue, and show empirically, that it is more productively asked as a question about kernel geometry. We present a controlled kernel-swap study in which the classifier, preprocessing, split construction, and family-internal model-selection logic are held fixed while only the kernel varies, instantiated on four security benchmarks spanning two modalities and three drift mechanisms (EMBER static malware; UNSW-NB15 and ToN-IoT network flows under synthetic covariate shift and natural regime drift), two classifier families (support vector classification and a Laplace-approximation Gaussian process classifier with calibrated uncertainty), and 72 principal settings with 15 repeated runs each; all quantum kernels are computed by exact statevector simulation, and no hardware claim is made. Against the customary linear and RBF baselines, fidelity-based quantum kernels improve out-of-distribution balanced accuracy nearly uniformly (69--71 of 72 settings; Wilcoxon $p<10^{-9}$ on network data). Against a broader classical family, a median-heuristic Laplacian kernel neutralizes the advantage on EMBER---revealing that the operative property is not quantumness but geometry---yet when both families receive the same bandwidth-tuning freedom the quantum advantage re-emerges on EMBER and remains dominant under natural network drift (54 of 54 settings under the probabilistic classifier, $p=1.6\times10^{-10}$). A mechanistic analysis explains these outcomes: within each setting, out-of-distribution accuracy tracks the survival of centered kernel-target alignment under shift, a regularity that holds in 89--99\% of 360 setting-seed units across all four datasets, with high effective rank of the training kernel as its structural precondition. The classical-favorable exceptions of the original comparison are precisely the settings where the selected quantum kernel collapses to low-rank, classical-like geometry. Beyond the specific quantum-versus-classical verdict, the study contributes a reusable, fully reproducible protocol for attributing robustness effects to kernel geometry, and a design principle---prefer kernels whose label-aligned geometry survives shift---that spans classical and quantum families alike.
+\end{abstract}
+
+\begin{IEEEkeywords}
+quantum machine learning, quantum kernels, distribution shift, out-of-distribution robustness, kernel methods, kernel-target alignment, Gaussian processes, malware detection, network intrusion detection
+\end{IEEEkeywords}
 
 \section{Introduction}
 \label{sec:introduction}
@@ -382,7 +266,7 @@ The network-flow grid applies the same structure to the three scenarios (UNSW-Do
 
 For clarity and reproducibility, Table~\ref{tab:protocol_summary} summarizes the main experimental protocol used throughout the paper, including the shift constructions, controlled seed structure, size regimes, dimensionality sweep, kernel families, classifiers, and repeated-run design.
 
-\begin{table}[t]
+\begin{table*}[!t]
 \centering
 \caption{Compact summary of the controlled experimental protocol. The repeated-run design is generated by combining five split seeds with three model seeds, yielding 15 runs per evaluated configuration under fixed setting definitions.}
 \label{tab:protocol_summary}
@@ -411,7 +295,7 @@ Statistical testing & Paired Wilcoxon over settings + Holm; effect proxy \\
 Principal settings & EMBER $2{\times}3{\times}3 = 18$; network $3{\times}2{\times}3{\times}3 = 54$; total 72 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 Within each setting, we evaluate both kernel families across the shared preprocessing grid and the dimension sweep $d \in \{4,6,8,10,12\}$. This produces both a setting-level comparison, used for the main Best-by-OOD and Best-by-ID analyses, and a broader dimension-level view used to characterize how representation size interacts with kernel-family behavior.
 
@@ -443,7 +327,7 @@ Under Best-by-ID selection (lower panel), the quantum family improves ID balance
 
 % Table generated by scripts/reporting/make_v2_tables.py from
 % results/ember_shift/extended_kernels/family_comparison_wilcoxon.csv
-\begin{table}[t]
+\begin{table*}[!t]
 \centering
 \caption{EMBER headline results (18 settings, 15 runs each). Within each classifier (GPC = Laplace Gaussian process classifier), family-internal selection compares the best quantum candidate against the best candidate of the stated classical reference set. $p$-values are two-sided paired Wilcoxon over settings, Holm-corrected within classifier; the last column counts settings whose quantum-favorable gain exceeds the combined run-to-run variability scale.}
 \label{tab:family_ember}
@@ -464,7 +348,7 @@ Selection & Classifier & Classical ref. & Q wins & Mean $\Delta$ & Median $\Delt
  & GPC & extended & 18/18 & $+0.0192$ & $+0.0166$ & $3.1\times 10^{-5}$ & 11 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 \subsection{The extended classical family neutralizes the OOD advantage on EMBER}
 \label{sec:res_extended}
@@ -493,7 +377,7 @@ The breakdown by shift mechanism sharpens the picture. Under SVC, the quantum-ve
 
 % Table generated by scripts/reporting/make_v2_tables.py from
 % results/netflow/family_comparison_wilcoxon.csv
-\begin{table}[t]
+\begin{table*}[!t]
 \centering
 \caption{Network-flow headline results (54 settings across UNSW-NB15 DoS/Reconnaissance and ToN-IoT Scanning, two shift mechanisms, 15 runs each). Columns as in Table~\ref{tab:family_ember}.}
 \label{tab:family_netflow}
@@ -514,7 +398,7 @@ Selection & Classifier & Classical ref. & Q wins & Mean $\Delta$ & Median $\Delt
  & GPC & extended & 40/54 & $+0.0057$ & $+0.0044$ & $7.9\times 10^{-7}$ & 14 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 \subsection{One geometric mechanism explains the pattern}
 \label{sec:res_mechanism}
@@ -526,7 +410,7 @@ Within every setting we correlate, across all evaluated kernel--dimension cells,
 
 % Table generated by scripts/reporting/make_v2_tables.py from
 % results/mechanism/mechanism_summary_by_dataset.csv
-\begin{table}[t]
+\begin{table*}[!t]
 \centering
 \caption{Within-setting Spearman correlation between kernel-geometry descriptors and OOD balanced accuracy, summarized per dataset and classifier over all setting-seed units (five q-split seeds per setting; 30--55 kernel--dimension cells per unit). ``$>0$'' is the fraction of units with a positive correlation.}
 \label{tab:mechanism}
@@ -547,7 +431,7 @@ UNSW-NB15 Recon. & GP classifier & 90 & 0.26 & 98\% & 0.57 & 94\% \\
 UNSW-NB15 Recon. & SVC & 90 & 0.19 & 83\% & 0.46 & 99\% \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
 % Figure generated by scripts/reporting/make_v2_figures.py
 \begin{figure*}[t]
@@ -669,7 +553,7 @@ The contribution is therefore threefold. Empirically, the study provides the bro
 
 The most important open problems are two. Practically, turning alignment survival into a deployment-time selection signal without OOD labels would convert the diagnosis into a tool. Theoretically, the dose-response relationship between spectral tails and alignment survival calls for a formal account: under which shift models does high effective rank provably protect kernel-target alignment? Answering either question would benefit classical and quantum kernel methods alike---which is, in the end, the point: the productive question is not whether one family dominates, but which similarity geometry aligns best with the shift regime one actually faces.
 
-\begin{appendices}
+\appendices
 
 \section{Additional Results}
 \label{app:additional_results}
@@ -677,7 +561,7 @@ The most important open problems are two. Practically, turning alignment surviva
 This appendix reports the full setting-level Best-by-OOD comparisons between the selected quantum kernel and the best kernel of the \emph{extended} classical family (the strongest comparison in the study), for both classifiers and all 72 principal settings. Every value is a mean $\pm$ standard deviation over 15 repeated runs; Effect denotes $\Delta_{\mathrm{OOD}}/\sqrt{\sigma_C^2+\sigma_Q^2}$. Size labels denote $(n_{\mathrm{train}}, n_{\mathrm{ID}}, n_{\mathrm{OOD}})$: S = (1k, 500, 500), M = (2k, 1k, 1k), L = (4k, 1.8k, 1.8k). Shift labels for the network scenarios abbreviate scenario/mechanism: UD = UNSW-NB15 DoS, UR = UNSW-NB15 Reconnaissance, TS = ToN-IoT Scanning; /m2 is the centroid construction and /nat is natural drift. Quantum kernel names carry the angle scale after \texttt{@} where it differs from 1. All tables are generated directly from the public artifact by \texttt{scripts/reporting/make\_v2\_tables.py}.
 
 
-\begin{table}[p]
+\begin{table*}[!t]
 \centering
 \caption{EMBER, SVC: full Best-by-OOD comparison against the extended classical family.}
 \label{app:ember_svc}
@@ -706,9 +590,9 @@ m2 & 999 & S & Laplacian (d12) & ZZ-r1 (d12) & $0.769\pm0.014$ & $0.775\pm0.022$
 m2 & 999 & M & Laplacian (d10) & ZZ-r2 (d12) & $0.776\pm0.016$ & $0.780\pm0.020$ & $+0.004$ & $+0.14$ \\
 m2 & 999 & L & Laplacian (d12) & ZZ-r2 (d12) & $0.787\pm0.013$ & $0.803\pm0.009$ & $+0.015$ & $+0.97$ \\\bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
-\begin{table}[p]
+\begin{table*}[!t]
 \centering
 \caption{EMBER, GP classifier: full Best-by-OOD comparison against the extended classical family.}
 \label{app:ember_gpc}
@@ -737,9 +621,9 @@ m2 & 999 & S & Laplacian (d12) & ZZ-r1 (d10) & $0.767\pm0.021$ & $0.775\pm0.021$
 m2 & 999 & M & Laplacian (d12) & ZZ-r2 (d12) & $0.776\pm0.016$ & $0.780\pm0.025$ & $+0.004$ & $+0.13$ \\
 m2 & 999 & L & Laplacian (d12) & ZZ-r2 (d12) & $0.786\pm0.013$ & $0.798\pm0.011$ & $+0.012$ & $+0.70$ \\\bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
-\begin{table}[p]
+\begin{table*}[!t]
 \centering
 \caption{Network flows, SVC: full Best-by-OOD comparison against the extended classical family.}
 \label{app:netflow_svc}
@@ -804,9 +688,9 @@ UR/nat & 999 & S & Linear (d12) & ZZ-r1 (d6) & $0.780\pm0.020$ & $0.781\pm0.008$
 UR/nat & 999 & M & Linear (d12) & ZZ-r2 (d6) & $0.783\pm0.014$ & $0.809\pm0.015$ & $+0.026$ & $+1.26$ \\
 UR/nat & 999 & L & Laplacian (d8) & ZZ-r2 (d6) & $0.804\pm0.015$ & $0.814\pm0.008$ & $+0.010$ & $+0.59$ \\\bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
-\begin{table}[p]
+\begin{table*}[!t]
 \centering
 \caption{Network flows, GP classifier: full Best-by-OOD comparison against the extended classical family.}
 \label{app:netflow_gpc}
@@ -871,39 +755,35 @@ UR/nat & 999 & S & Poly-2 (d12) & ZZ-r2 (d6) & $0.777\pm0.016$ & $0.782\pm0.005$
 UR/nat & 999 & M & Poly-2 (d12) & ZZ-r2 (d6) & $0.780\pm0.017$ & $0.814\pm0.016$ & $+0.034$ & $+1.51$ \\
 UR/nat & 999 & L & Laplacian (d8) & ZZ-r1 (d4) & $0.790\pm0.010$ & $0.807\pm0.011$ & $+0.017$ & $+1.10$ \\\bottomrule
 \end{tabular}
-\end{table}
+\end{table*}
 
-\end{appendices}
 
-\clearpage
-\backmatter
-\bmhead{Statements and Declarations}
 
-\bmhead{Funding}
+\section*{Funding}
 The authors received no specific funding for the submitted work.
 
-\bmhead{Competing Interests}
+\section*{Competing Interests}
 The authors declare that they have no competing interests.
 
-\bmhead{Author Contributions}
+\section*{Author Contributions}
 Roberto Fernández-Barrios: Conceptualization, Methodology, Software, Data curation, Formal analysis, Visualization, Investigation, Writing--original draft, Writing--review \& editing.
 Iker Pastor-López: Supervision, Validation, Writing--review \& editing.
 Asier González-Santocildes: Validation, Project administration, Writing--review \& editing.
 Pablo Garcia Bringas: Supervision, Resources, Writing--review \& editing.
 
-\bmhead{Data Availability}
+\section*{Data Availability}
 This study is based on the public EMBER \cite{anderson2018ember}, UNSW-NB15 \cite{moustafa2015unsw}, and ToN-IoT \cite{alsaedi2020toniot} benchmark datasets. The derived split definitions, exporters, shift constructions, aggregated results, experiment manifests, and summary tables used in this work are publicly available in the archived project repository: \url{https://github.com/roberto-fernandez-barrios/kernel_shift_framework}. Release DOI: \url{https://doi.org/10.5281/zenodo.19152497}.
 
-\bmhead{Code Availability}
+\section*{Code Availability}
 The code used to generate the shift splits, create q-splits, run the classical and quantum kernel experiments, aggregate repeated-run results, and reproduce the reported tables and figures is publicly available at \url{https://github.com/roberto-fernandez-barrios/kernel_shift_framework}. Archived release DOI: \url{https://doi.org/10.5281/zenodo.19152497}.
 
-\bmhead{Ethics Approval}
+\section*{Ethics Approval}
 Not applicable.
 
-\bmhead{Consent to Participate}
+\section*{Consent to Participate}
 Not applicable.
 
-\bmhead{Consent for Publication}
+\section*{Consent for Publication}
 Not applicable.
 
 
@@ -915,9 +795,8 @@ Not applicable.
 %% file, and delete the associated \verb+\bibliography+ commands.                            %%
 %%===========================================================================================%%
 
-\clearpage
-\bibliography{sn-bibliography}% common bib file
-%% if required, the content of .bbl file can be included here once bbl is generated
-%%\input sn-article.bbl
+
+\bibliographystyle{IEEEtran}
+\bibliography{sn-bibliography}
 
 \end{document}
