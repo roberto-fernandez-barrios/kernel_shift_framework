@@ -1,5 +1,11 @@
 # Paper v2 — Expansion Roadmap
 
+> **ESTADO (2026-07-11): COMPLETADO.** Fase experimental cerrada (72 settings × 15 runs,
+> mecanismo, sweep de bandwidth), manuscrito v2 reescrito y adaptado a EPJ Quantum
+> Technology (venue elegido tras verificación de cuartiles/índices), 5 figuras, cover
+> letter. Pendiente solo: refresco de números del sweep 15-run (background), revisores
+> sugeridos, arXiv v2 y envío. Este documento queda como registro histórico del plan.
+
 Branch: `paper-v2-expansion`. Objetivo: responder a las tres críticas de la carta de
 rechazo de Quantum Machine Intelligence (2026) y reenviar el manuscrito ampliado.
 La v1 se publica en arXiv tal cual; la v2 se subirá como revisión del mismo arXiv.
