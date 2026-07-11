@@ -122,7 +122,8 @@ def fig_mechanism_scatter() -> None:
         r = a.loc[kernel]
         arrow = dict(arrowstyle="-", lw=0.5, color="#999999", shrinkA=0, shrinkB=3) if leader else None
         ax.annotate(text, (r.eff_rank, r.kta_gain), textcoords="offset points",
-                    xytext=(dx, dy), fontsize=7, color="#333333", arrowprops=arrow)
+                    xytext=(dx, dy), fontsize=7, color="#333333", arrowprops=arrow,
+                    bbox=dict(fc="white", ec="none", alpha=0.75, pad=0.4), zorder=6)
 
     label("poly2", "Linear, Poly-2/3", 6, 14, leader=True)
     label("rbf_gscale", "RBF", 8, -4, leader=True)
@@ -210,8 +211,10 @@ def fig_protocol() -> None:
         ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs, color="#222222")
 
     def arrow(x0, y0, x1, y1):
+        # shrinkB compensates the visual pad of FancyBboxPatch so arrowheads
+        # stop at the drawn border instead of entering the box.
         ax.annotate("", (x1, y1), (x0, y0),
-                    arrowprops=dict(arrowstyle="-|>", lw=0.9, color="#555555", shrinkA=1, shrinkB=1))
+                    arrowprops=dict(arrowstyle="-|>", lw=0.9, color="#555555", shrinkA=2, shrinkB=7))
 
     box(1, 26, 16, 13, "Benchmarks\nEMBER (malware)\nUNSW / ToN-IoT\n(network flows)", fs=6.5)
     box(21, 26, 17, 13, "Shift construction\n$m1$ $\\cdot$ $m2$ $\\cdot$ natural\n$T,\\ S_{\\mathrm{ID}},\\ S_{\\mathrm{OOD}}$\n15 runs / setting", fs=6.5)
