@@ -89,10 +89,57 @@ def dose_response_table() -> str:
     return "\n".join(lines)
 
 
+KERNEL_SHORT = {
+    "linear": "Linear", "rbf_gscale": "RBF", "poly2": "Poly-2", "poly3": "Poly-3",
+    "laplacian_med": "Laplacian", "matern15_med": "Mat\\'ern-3/2", "matern25_med": "Mat\\'ern-5/2",
+    "zz_r1_full": "ZZ-r1", "zz_r2_full": "ZZ-r2", "pauli_xz_r1_full": "PauliXZ", "zmap_r2": "Z-map",
+}
+SIZE_SHORT = {"size_q1000_id500_ood500": "S", "size_q2000_id1000_ood1000": "M", "size_q4000_id1800_ood1800": "L"}
+VARIANT_SHORT = {
+    "m1_hist_byteent": "m1", "m2_hist_byteent": "m2",
+    "unsw_dos__m2_centroid": "U-DoS/m2c", "unsw_dos__natural_cur": "U-DoS/nat",
+    "unsw_recon__m2_centroid": "U-Rec/m2c", "unsw_recon__natural_cur": "U-Rec/nat",
+    "toniot_scanning__m2_centroid": "T-Scan/m2c", "toniot_scanning__natural_cur": "T-Scan/nat",
+}
+
+
+def cfg_short(cfg: str) -> str:
+    parts = cfg.split("__")
+    dim = parts[-1]
+    kernel = parts[0]
+    suffix = ""
+    for p in parts[1:-1]:
+        if p.startswith("as"):
+            suffix = f"@{p[2:]}"
+    return f"{KERNEL_SHORT.get(kernel, kernel)}{suffix} ({dim})"
+
+
+def appendix_setting_tables(name: str, by_setting_csv: str) -> None:
+    df = pd.read_csv(by_setting_csv)
+    for model in ["svc", "gpc"]:
+        r = df[df.model == model].sort_values(["variant", "master_seed", "size_tag"])
+        lines = []
+        for _, row in r.iterrows():
+            lines.append(
+                f"{VARIANT_SHORT.get(row.variant, row.variant)} & {row.master_seed} & "
+                f"{SIZE_SHORT[row.size_tag]} & "
+                f"{cfg_short(row.ood_best_classical_ext_cfg)} & "
+                f"{cfg_short(row.ood_best_quantum_cfg)} & "
+                f"${row.ood_best_classical_ext_bacc:.3f}\\pm{row.ood_best_classical_ext_std:.3f}$ & "
+                f"${row.ood_best_quantum_bacc:.3f}\\pm{row.ood_best_quantum_std:.3f}$ & "
+                f"${row.ood_delta_q_vs_ext:+.3f}$ & ${row.ood_effect_q_vs_ext:+.2f}$ \\\\"
+            )
+        out = OUT / f"appendix_{name}_{model}.tex"
+        out.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        print(f"[✓] {out.name}")
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "table_dose_response.tex").write_text(dose_response_table() + "\n", encoding="utf-8")
     print("[✓] table_dose_response.tex")
+    appendix_setting_tables("ember", "results/ember_shift/extended_kernels/family_comparison_by_setting.csv")
+    appendix_setting_tables("netflow", "results/netflow/family_comparison_by_setting.csv")
     for name, (csv_path, n) in COMPARISONS.items():
         p = Path(csv_path)
         if not p.exists():

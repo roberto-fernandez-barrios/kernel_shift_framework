@@ -202,7 +202,9 @@ However, the contemporary QML literature also makes clear that promising empiric
 
 Most importantly for the present work, recent benchmarking studies have raised the standard for empirical claims in QML. Bowles et al.\ argued that experimental design choices can dominate conclusions and showed, in a broad simulated benchmark, that out-of-the-box classical models often remain strong baselines against quantum alternatives \cite{bowles2024betterthanclassical}. Schnabel and Roth extended this benchmarking perspective specifically to quantum kernel methods, conducting a large-scale study across many design choices and showing that performance depends strongly on kernel type, encoding strategy, and hyperparameter configuration rather than on a simple classical-versus-quantum dichotomy \cite{schnabel2025scrutiny}. Related controlled evidence from adjacent QML settings points in the same methodological direction: recent work in hybrid quantum reinforcement learning shows that varying multiple pipeline components at once can obscure attribution, and highlights the importance of component-isolating, reproducible evaluation under fixed experimental conditions \cite{lazaro2025dissectingqrl}. This line of work is especially relevant to our paper because it supports a conservative framing: the value of quantum kernels, if any, must be demonstrated under controlled and transparent comparisons, and should be expected to be regime-dependent.
 
-Our study is positioned at the intersection of these three literatures. From the distribution-shift literature, we adopt the principle that robustness claims must rest on evaluation protocols that control major confounds. From the malware literature, we take the practical motivation that temporal and distributional change are intrinsic to realistic security deployment. From the QML literature, we take both the motivation for studying quantum kernels and the caution that benchmarking quality is central to interpretation. Relative to prior work, our contribution is not to claim universal superiority for quantum kernels, nor to propose a new adaptation method for drifted malware, but to provide a controlled, variability-aware comparison of classical and quantum kernel families in a malware-detection setting where OOD robustness is part of the primary target of evaluation.
+Three further strands supply the analytical tools of this study. First, work on kernel bandwidth in QML has shown that rescaling the data encoding is as consequential for fidelity kernels as the length scale is for classical kernels, and can determine whether quantum models generalize at all \cite{shaydulin2022bandwidth,canatar2023bandwidth}; we operationalize this insight as a fairness requirement---symmetric bandwidth freedom for both families---rather than as a quantum-side tuning trick. Second, kernel-target alignment \cite{cristianini2001kta,cortes2012centeredalignment} and effective rank \cite{roy2007effective} are classical tools for characterizing Gram-matrix geometry; to our knowledge their joint use as \emph{predictors of OOD behavior under distribution shift}, across classical and quantum kernels alike, is new. Third, Gaussian process classification \cite{rasmussen2006gpml} provides the standard route to calibrated uncertainty in kernel methods; including a Laplace-approximation GP classifier in the kernel-swap protocol lets us evaluate uncertainty quality under shift without changing anything else in the pipeline.
+
+Our study is positioned at the intersection of these literatures. From the distribution-shift literature, we adopt the principle that robustness claims must rest on evaluation protocols that control major confounds. From the security literature, we take the practical motivation that temporal and distributional change are intrinsic to realistic deployment, in malware and network intrusion detection alike. From the QML literature, we take both the motivation for studying quantum kernels and the caution that benchmarking quality is central to interpretation. Relative to prior work, our contribution is not to claim universal superiority for quantum kernels, nor to propose a new adaptation method for drifted security data, but to provide a controlled, variability-aware, multi-dataset comparison of classical and quantum kernel families in which out-of-distribution robustness is the primary evaluation target---and to accompany the comparison with a mechanistic account of why its outcomes are what they are.
 
 \section{Methods}
 \label{sec:methods}
@@ -590,197 +592,274 @@ Taken together, the results support four conclusions. First, against the linear 
 \section{Discussion}
 \label{sec:discussion}
 
-\subsection{What do the results say about robustness under shift?}
+\subsection{What is, and is not, a quantum advantage here}
 
-The primary objective of this study is robustness under distribution shift rather than maximum in-distribution accuracy. Under the controlled kernel-swap protocol, quantum kernels improve OOD balanced accuracy in the majority of the evaluated settings under Best-by-OOD selection. This finding is meaningful for two reasons. First, the comparison is intentionally strict: the classifier family, preprocessing pipeline, split definitions, and model-selection logic are fixed, so the observed differences are interpretable as differences in kernel behavior rather than as artifacts of heterogeneous pipelines. Second, the gains are not supported only by win counts; several settings also exhibit improvements that exceed the combined run-to-run variability scale, indicating that at least part of the observed advantage is large relative to the experimental noise.
+The study's central interpretive move is to replace the question ``do quantum kernels beat classical kernels under shift?'' with ``which property of a kernel governs its behavior under shift, and who has it?''. Read through that lens, the results decompose cleanly. The near-uniform advantage over linear and RBF baselines is real, replicable across four datasets and two classifiers, and statistically unambiguous---but it is an advantage of \emph{high-effective-rank, alignment-preserving geometry} over the two lowest-rank geometries in the study, a property the fidelity maps possess natively rather than exclusively. The Laplacian result makes this precise: one classical kernel with the same geometric signature closes the OOD gap on EMBER, so the property, not the physics, is doing the work there. What remains after every control we could devise---extended baselines, symmetric bandwidth tuning, a probabilistic classifier, natural drift---is a genuine residual: the ID-separability advantage survives everything on EMBER, and the OOD advantage survives everything on drifting network traffic. Those two residuals are, on present evidence, the defensible quantum contribution.
 
-From the perspective of the distribution-shift literature, this reinforces a general lesson: conclusions about robustness are only as credible as the protocol used to obtain them \cite{quinonero-candela2008datasetshift,gulrajani2021domainbed,koh2021wilds,yao2022wildtime}. In our case, the relevant conclusion is not that quantum kernels are categorically superior, but that under a fair, explicitly shift-aware comparison, they emerge as a competitive and often advantageous kernel family for malware detection.
+From the perspective of the distribution-shift literature, this reinforces a general lesson: conclusions about robustness are only as credible as the protocol used to obtain them \cite{quinonero-candela2008datasetshift,gulrajani2021domainbed,koh2021wilds,yao2022wildtime}. Our results add a QML-specific corollary: the composition of the classical reference set and the symmetry of tuning freedom are not implementation details but the difference between a significant advantage, a null result, and a significant advantage again (Sections~\ref{sec:res_baselines}--\ref{sec:res_bandwidth}). Any single one of those three verdicts, reported alone, would have been misleading.
 
-At the same time, the evidence should be interpreted as \emph{regime-conditional}. Our OOD splits are induced by two controlled shift mechanisms, not by an exhaustive model of all real malware drift processes. Accordingly, the strongest defensible reading is that quantum kernels improve robustness in many of the shift regimes studied here, not that they would necessarily do so under every temporal, adversarial, or cross-domain drift scenario encountered in practice.
+\subsection{The ID--OOD dissociation is informative}
 
-\subsection{Consistent ID gains do not imply universal OOD dominance}
+The contrast between the two selection views is sharper in this study than in its predecessors, and it now has an interpretation. The quantum ID-separability advantage is universal (18 of 18 EMBER settings against every classical reference, with effects exceeding run-to-run noise in most) and is not replicated by any classical kernel we evaluate, including the Laplacian. The OOD advantage, by contrast, is contingent: it depends on the reference family, the bandwidth protocol, and the drift mechanism. This dissociation is exactly what the mechanism predicts. In-distribution separability rewards expressive geometry per se; robustness rewards geometry whose label alignment \emph{survives} the shift, which is a joint property of the kernel and the shift mechanism. A kernel family can therefore dominate the first criterion while merely competing on the second---and mistaking one for the other is precisely the error the two-view protocol is designed to prevent \cite{gulrajani2021domainbed}.
 
-One of the clearest empirical patterns in the paper is the contrast between the ID and OOD views. Under Best-by-ID selection, quantum kernels improve ID balanced accuracy in all 18 main settings. This is a strong and highly consistent result. A natural interpretation is that, within the shared reduced representation used here, the quantum feature maps often induce a similarity geometry that is favorable for class separation under SVC. This interpretation is compatible with the kernel view of quantum models, in which the feature map changes the implicit geometry of the classification problem rather than the classifier itself \cite{havlicek2019quantumenhanced,schuld2019featurehilbert,schuld2021kernelmethods}.
+\subsection{The mechanism in context}
 
-However, the OOD results are more qualified than the ID results, and that distinction matters. A model family can induce better margins, cleaner separation, or stronger fit on the ID distribution without being uniformly more robust once the evaluation distribution changes. This is exactly why we separated Best-by-ID and Best-by-OOD selection modes. That separation acts as a methodological guardrail: it prevents strong ID performance from being mistaken for direct evidence of robustness.
+The alignment-survival regularity connects several strands of literature that have so far run in parallel. The bandwidth results extend the findings of Shaydulin and Wild \cite{shaydulin2022bandwidth} and Canatar et al.\ \cite{canatar2023bandwidth} from in-distribution generalization to robustness under shift, and give them a comparative twist: bandwidth is not merely important for quantum kernels, it is important \emph{symmetrically}, and asymmetric tuning protocols systematically bias quantum-versus-classical comparisons. The failure of the geometric difference \cite{huang2021powerofdata} to predict OOD outcomes sharpens its interpretation rather than contradicting it: $g$ was derived as a bound on the potential for in-distribution separations, and our results show empirically that potential-for-difference and benefit-under-shift are distinct quantities---large $g$ is compatible with large losses. Finally, the dose-response gradient within the classical family (Table~\ref{tab:dose_response}) grounds the mechanism independently of anything quantum: kernels with heavier spectral tails hold their label alignment into the tails of the data distribution, a statement about kernels generally, for which the quantum maps are simply the most extreme instances in our study.
 
-This point is broader than the present paper. In domain generalization and OOD evaluation, methods often look impressive under one selection criterion but lose their advantage under another \cite{gulrajani2021domainbed}. In malware detection, the same caution is even more important because temporal variation and concept drift can alter the relationship between training geometry and future data \cite{barbero2022transcending,li2025revisitingdrift}. Our results fit this pattern well: the ID gains are real and strong, but the OOD story is more nuanced, which is exactly why the robustness-oriented view must remain primary.
-
-\subsection{Why do classical-dominant regimes appear?}
-
-The presence of classical-dominant regimes is not a weakness of the study; it is one of its most informative outcomes. If the results had shown quantum wins everywhere, the paper would be more vulnerable to the suspicion that the benchmark was unintentionally tuned toward one family. Instead, the fact that a small number of structured settings remain favorable to classical kernels strengthens the interpretation that the protocol is actually discriminating between regimes rather than merely amplifying one side.
-
-A plausible explanation is that these exceptions arise from interactions between the shift mechanism and the induced kernel geometry. In the $m2$ construction, OOD samples are selected as within-class extremes of a distance-to-train score anchored on the final training set. Such points may occupy regions where some fidelity-based quantum kernels become overly concentrated, less discriminative, or otherwise poorly matched to the relevant notion of locality. This hypothesis is consistent with the broader quantum-kernel literature, which emphasizes the importance of encoding, kernel concentration, and bandwidth-like effects in determining empirical performance \cite{schuld2021encoding,huang2021powerofdata,gilfuster2024rethinkinggeneralization,schnabel2025scrutiny}. Classical RBF kernels, by contrast, can behave as strong local similarity measures whose effective geometry may align more naturally with certain outlier-driven or centroid-distance-driven OOD constructions.
-
-The key message is therefore not ``quantum versus classical'' as a universal hierarchy, but \emph{kernel family versus shift regime}. The exceptions reveal that kernel usefulness depends on how the induced similarity notion interacts with the representation and with the way OOD examples are generated. This regime-aware interpretation is much more valuable than a binary winner-takes-all narrative, because it points toward a more actionable question for future work: which properties of a shift regime predict whether a given kernel family will be favorable?
+We emphasize what the mechanism does not yet deliver. It is explanatory and diagnostic---given the Gram matrices of a setting, it accounts for which kernels will generalize under the shift---but our attempts to convert it into an a-priori selection rule from training data alone failed (Section~\ref{sec:res_mechanism}). Alignment on OOD inputs requires OOD labels; effective rank is train-only but is a precondition, not a guarantee. Turning alignment survival into a deployable model-selection signal, perhaps via unlabeled OOD data or distributionally robust surrogates, is in our view the most interesting open problem this study raises.
 
 \subsection{Implications for security machine learning practice}
 
-From a practical perspective, the paper suggests two takeaways for security ML. The first is substantive: when compared fairly under fixed protocols, quantum kernels can provide meaningful OOD robustness gains in malware detection. This makes them worthy of serious consideration as candidate models in security pipelines, especially when the main concern is not just fitting the present distribution but preserving performance under plausible shift.
+From a practical perspective, the paper suggests three takeaways for security ML. The first is substantive: for OOD-sensitive kernel selection, prefer kernels whose label-aligned geometry survives shift. Concretely, if quantum kernels are unavailable or too costly, a median-heuristic Laplacian kernel is a far stronger robustness baseline than the RBF kernel that pipelines default to---on our EMBER settings it recovers most of what the fidelity maps offer. Where quantum kernels are on the table, they warrant serious consideration for drifting-traffic workloads, where their advantage was largest and most uniform in our study.
 
-The second is methodological. Independently of whether one ultimately prefers a classical or quantum kernel, the protocol used here provides a reusable blueprint for robust evaluation in security settings:
+The second is methodological. Independently of the preferred kernel family, the protocol used here provides a reusable blueprint for robust evaluation in security settings:
 \begin{enumerate}
-    \item keep the classifier and preprocessing fixed,
-    \item define explicit OOD splits tied to interpretable shift mechanisms,
-    \item repeat runs and report variability rather than single numbers,
+    \item keep the classifier and preprocessing fixed, and swap only the kernel;
+    \item define explicit OOD splits tied to interpretable shift mechanisms, including at least one natural drift mechanism where the data permit;
+    \item give every family the same hyperparameter freedom, bandwidth included;
+    \item repeat runs, report variability, and test family-level claims formally;
     \item and separate model-selection criteria according to the actual objective (robustness vs.\ separability).
 \end{enumerate}
-This structure is useful beyond the specific models studied here. Security ML frequently suffers from comparisons in which model class, tuning effort, and evaluation conditions change simultaneously. A controlled kernel-swap design avoids that ambiguity and yields conclusions that are easier to trust and easier to reproduce.
+Security ML frequently suffers from comparisons in which model class, tuning effort, and evaluation conditions change simultaneously; the three-verdict sequence of Sections~\ref{sec:res_baselines}--\ref{sec:res_bandwidth} is a concrete demonstration of how much the conclusion depends on getting this right.
 
-Practitioners should nonetheless resist the temptation to interpret these results as a blanket recommendation to replace classical kernels. The more responsible recommendation is narrower: treat quantum kernels as a strong candidate family whose value should be tested under the expected shift regime, not as a default substitute for well-tuned classical baselines.
+The third concerns diagnostics: the geometry descriptors are cheap to compute from Gram matrices that the pipeline already builds, and the alignment-survival analysis can be run post hoc on any deployed kernel system with a labeled drift sample. Practitioners should nonetheless resist reading these results as a blanket recommendation to replace classical kernels; the responsible recommendation is to test the candidate families under the expected shift regime, using exactly the kind of protocol described here.
 
 \subsection{Limitations and threats to validity}
 
 Several limitations define the scope of our conclusions.
 
 \paragraph{Shift operationalization.}
-Our OOD splits are constructed through two controlled mechanisms, $m1$ and $m2$. These mechanisms are reproducible and useful for regime comparisons, but they represent only a subset of possible real-world drift processes. Future work should connect the present protocol to additional forms of shift, including explicit temporal splits, family-based drift, and adversarially induced distribution change.
+Our OOD splits cover three reproducible mechanisms---within-class sparsity extremes, train-geometry extremes, and natural regime drift on network traffic---but not the full space of real-world drift processes. Explicit temporal splits on timestamped malware, family-based drift, and adversarially induced shift remain outside the study's scope, and the alignment-survival regularity should be re-tested under them rather than assumed.
 
-\paragraph{Kernel-family coverage.}
-We compare strong classical baselines (linear and RBF) against multiple fidelity-based quantum kernels induced by commonly used feature maps. This is a meaningful and fair comparison, but not an exhaustive one. The quantum-kernel design space is much larger, and classical alternatives beyond linear/RBF could also be relevant. Extending the study to broader kernel families would help determine whether the present trends persist or are specific to the compared set.
+\paragraph{Kernel and encoding coverage.}
+The classical family now spans seven kernels plus a bandwidth sweep, and both families receive symmetric tuning freedom, but neither candidate set is exhaustive: the quantum side is restricted to four commonly used fidelity feature maps at low qubit counts, and trained or task-adapted encodings, projected kernels, and deeper maps are not evaluated. The mechanism gives a concrete prediction for such extensions---what should matter is their Gram-matrix geometry, not their provenance---which future work can falsify.
 
 \paragraph{Selection over candidate sets.}
-Both Best-by-OOD and Best-by-ID are selection procedures over a finite candidate set. Although the same logic is applied within each family, the outcome still depends on the candidate space and search granularity. This is one reason why repeated-run reporting is important, but it does not eliminate all forms of selection sensitivity. Future work could strengthen the analysis further through formal statistical testing, nested selection protocols, or robustness analyses over expanded search spaces.
+Best-by-OOD and Best-by-ID are selection procedures over finite candidate sets, applied identically to both families and evaluated on run means with formal paired testing. Residual sensitivity to the candidate space and search granularity nonetheless remains, and nested or cross-validated selection protocols would strengthen the analysis further.
 
-\paragraph{Hardware interpretation.}
-Our quantum kernels are studied as kernel constructions defined through fidelity-based similarities, not as demonstrations of near-term hardware advantage. This distinction is important. The paper evaluates the geometry induced by the kernels, not the practical performance of noisy quantum devices. We therefore make no claim about hardware superiority, resource advantage, or quantum speedup.
+\paragraph{Simulation, not hardware.}
+All quantum kernels are computed by exact statevector simulation. The study therefore characterizes the geometry of fidelity kernels, not the behavior of noisy devices: finite sampling of kernel entries, hardware noise, and error mitigation would all perturb the Gram matrices, and their effect on alignment survival is unknown. We make no claim about hardware feasibility, resource advantage, or quantum speedup; at the dimensions studied, the fidelity kernels are also classically simulable, which is precisely what makes them available as practical kernel constructions today.
 
-\paragraph{Generality beyond EMBER.}
-EMBER is a strong benchmark for static PE malware detection, and the updated benchmark landscape further supports its relevance \cite{anderson2018ember,joyce2025ember2024}. Even so, conclusions drawn from one dataset family should not be assumed to transfer automatically to other security modalities such as dynamic malware analysis, network intrusion data, or broader cyber-defense settings. Replication on additional benchmark families will be important for establishing external validity.
+\paragraph{Dataset scope and feature caveats.}
+Four benchmark scenarios across two modalities is a substantial widening relative to single-dataset studies, but security is broader still: dynamic malware analysis, encrypted traffic, and non-security modalities remain untested. Within the network scenarios, the feature sets inherited from the public benchmarks retain port numbers and protocol indicators, which are legitimate but known shortcut-prone features in NIDS; because every kernel receives identical features, this affects absolute accuracies, not the family comparisons. Finally, the mechanism's effective-rank component is itself regime-dependent (strong on EMBER and ToN-IoT, weak on UNSW-Reconnaissance), a gradation we report rather than smooth over.
 
 \subsection{Conservative interpretation}
 
-In light of these limitations and the broader QML benchmarking literature, the appropriate interpretation of the paper is deliberately conservative. We do not claim universal superiority, complexity-theoretic quantum advantage, or immediate hardware relevance. Instead, we provide controlled empirical evidence that quantum kernels can improve OOD robustness in a meaningful fraction of settings relevant to malware detection under shift, while also identifying structured regimes in which classical kernels remain competitive or preferable.
-
-This regime-aware view is, in our view, scientifically stronger than a more ambitious narrative. It is consistent with recent calls for careful benchmarking in QML \cite{bowles2024betterthanclassical,schnabel2025scrutiny} and with the broader lesson from distribution-shift research that robustness claims should be narrow enough to be credible and specific enough to be testable. Under that standard, the present study supports a clear conclusion: kernel choice matters under shift, quantum kernels deserve serious consideration in this setting, and their benefits are best understood not as universal truths but as structured advantages that depend on the interaction between representation, similarity, and shift regime.
+In light of these limitations and the broader QML benchmarking literature, the appropriate interpretation of the paper is deliberately conservative. We do not claim universal superiority, complexity-theoretic quantum advantage, or hardware relevance. We claim, with formal statistical support, three narrower things: that fidelity-based quantum kernels beat the customary baselines under shift essentially wherever we looked; that this fact is explained by a geometric property a well-chosen classical kernel can partially share; and that under symmetric protocols the quantum family retains a significant OOD advantage on drifting network traffic and a universal ID-separability advantage on EMBER. This regime-aware view is consistent with recent calls for careful benchmarking in QML \cite{bowles2024betterthanclassical,schnabel2025scrutiny} and, we believe, is scientifically stronger than either an unqualified advantage claim or an unqualified debunking: it says what the advantage is made of, where it lives, and how to check for it.
 
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-This paper asked whether quantum kernels can improve robustness under distribution shift in malware detection when compared fairly against strong classical kernels. To answer this question, we introduced a controlled kernel-swap protocol in which the classifier family, preprocessing pipeline, and split definitions were held fixed, and only the kernel was changed. This design allowed the comparison to be interpreted as a comparison of kernel behavior rather than as a comparison between heterogeneous model pipelines.
+This paper asked why kernel families behave differently under distribution shift, using the quantum-versus-classical comparison as both motivation and stress test. A controlled kernel-swap protocol---classifier, preprocessing, splits, selection logic, and tuning freedom held fixed while only the kernel varies---was instantiated on four security benchmarks spanning two modalities and three drift mechanisms, two classifier families including a probabilistic one, and 72 principal settings with 15 repeated runs and formal paired testing.
 
-Across 18 principal settings on EMBER malware detection, quantum kernels improved OOD balanced accuracy in the majority of cases under robustness-oriented selection, while improving ID balanced accuracy consistently under ID-oriented selection. At the same time, the results were not uniform enough to justify any claim of universal superiority: a small number of structured and localized regimes remained favorable to classical kernels. This is not a weakness of the study, but one of its main outcomes, because it shows that the practical question is not whether quantum kernels always win, but under which shift regimes and representation conditions they help.
+The empirical arc has four movements. Fidelity-based quantum kernels beat the customary linear and RBF baselines under shift nearly everywhere. A stronger classical family neutralizes that advantage on EMBER, revealing that the operative property is geometric rather than quantum. Symmetric bandwidth tuning restores it, revealing that the neutralization itself depended on an asymmetric protocol. And on drifting network traffic the advantage is uniform under the probabilistic classifier, while the in-distribution separability advantage survives every control on EMBER. A single mechanism accounts for the whole pattern: kernels whose training geometry has high effective rank retain their kernel-target alignment under shift, and alignment survival predicts out-of-distribution accuracy within settings in 89--99\% of 360 setting-seed units across all four datasets. The mechanism also explains the exceptions---the competitive classical kernels are exactly those sharing the geometric signature---and makes falsifiable predictions for kernel constructions we did not test.
 
-The contribution of the paper is therefore twofold. Empirically, it provides variability-aware evidence that quantum kernels can be a competitive and often advantageous family for malware detection under shift. Methodologically, it provides a reproducible evaluation template for controlled comparison under OOD conditions, separating robustness-oriented and separability-oriented selection views and explicitly reporting variability rather than relying on single-run outcomes.
+The contribution is therefore threefold. Empirically, the study provides the broadest controlled, variability-aware regime map of quantum-versus-classical kernel behavior under shift that we are aware of, including the honest negative results (the Laplacian neutralization, the non-predictiveness of the geometric difference, the absence of an a-priori selection rule). Mechanistically, it converts an observation into an explanation with cross-dataset support. Methodologically, it leaves behind a fully reproducible protocol---and a cautionary demonstration that the quantum-versus-classical verdict flips twice as the protocol is made progressively fairer, which we offer as a concrete standard for future QML benchmarking.
 
-Our claims are deliberately conservative. We do not claim complexity-theoretic quantum advantage, hardware superiority, or universal dominance over classical kernels. Instead, we show that under a fair and explicitly shift-aware protocol, kernel choice materially affects robustness, and that quantum kernels frequently offer an advantage while still exhibiting identifiable, structured failure regimes. In this sense, the most defensible interpretation of the evidence is regime-aware rather than universal: the benefits of quantum kernels are best understood as depending on the interaction between similarity geometry, representation, and shift regime.
-
-Several directions follow naturally from this work. Future studies should extend the protocol to additional forms of malware drift, broader classical and quantum kernel families, and further security-relevant datasets. More generally, the results suggest that the most fruitful path forward is not to treat quantum and classical kernels as competing absolutes, but to understand more precisely how kernel geometry interacts with representation and shift regime. The central question is therefore not whether one kernel family universally dominates, but which similarity geometry aligns best with the target shift regime under controlled and reproducible evaluation.
+The most important open problems are two. Practically, turning alignment survival into a deployment-time selection signal without OOD labels would convert the diagnosis into a tool. Theoretically, the dose-response relationship between spectral tails and alignment survival calls for a formal account: under which shift models does high effective rank provably protect kernel-target alignment? Answering either question would benefit classical and quantum kernel methods alike---which is, in the end, the point: the productive question is not whether one family dominates, but which similarity geometry aligns best with the shift regime one actually faces.
 
 \begin{appendices}
 
 \section{Additional Results}
 \label{app:additional_results}
 
-This appendix provides the full setting-level tables underlying the main-text summary results. To preserve readability in the main manuscript, the core narrative is supported there by compact summary tables and figures, while the complete per-setting comparisons are reported here for transparency and reproducibility. For compactness, size labels denote $(n_{\mathrm{train}}, n_{\mathrm{ID}}, n_{\mathrm{OOD}})$ as follows: S = (1k, 500, 500), M = (2k, 1k, 1k), and L = (4k, 1.8k, 1.8k).
+This appendix reports the full setting-level Best-by-OOD comparisons between the selected quantum kernel and the best kernel of the \emph{extended} classical family (the strongest comparison in the study), for both classifiers and all 72 principal settings. Every value is a mean $\pm$ standard deviation over 15 repeated runs; Effect denotes $\Delta_{\mathrm{OOD}}/\sqrt{\sigma_C^2+\sigma_Q^2}$. Size labels denote $(n_{\mathrm{train}}, n_{\mathrm{ID}}, n_{\mathrm{OOD}})$: S = (1k, 500, 500), M = (2k, 1k, 1k), L = (4k, 1.8k, 1.8k). Shift labels for the network scenarios abbreviate scenario/mechanism (e.g., U-DoS/nat is UNSW-NB15 DoS under natural drift; m2c is the centroid construction). All tables are generated directly from the public artifact by \texttt{scripts/reporting/make\_v2\_tables.py}.
 
-\begin{figure*}[t]
+
+\begin{table}[p]
 \centering
-\includegraphics[width=\textwidth]{fig_setting_level_deltas.png}
-\caption{Setting-level OOD deltas across the 18 principal settings. Positive values indicate an advantage for the selected quantum model over the selected classical model under Best-by-OOD selection.}
-\label{fig:setting_deltas_appendix}
-\end{figure*}
-
-\subsection{Full Best-by-OOD comparisons}
-\label{app:best_ood_full}
-
-Tables~\ref{tab:best_ood_m1} and \ref{tab:best_ood_m2} report the full setting-level Best-by-OOD comparisons, split by shift variant for readability.
-
-\begin{table}[t]
-\centering
-\caption{Full Best-by-OOD comparison for shift variant m1.}
-\label{tab:best_ood_m1}
+\caption{EMBER, SVC: full Best-by-OOD comparison against the extended classical family.}
+\label{app:ember_svc}
 \scriptsize
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}cccp{1.55cm}p{1.75cm}ccc c@{}}
+\begin{tabular}{@{}ccc ll cc rr@{}}
 \toprule
-Var. & Seed & Size & Classical & Quantum & \shortstack{OOD\\C} & \shortstack{OOD\\Q} & $\Delta_{\mathrm{OOD}}$ & Win. \\
+Shift & Seed & Size & Best classical (ext.) & Best quantum & \shortstack{OOD\\C} & \shortstack{OOD\\Q} & $\Delta_{\mathrm{OOD}}$ & Effect \\
 \midrule
-m1 & 42  & S & RBF(scale) & PauliXZ-r1 (d=12) & 0.722$\pm$0.013 & 0.758$\pm$0.020 & +0.036 & Q \\
-m1 & 42  & M & RBF(scale) & ZZ-r1 (d=12)      & 0.709$\pm$0.009 & 0.761$\pm$0.007 & +0.052 & Q \\
-m1 & 42  & L & RBF(scale) & ZZ-r1 (d=12)      & 0.749$\pm$0.020 & 0.756$\pm$0.008 & +0.008 & Q \\
-m1 & 123 & S & RBF(scale) & PauliXZ-r1 (d=12) & 0.729$\pm$0.024 & 0.750$\pm$0.020 & +0.020 & Q \\
-m1 & 123 & M & RBF(scale) & ZZ-r1 (d=10)      & 0.746$\pm$0.020 & 0.756$\pm$0.029 & +0.010 & Q \\
-m1 & 123 & L & RBF(scale) & ZZ-r1 (d=10)      & 0.741$\pm$0.032 & 0.753$\pm$0.014 & +0.012 & Q \\
-m1 & 999 & S & RBF(scale) & PauliXZ-r1 (d=12) & 0.737$\pm$0.012 & 0.767$\pm$0.022 & +0.030 & Q \\
-m1 & 999 & M & RBF(scale) & ZZ-r1 (d=12)      & 0.750$\pm$0.009 & 0.762$\pm$0.013 & +0.012 & Q \\
-m1 & 999 & L & RBF(scale) & ZZ-r1 (d=10)      & 0.763$\pm$0.024 & 0.753$\pm$0.005 & -0.010 & C \\
-\bottomrule
+m1 & 42 & S & Laplacian (d4) & PauliXZ (d12) & $0.756\pm0.007$ & $0.758\pm0.020$ & $+0.002$ & $+0.09$ \\
+m1 & 42 & M & Laplacian (d12) & ZZ-r1 (d12) & $0.753\pm0.019$ & $0.761\pm0.007$ & $+0.009$ & $+0.42$ \\
+m1 & 42 & L & Laplacian (d12) & ZZ-r1 (d12) & $0.750\pm0.014$ & $0.757\pm0.008$ & $+0.006$ & $+0.38$ \\
+m1 & 123 & S & Laplacian (d12) & PauliXZ (d12) & $0.762\pm0.019$ & $0.750\pm0.020$ & $-0.012$ & $-0.43$ \\
+m1 & 123 & M & Laplacian (d12) & ZZ-r1 (d10) & $0.760\pm0.027$ & $0.756\pm0.029$ & $-0.003$ & $-0.08$ \\
+m1 & 123 & L & Laplacian (d12) & ZZ-r1 (d10) & $0.751\pm0.019$ & $0.753\pm0.014$ & $+0.002$ & $+0.09$ \\
+m1 & 999 & S & Laplacian (d12) & PauliXZ (d12) & $0.767\pm0.028$ & $0.768\pm0.022$ & $+0.000$ & $+0.00$ \\
+m1 & 999 & M & Mat\'ern-5/2 (d12) & ZZ-r1 (d12) & $0.755\pm0.015$ & $0.762\pm0.013$ & $+0.007$ & $+0.34$ \\
+m1 & 999 & L & RBF (d12) & ZZ-r1 (d10) & $0.763\pm0.024$ & $0.753\pm0.005$ & $-0.010$ & $-0.42$ \\
+m2 & 42 & S & Laplacian (d10) & ZZ-r1 (d10) & $0.762\pm0.012$ & $0.763\pm0.018$ & $+0.000$ & $+0.02$ \\
+m2 & 42 & M & Laplacian (d12) & ZZ-r2 (d12) & $0.767\pm0.012$ & $0.784\pm0.009$ & $+0.017$ & $+1.10$ \\
+m2 & 42 & L & Laplacian (d12) & ZZ-r2 (d12) & $0.783\pm0.008$ & $0.795\pm0.011$ & $+0.012$ & $+0.85$ \\
+m2 & 123 & S & Laplacian (d12) & ZZ-r1 (d12) & $0.762\pm0.023$ & $0.771\pm0.019$ & $+0.009$ & $+0.30$ \\
+m2 & 123 & M & Laplacian (d12) & ZZ-r1 (d12) & $0.775\pm0.017$ & $0.783\pm0.013$ & $+0.007$ & $+0.35$ \\
+m2 & 123 & L & Laplacian (d12) & ZZ-r2 (d12) & $0.785\pm0.011$ & $0.794\pm0.007$ & $+0.009$ & $+0.71$ \\
+m2 & 999 & S & Laplacian (d12) & ZZ-r1 (d12) & $0.769\pm0.014$ & $0.775\pm0.022$ & $+0.006$ & $+0.25$ \\
+m2 & 999 & M & Laplacian (d10) & ZZ-r2 (d12) & $0.776\pm0.016$ & $0.780\pm0.020$ & $+0.004$ & $+0.14$ \\
+m2 & 999 & L & Laplacian (d12) & ZZ-r2 (d12) & $0.787\pm0.013$ & $0.803\pm0.009$ & $+0.015$ & $+0.97$ \\\bottomrule
 \end{tabular}
 \end{table}
 
-\begin{table}[t]
+\begin{table}[p]
 \centering
-\caption{Full Best-by-OOD comparison for shift variant m2.}
-\label{tab:best_ood_m2}
+\caption{EMBER, GP classifier: full Best-by-OOD comparison against the extended classical family.}
+\label{app:ember_gpc}
 \scriptsize
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}cccp{1.55cm}p{1.75cm}ccc c@{}}
+\begin{tabular}{@{}ccc ll cc rr@{}}
 \toprule
-Var. & Seed & Size & Classical & Quantum & \shortstack{OOD\\C} & \shortstack{OOD\\Q} & $\Delta_{\mathrm{OOD}}$ & Win. \\
+Shift & Seed & Size & Best classical (ext.) & Best quantum & \shortstack{OOD\\C} & \shortstack{OOD\\Q} & $\Delta_{\mathrm{OOD}}$ & Effect \\
 \midrule
-m2 & 42  & S & RBF(scale) & PauliXZ-r1 (d=8)  & 0.735$\pm$0.013 & 0.674$\pm$0.030 & -0.061 & C \\
-m2 & 42  & M & Linear     & PauliXZ-r1 (d=12) & 0.769$\pm$0.019 & 0.708$\pm$0.019 & -0.061 & C \\
-m2 & 42  & L & Linear     & PauliXZ-r1 (d=10) & 0.784$\pm$0.012 & 0.728$\pm$0.017 & -0.056 & C \\
-m2 & 123 & S & RBF(scale) & ZZ-r1 (d=12)      & 0.729$\pm$0.017 & 0.786$\pm$0.018 & +0.057 & Q \\
-m2 & 123 & M & RBF(scale) & ZZ-r2 (d=12)      & 0.741$\pm$0.005 & 0.782$\pm$0.016 & +0.042 & Q \\
-m2 & 123 & L & RBF(scale) & ZZ-r2 (d=12)      & 0.747$\pm$0.022 & 0.797$\pm$0.009 & +0.050 & Q \\
-m2 & 999 & S & RBF(scale) & ZZ-r1 (d=10)      & 0.709$\pm$0.024 & 0.774$\pm$0.007 & +0.066 & Q \\
-m2 & 999 & M & RBF(scale) & ZZ-r1 (d=12)      & 0.725$\pm$0.030 & 0.782$\pm$0.017 & +0.057 & Q \\
-m2 & 999 & L & RBF(scale) & ZZ-r1 (d=12)      & 0.724$\pm$0.037 & 0.800$\pm$0.009 & +0.076 & Q \\
-\bottomrule
+m1 & 42 & S & Laplacian (d12) & PauliXZ (d12) & $0.767\pm0.018$ & $0.760\pm0.017$ & $-0.007$ & $-0.29$ \\
+m1 & 42 & M & Laplacian (d12) & ZZ-r1 (d12) & $0.765\pm0.021$ & $0.766\pm0.011$ & $+0.002$ & $+0.07$ \\
+m1 & 42 & L & RBF (d10) & PauliXZ (d12) & $0.764\pm0.015$ & $0.761\pm0.011$ & $-0.003$ & $-0.16$ \\
+m1 & 123 & S & Laplacian (d12) & PauliXZ (d12) & $0.765\pm0.016$ & $0.753\pm0.025$ & $-0.012$ & $-0.41$ \\
+m1 & 123 & M & Laplacian (d12) & PauliXZ (d12) & $0.775\pm0.035$ & $0.772\pm0.023$ & $-0.004$ & $-0.09$ \\
+m1 & 123 & L & Mat\'ern-5/2 (d10) & ZZ-r2 (d12) & $0.758\pm0.017$ & $0.754\pm0.014$ & $-0.004$ & $-0.18$ \\
+m1 & 999 & S & Laplacian (d12) & PauliXZ (d12) & $0.766\pm0.028$ & $0.762\pm0.027$ & $-0.004$ & $-0.11$ \\
+m1 & 999 & M & Mat\'ern-5/2 (d12) & Z-map (d12) & $0.768\pm0.016$ & $0.776\pm0.009$ & $+0.008$ & $+0.43$ \\
+m1 & 999 & L & RBF (d12) & ZZ-r1 (d8) & $0.763\pm0.009$ & $0.754\pm0.008$ & $-0.008$ & $-0.74$ \\
+m2 & 42 & S & Laplacian (d12) & ZZ-r1 (d12) & $0.762\pm0.024$ & $0.764\pm0.015$ & $+0.002$ & $+0.06$ \\
+m2 & 42 & M & Laplacian (d12) & ZZ-r2 (d12) & $0.767\pm0.013$ & $0.778\pm0.008$ & $+0.010$ & $+0.68$ \\
+m2 & 42 & L & Laplacian (d12) & ZZ-r2 (d12) & $0.783\pm0.008$ & $0.793\pm0.009$ & $+0.010$ & $+0.85$ \\
+m2 & 123 & S & Laplacian (d12) & ZZ-r2 (d12) & $0.767\pm0.025$ & $0.772\pm0.015$ & $+0.005$ & $+0.19$ \\
+m2 & 123 & M & Laplacian (d12) & ZZ-r1 (d12) & $0.772\pm0.020$ & $0.783\pm0.015$ & $+0.011$ & $+0.44$ \\
+m2 & 123 & L & Laplacian (d12) & ZZ-r2 (d12) & $0.780\pm0.010$ & $0.791\pm0.010$ & $+0.012$ & $+0.83$ \\
+m2 & 999 & S & Laplacian (d12) & ZZ-r1 (d10) & $0.767\pm0.021$ & $0.775\pm0.021$ & $+0.008$ & $+0.27$ \\
+m2 & 999 & M & Laplacian (d12) & ZZ-r2 (d12) & $0.776\pm0.016$ & $0.780\pm0.025$ & $+0.004$ & $+0.13$ \\
+m2 & 999 & L & Laplacian (d12) & ZZ-r2 (d12) & $0.786\pm0.013$ & $0.798\pm0.011$ & $+0.012$ & $+0.70$ \\\bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Full Best-by-ID comparisons}
-\label{app:best_id_full}
-
-Tables~\ref{tab:best_id_m1} and \ref{tab:best_id_m2} report the full setting-level Best-by-ID comparisons, again split by shift variant for readability.
-
-\begin{table}[t]
+\begin{table}[p]
 \centering
-\caption{Full Best-by-ID comparison for shift variant m1.}
-\label{tab:best_id_m1}
+\caption{Network flows, SVC: full Best-by-OOD comparison against the extended classical family.}
+\label{app:netflow_svc}
 \scriptsize
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}cccp{1.55cm}p{1.75cm}ccc c@{}}
+\begin{tabular}{@{}ccc ll cc rr@{}}
 \toprule
-Var. & Seed & Size & Classical & Quantum & \shortstack{ID\\C} & \shortstack{ID\\Q} & $\Delta_{\mathrm{ID}}$ & Win. \\
+Shift & Seed & Size & Best classical (ext.) & Best quantum & \shortstack{OOD\\C} & \shortstack{OOD\\Q} & $\Delta_{\mathrm{OOD}}$ & Effect \\
 \midrule
-m1 & 42  & S & RBF(scale) & ZZ-r1 (d=12) & 0.711$\pm$0.024 & 0.778$\pm$0.022 & +0.067 & Q \\
-m1 & 42  & M & RBF(scale) & ZZ-r1 (d=10) & 0.702$\pm$0.005 & 0.793$\pm$0.006 & +0.090 & Q \\
-m1 & 42  & L & RBF(scale) & ZZ-r2 (d=12) & 0.719$\pm$0.005 & 0.805$\pm$0.008 & +0.086 & Q \\
-m1 & 123 & S & RBF(scale) & ZZ-r1 (d=12) & 0.733$\pm$0.020 & 0.790$\pm$0.013 & +0.057 & Q \\
-m1 & 123 & M & RBF(scale) & ZZ-r1 (d=12) & 0.716$\pm$0.011 & 0.798$\pm$0.016 & +0.082 & Q \\
-m1 & 123 & L & RBF(scale) & ZZ-r2 (d=12) & 0.712$\pm$0.011 & 0.801$\pm$0.006 & +0.090 & Q \\
-m1 & 999 & S & RBF(scale) & ZZ-r1 (d=12) & 0.718$\pm$0.030 & 0.773$\pm$0.023 & +0.055 & Q \\
-m1 & 999 & M & RBF(scale) & ZZ-r2 (d=12) & 0.720$\pm$0.011 & 0.793$\pm$0.012 & +0.073 & Q \\
-m1 & 999 & L & RBF(scale) & ZZ-r2 (d=12) & 0.722$\pm$0.017 & 0.802$\pm$0.006 & +0.080 & Q \\
-\bottomrule
+T-Scan/m2c & 42 & S & Laplacian (d12) & ZZ-r1 (d6) & $0.941\pm0.013$ & $0.954\pm0.009$ & $+0.014$ & $+0.90$ \\
+T-Scan/m2c & 42 & M & Laplacian (d12) & ZZ-r1 (d10) & $0.941\pm0.014$ & $0.958\pm0.005$ & $+0.017$ & $+1.15$ \\
+T-Scan/m2c & 42 & L & Laplacian (d12) & ZZ-r1 (d8) & $0.959\pm0.009$ & $0.964\pm0.006$ & $+0.005$ & $+0.44$ \\
+T-Scan/m2c & 123 & S & Laplacian (d12) & ZZ-r1 (d8) & $0.943\pm0.017$ & $0.959\pm0.011$ & $+0.015$ & $+0.75$ \\
+T-Scan/m2c & 123 & M & Laplacian (d12) & ZZ-r1 (d6) & $0.954\pm0.007$ & $0.958\pm0.006$ & $+0.003$ & $+0.35$ \\
+T-Scan/m2c & 123 & L & Laplacian (d10) & ZZ-r1 (d8) & $0.955\pm0.003$ & $0.959\pm0.003$ & $+0.003$ & $+0.72$ \\
+T-Scan/m2c & 999 & S & Laplacian (d10) & ZZ-r1 (d10) & $0.936\pm0.011$ & $0.957\pm0.003$ & $+0.021$ & $+1.80$ \\
+T-Scan/m2c & 999 & M & Laplacian (d12) & ZZ-r1 (d8) & $0.954\pm0.009$ & $0.962\pm0.007$ & $+0.008$ & $+0.72$ \\
+T-Scan/m2c & 999 & L & Laplacian (d12) & ZZ-r1 (d10) & $0.965\pm0.004$ & $0.969\pm0.003$ & $+0.003$ & $+0.71$ \\
+T-Scan/nat & 42 & S & Laplacian (d8) & ZZ-r1 (d10) & $0.987\pm0.003$ & $0.988\pm0.005$ & $+0.001$ & $+0.10$ \\
+T-Scan/nat & 42 & M & Laplacian (d10) & ZZ-r1 (d12) & $0.989\pm0.004$ & $0.990\pm0.002$ & $+0.001$ & $+0.24$ \\
+T-Scan/nat & 42 & L & Laplacian (d12) & Z-map (d12) & $0.989\pm0.005$ & $0.991\pm0.003$ & $+0.002$ & $+0.31$ \\
+T-Scan/nat & 123 & S & Laplacian (d8) & ZZ-r1 (d12) & $0.990\pm0.005$ & $0.992\pm0.005$ & $+0.002$ & $+0.36$ \\
+T-Scan/nat & 123 & M & Laplacian (d12) & Z-map (d10) & $0.989\pm0.003$ & $0.992\pm0.002$ & $+0.003$ & $+0.61$ \\
+T-Scan/nat & 123 & L & Laplacian (d10) & Z-map (d12) & $0.990\pm0.002$ & $0.991\pm0.003$ & $+0.002$ & $+0.40$ \\
+T-Scan/nat & 999 & S & Laplacian (d12) & Z-map (d12) & $0.979\pm0.006$ & $0.985\pm0.002$ & $+0.006$ & $+1.05$ \\
+T-Scan/nat & 999 & M & Laplacian (d10) & Z-map (d10) & $0.990\pm0.002$ & $0.991\pm0.004$ & $+0.002$ & $+0.38$ \\
+T-Scan/nat & 999 & L & Laplacian (d10) & Z-map (d12) & $0.992\pm0.002$ & $0.992\pm0.003$ & $+0.000$ & $+0.12$ \\
+U-DoS/m2c & 42 & S & Laplacian (d12) & PauliXZ (d12) & $0.920\pm0.016$ & $0.919\pm0.014$ & $-0.001$ & $-0.06$ \\
+U-DoS/m2c & 42 & M & Laplacian (d12) & PauliXZ (d12) & $0.934\pm0.017$ & $0.937\pm0.007$ & $+0.003$ & $+0.16$ \\
+U-DoS/m2c & 42 & L & Laplacian (d12) & PauliXZ (d10) & $0.942\pm0.008$ & $0.940\pm0.006$ & $-0.002$ & $-0.18$ \\
+U-DoS/m2c & 123 & S & Laplacian (d12) & PauliXZ (d12) & $0.917\pm0.020$ & $0.926\pm0.013$ & $+0.008$ & $+0.33$ \\
+U-DoS/m2c & 123 & M & Laplacian (d12) & PauliXZ (d12) & $0.943\pm0.007$ & $0.940\pm0.010$ & $-0.004$ & $-0.28$ \\
+U-DoS/m2c & 123 & L & Laplacian (d12) & Z-map (d12) & $0.948\pm0.003$ & $0.947\pm0.005$ & $-0.001$ & $-0.20$ \\
+U-DoS/m2c & 999 & S & Laplacian (d12) & PauliXZ (d12) & $0.923\pm0.023$ & $0.927\pm0.009$ & $+0.004$ & $+0.16$ \\
+U-DoS/m2c & 999 & M & Laplacian (d12) & PauliXZ (d12) & $0.935\pm0.013$ & $0.939\pm0.007$ & $+0.004$ & $+0.26$ \\
+U-DoS/m2c & 999 & L & Laplacian (d12) & Z-map (d12) & $0.947\pm0.004$ & $0.946\pm0.004$ & $-0.001$ & $-0.22$ \\
+U-DoS/nat & 42 & S & Linear (d4) & ZZ-r2 (d10) & $0.781\pm0.040$ & $0.809\pm0.017$ & $+0.028$ & $+0.65$ \\
+U-DoS/nat & 42 & M & Laplacian (d12) & Z-map (d12) & $0.829\pm0.019$ & $0.838\pm0.014$ & $+0.009$ & $+0.38$ \\
+U-DoS/nat & 42 & L & Laplacian (d12) & Z-map (d12) & $0.829\pm0.011$ & $0.829\pm0.008$ & $+0.000$ & $+0.01$ \\
+U-DoS/nat & 123 & S & Laplacian (d12) & ZZ-r2 (d6) & $0.775\pm0.026$ & $0.818\pm0.018$ & $+0.043$ & $+1.37$ \\
+U-DoS/nat & 123 & M & Laplacian (d12) & ZZ-r1 (d10) & $0.790\pm0.020$ & $0.812\pm0.007$ & $+0.022$ & $+1.04$ \\
+U-DoS/nat & 123 & L & Laplacian (d12) & ZZ-r1 (d12) & $0.809\pm0.012$ & $0.825\pm0.011$ & $+0.016$ & $+0.97$ \\
+U-DoS/nat & 999 & S & Linear (d4) & ZZ-r2 (d6) & $0.759\pm0.051$ & $0.800\pm0.018$ & $+0.042$ & $+0.77$ \\
+U-DoS/nat & 999 & M & Laplacian (d12) & ZZ-r2 (d10) & $0.788\pm0.016$ & $0.809\pm0.014$ & $+0.021$ & $+0.95$ \\
+U-DoS/nat & 999 & L & Laplacian (d12) & ZZ-r1 (d12) & $0.804\pm0.006$ & $0.826\pm0.013$ & $+0.023$ & $+1.63$ \\
+U-Rec/m2c & 42 & S & Laplacian (d12) & Z-map (d12) & $0.909\pm0.025$ & $0.909\pm0.015$ & $-0.000$ & $-0.01$ \\
+U-Rec/m2c & 42 & M & Laplacian (d12) & PauliXZ (d12) & $0.931\pm0.019$ & $0.935\pm0.008$ & $+0.004$ & $+0.18$ \\
+U-Rec/m2c & 42 & L & Laplacian (d12) & PauliXZ (d12) & $0.944\pm0.005$ & $0.943\pm0.006$ & $-0.001$ & $-0.12$ \\
+U-Rec/m2c & 123 & S & Laplacian (d12) & PauliXZ (d12) & $0.946\pm0.014$ & $0.942\pm0.007$ & $-0.004$ & $-0.24$ \\
+U-Rec/m2c & 123 & M & Laplacian (d12) & PauliXZ (d12) & $0.951\pm0.011$ & $0.948\pm0.008$ & $-0.004$ & $-0.26$ \\
+U-Rec/m2c & 123 & L & Laplacian (d12) & Z-map (d12) & $0.954\pm0.007$ & $0.954\pm0.006$ & $-0.000$ & $-0.03$ \\
+U-Rec/m2c & 999 & S & Laplacian (d12) & Z-map (d12) & $0.915\pm0.016$ & $0.918\pm0.014$ & $+0.003$ & $+0.12$ \\
+U-Rec/m2c & 999 & M & Laplacian (d12) & Z-map (d12) & $0.947\pm0.006$ & $0.944\pm0.008$ & $-0.003$ & $-0.33$ \\
+U-Rec/m2c & 999 & L & Laplacian (d12) & Z-map (d12) & $0.956\pm0.003$ & $0.948\pm0.007$ & $-0.008$ & $-1.03$ \\
+U-Rec/nat & 42 & S & Linear (d12) & ZZ-r2 (d6) & $0.770\pm0.019$ & $0.778\pm0.013$ & $+0.008$ & $+0.36$ \\
+U-Rec/nat & 42 & M & Laplacian (d10) & ZZ-r1 (d4) & $0.809\pm0.035$ & $0.815\pm0.010$ & $+0.007$ & $+0.18$ \\
+U-Rec/nat & 42 & L & Laplacian (d10) & ZZ-r1 (d4) & $0.812\pm0.020$ & $0.815\pm0.008$ & $+0.003$ & $+0.12$ \\
+U-Rec/nat & 123 & S & Linear (d12) & ZZ-r1 (d6) & $0.795\pm0.012$ & $0.797\pm0.018$ & $+0.002$ & $+0.11$ \\
+U-Rec/nat & 123 & M & Linear (d10) & ZZ-r1 (d4) & $0.800\pm0.018$ & $0.802\pm0.024$ & $+0.003$ & $+0.09$ \\
+U-Rec/nat & 123 & L & Laplacian (d12) & ZZ-r1 (d4) & $0.818\pm0.018$ & $0.811\pm0.009$ & $-0.007$ & $-0.34$ \\
+U-Rec/nat & 999 & S & Linear (d12) & ZZ-r1 (d6) & $0.780\pm0.020$ & $0.781\pm0.008$ & $+0.000$ & $+0.02$ \\
+U-Rec/nat & 999 & M & Linear (d12) & ZZ-r2 (d6) & $0.783\pm0.014$ & $0.809\pm0.015$ & $+0.026$ & $+1.26$ \\
+U-Rec/nat & 999 & L & Laplacian (d8) & ZZ-r2 (d6) & $0.804\pm0.015$ & $0.814\pm0.008$ & $+0.010$ & $+0.59$ \\\bottomrule
 \end{tabular}
 \end{table}
 
-\begin{table}[t]
+\begin{table}[p]
 \centering
-\caption{Full Best-by-ID comparison for shift variant m2.}
-\label{tab:best_id_m2}
+\caption{Network flows, GP classifier: full Best-by-OOD comparison against the extended classical family.}
+\label{app:netflow_gpc}
 \scriptsize
 \setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}cccp{1.55cm}p{1.75cm}ccc c@{}}
+\begin{tabular}{@{}ccc ll cc rr@{}}
 \toprule
-Var. & Seed & Size & Classical & Quantum & \shortstack{ID\\C} & \shortstack{ID\\Q} & $\Delta_{\mathrm{ID}}$ & Win. \\
+Shift & Seed & Size & Best classical (ext.) & Best quantum & \shortstack{OOD\\C} & \shortstack{OOD\\Q} & $\Delta_{\mathrm{OOD}}$ & Effect \\
 \midrule
-m2 & 42  & S & RBF(scale) & ZZ-r1 (d=12) & 0.706$\pm$0.015 & 0.772$\pm$0.014 & +0.066 & Q \\
-m2 & 42  & M & RBF(scale) & ZZ-r1 (d=12) & 0.759$\pm$0.014 & 0.797$\pm$0.014 & +0.037 & Q \\
-m2 & 42  & L & RBF(scale) & ZZ-r1 (d=12) & 0.767$\pm$0.012 & 0.820$\pm$0.007 & +0.053 & Q \\
-m2 & 123 & S & RBF(scale) & ZZ-r1 (d=12) & 0.709$\pm$0.022 & 0.784$\pm$0.010 & +0.076 & Q \\
-m2 & 123 & M & RBF(scale) & ZZ-r2 (d=12) & 0.714$\pm$0.020 & 0.792$\pm$0.013 & +0.079 & Q \\
-m2 & 123 & L & RBF(scale) & ZZ-r2 (d=12) & 0.712$\pm$0.007 & 0.793$\pm$0.006 & +0.081 & Q \\
-m2 & 999 & S & RBF(scale) & ZZ-r2 (d=12) & 0.706$\pm$0.024 & 0.798$\pm$0.016 & +0.092 & Q \\
-m2 & 999 & M & RBF(scale) & ZZ-r2 (d=12) & 0.702$\pm$0.019 & 0.787$\pm$0.009 & +0.085 & Q \\
-m2 & 999 & L & RBF(scale) & ZZ-r2 (d=12) & 0.715$\pm$0.019 & 0.793$\pm$0.006 & +0.079 & Q \\
-\bottomrule
+T-Scan/m2c & 42 & S & Laplacian (d12) & ZZ-r1 (d8) & $0.906\pm0.019$ & $0.954\pm0.011$ & $+0.049$ & $+2.27$ \\
+T-Scan/m2c & 42 & M & Laplacian (d8) & ZZ-r1 (d12) & $0.921\pm0.004$ & $0.957\pm0.005$ & $+0.037$ & $+5.70$ \\
+T-Scan/m2c & 42 & L & Laplacian (d8) & ZZ-r1 (d8) & $0.931\pm0.007$ & $0.964\pm0.006$ & $+0.034$ & $+3.58$ \\
+T-Scan/m2c & 123 & S & Laplacian (d8) & ZZ-r1 (d10) & $0.910\pm0.056$ & $0.958\pm0.006$ & $+0.048$ & $+0.86$ \\
+T-Scan/m2c & 123 & M & Laplacian (d4) & ZZ-r1 (d12) & $0.932\pm0.007$ & $0.958\pm0.007$ & $+0.025$ & $+2.59$ \\
+T-Scan/m2c & 123 & L & Laplacian (d4) & ZZ-r1 (d10) & $0.934\pm0.004$ & $0.960\pm0.003$ & $+0.026$ & $+4.84$ \\
+T-Scan/m2c & 999 & S & Laplacian (d6) & ZZ-r1 (d10) & $0.918\pm0.021$ & $0.954\pm0.009$ & $+0.036$ & $+1.58$ \\
+T-Scan/m2c & 999 & M & Laplacian (d4) & ZZ-r1 (d10) & $0.931\pm0.002$ & $0.961\pm0.006$ & $+0.030$ & $+4.49$ \\
+T-Scan/m2c & 999 & L & Laplacian (d8) & ZZ-r1 (d10) & $0.941\pm0.003$ & $0.968\pm0.003$ & $+0.027$ & $+6.65$ \\
+T-Scan/nat & 42 & S & Laplacian (d8) & ZZ-r1 (d8) & $0.981\pm0.005$ & $0.990\pm0.002$ & $+0.009$ & $+1.67$ \\
+T-Scan/nat & 42 & M & Laplacian (d8) & ZZ-r1 (d10) & $0.987\pm0.002$ & $0.991\pm0.003$ & $+0.004$ & $+1.08$ \\
+T-Scan/nat & 42 & L & Laplacian (d8) & ZZ-r1 (d12) & $0.983\pm0.003$ & $0.992\pm0.002$ & $+0.009$ & $+2.30$ \\
+T-Scan/nat & 123 & S & Laplacian (d8) & ZZ-r1 (d8) & $0.981\pm0.017$ & $0.992\pm0.003$ & $+0.011$ & $+0.65$ \\
+T-Scan/nat & 123 & M & Laplacian (d8) & ZZ-r1 (d10) & $0.985\pm0.004$ & $0.993\pm0.002$ & $+0.008$ & $+1.72$ \\
+T-Scan/nat & 123 & L & Laplacian (d8) & ZZ-r1 (d12) & $0.985\pm0.004$ & $0.992\pm0.002$ & $+0.007$ & $+1.64$ \\
+T-Scan/nat & 999 & S & Laplacian (d10) & ZZ-r1 (d10) & $0.965\pm0.027$ & $0.980\pm0.015$ & $+0.015$ & $+0.48$ \\
+T-Scan/nat & 999 & M & Laplacian (d8) & ZZ-r1 (d10) & $0.984\pm0.005$ & $0.991\pm0.003$ & $+0.007$ & $+1.20$ \\
+T-Scan/nat & 999 & L & Laplacian (d8) & ZZ-r1 (d10) & $0.988\pm0.002$ & $0.992\pm0.003$ & $+0.004$ & $+1.41$ \\
+U-DoS/m2c & 42 & S & Laplacian (d12) & PauliXZ (d12) & $0.894\pm0.028$ & $0.904\pm0.016$ & $+0.009$ & $+0.29$ \\
+U-DoS/m2c & 42 & M & Laplacian (d12) & PauliXZ (d12) & $0.911\pm0.007$ & $0.934\pm0.009$ & $+0.023$ & $+1.96$ \\
+U-DoS/m2c & 42 & L & Laplacian (d12) & Z-map (d12) & $0.927\pm0.008$ & $0.939\pm0.010$ & $+0.013$ & $+1.02$ \\
+U-DoS/m2c & 123 & S & Laplacian (d12) & Z-map (d12) & $0.889\pm0.019$ & $0.917\pm0.019$ & $+0.028$ & $+1.04$ \\
+U-DoS/m2c & 123 & M & Laplacian (d12) & PauliXZ (d12) & $0.916\pm0.016$ & $0.937\pm0.007$ & $+0.022$ & $+1.24$ \\
+U-DoS/m2c & 123 & L & Laplacian (d12) & Z-map (d12) & $0.932\pm0.014$ & $0.945\pm0.007$ & $+0.013$ & $+0.86$ \\
+U-DoS/m2c & 999 & S & Laplacian (d12) & Z-map (d12) & $0.878\pm0.022$ & $0.911\pm0.031$ & $+0.033$ & $+0.87$ \\
+U-DoS/m2c & 999 & M & Laplacian (d12) & PauliXZ (d12) & $0.914\pm0.011$ & $0.931\pm0.009$ & $+0.017$ & $+1.19$ \\
+U-DoS/m2c & 999 & L & Laplacian (d12) & PauliXZ (d12) & $0.936\pm0.009$ & $0.944\pm0.003$ & $+0.008$ & $+0.82$ \\
+U-DoS/nat & 42 & S & Laplacian (d12) & ZZ-r2 (d6) & $0.764\pm0.023$ & $0.801\pm0.023$ & $+0.037$ & $+1.13$ \\
+U-DoS/nat & 42 & M & Laplacian (d12) & PauliXZ (d12) & $0.813\pm0.010$ & $0.829\pm0.008$ & $+0.016$ & $+1.20$ \\
+U-DoS/nat & 42 & L & Laplacian (d12) & Z-map (d12) & $0.818\pm0.010$ & $0.831\pm0.009$ & $+0.013$ & $+0.97$ \\
+U-DoS/nat & 123 & S & Laplacian (d12) & ZZ-r2 (d10) & $0.775\pm0.027$ & $0.813\pm0.017$ & $+0.038$ & $+1.20$ \\
+U-DoS/nat & 123 & M & Laplacian (d12) & ZZ-r2 (d6) & $0.781\pm0.020$ & $0.805\pm0.016$ & $+0.024$ & $+0.93$ \\
+U-DoS/nat & 123 & L & Laplacian (d12) & ZZ-r1 (d12) & $0.800\pm0.005$ & $0.816\pm0.006$ & $+0.016$ & $+2.09$ \\
+U-DoS/nat & 999 & S & Linear (d4) & ZZ-r2 (d6) & $0.766\pm0.053$ & $0.797\pm0.021$ & $+0.032$ & $+0.55$ \\
+U-DoS/nat & 999 & M & Laplacian (d12) & ZZ-r2 (d12) & $0.784\pm0.018$ & $0.806\pm0.013$ & $+0.022$ & $+1.02$ \\
+U-DoS/nat & 999 & L & Laplacian (d12) & ZZ-r2 (d12) & $0.805\pm0.006$ & $0.822\pm0.012$ & $+0.017$ & $+1.31$ \\
+U-Rec/m2c & 42 & S & Laplacian (d12) & Z-map (d12) & $0.880\pm0.021$ & $0.902\pm0.022$ & $+0.022$ & $+0.73$ \\
+U-Rec/m2c & 42 & M & Laplacian (d12) & Z-map (d12) & $0.901\pm0.008$ & $0.925\pm0.009$ & $+0.024$ & $+1.99$ \\
+U-Rec/m2c & 42 & L & Laplacian (d12) & PauliXZ (d12) & $0.929\pm0.012$ & $0.942\pm0.003$ & $+0.013$ & $+1.05$ \\
+U-Rec/m2c & 123 & S & Laplacian (d12) & Z-map (d12) & $0.905\pm0.012$ & $0.926\pm0.023$ & $+0.021$ & $+0.81$ \\
+U-Rec/m2c & 123 & M & Laplacian (d12) & Z-map (d12) & $0.914\pm0.010$ & $0.946\pm0.010$ & $+0.032$ & $+2.29$ \\
+U-Rec/m2c & 123 & L & Laplacian (d12) & PauliXZ (d12) & $0.946\pm0.004$ & $0.953\pm0.006$ & $+0.007$ & $+0.91$ \\
+U-Rec/m2c & 999 & S & Laplacian (d10) & PauliXZ (d12) & $0.883\pm0.023$ & $0.910\pm0.025$ & $+0.027$ & $+0.81$ \\
+U-Rec/m2c & 999 & M & Laplacian (d12) & Z-map (d12) & $0.912\pm0.004$ & $0.941\pm0.008$ & $+0.029$ & $+3.13$ \\
+U-Rec/m2c & 999 & L & Laplacian (d10) & PauliXZ (d12) & $0.937\pm0.014$ & $0.949\pm0.003$ & $+0.012$ & $+0.84$ \\
+U-Rec/nat & 42 & S & Poly-2 (d4) & PauliXZ (d6) & $0.760\pm0.020$ & $0.784\pm0.024$ & $+0.025$ & $+0.79$ \\
+U-Rec/nat & 42 & M & Laplacian (d10) & ZZ-r1 (d4) & $0.795\pm0.040$ & $0.817\pm0.013$ & $+0.022$ & $+0.51$ \\
+U-Rec/nat & 42 & L & Laplacian (d8) & ZZ-r1 (d4) & $0.796\pm0.007$ & $0.813\pm0.005$ & $+0.017$ & $+1.95$ \\
+U-Rec/nat & 123 & S & Poly-2 (d12) & ZZ-r2 (d6) & $0.780\pm0.024$ & $0.797\pm0.016$ & $+0.017$ & $+0.59$ \\
+U-Rec/nat & 123 & M & Linear (d12) & ZZ-r1 (d4) & $0.794\pm0.014$ & $0.803\pm0.020$ & $+0.008$ & $+0.34$ \\
+U-Rec/nat & 123 & L & Laplacian (d12) & ZZ-r2 (d12) & $0.810\pm0.023$ & $0.812\pm0.019$ & $+0.002$ & $+0.06$ \\
+U-Rec/nat & 999 & S & Poly-2 (d12) & ZZ-r2 (d6) & $0.777\pm0.016$ & $0.782\pm0.005$ & $+0.005$ & $+0.30$ \\
+U-Rec/nat & 999 & M & Poly-2 (d12) & ZZ-r2 (d6) & $0.780\pm0.017$ & $0.814\pm0.016$ & $+0.034$ & $+1.51$ \\
+U-Rec/nat & 999 & L & Laplacian (d8) & ZZ-r1 (d4) & $0.790\pm0.010$ & $0.807\pm0.011$ & $+0.017$ & $+1.10$ \\\bottomrule
 \end{tabular}
 \end{table}
 
