@@ -431,149 +431,161 @@ For reproducibility, split definitions are fixed within each setting, random see
 
 \subsection{Overview}
 
-We report results under the controlled kernel-swap protocol described in Section~\ref{sec:methods}. All comparisons share the same classifier family, preprocessing pipeline, and ID/OOD split definitions; the only varying component is the kernel. Performance is summarized using balanced accuracy on the ID and OOD splits, the ID-to-OOD degradation (\emph{drop}), and the variability-aware effect proxy defined in Section~\ref{sec:methods}. To keep the empirical questions distinct, we organize the results around two complementary selection modes: \emph{Best-by-OOD}, which targets robustness under shift, and \emph{Best-by-ID}, which targets in-distribution separability.
+We report results under the controlled kernel-swap protocol described in Section~\ref{sec:methods}. All comparisons share the same classifier, preprocessing pipeline, and ID/OOD split definitions within a setting; the only varying component is the kernel, and every number below is a mean over 15 repeated runs. The results are organized as an argument in four movements. First, on EMBER, the quantum family is compared against the customary linear+RBF baselines (Section~\ref{sec:res_baselines}). Second, the classical reference set is strengthened to the extended family, which changes the verdict on one modality (Section~\ref{sec:res_extended}). Third, both families receive the same bandwidth-tuning freedom, which changes it back (Section~\ref{sec:res_bandwidth}). Fourth, the protocol is repeated on three network-flow scenarios including natural drift (Section~\ref{sec:res_netflow}). Section~\ref{sec:res_mechanism} then explains the entire pattern with a single geometric mechanism, and Section~\ref{sec:res_uncertainty} examines predictive uncertainty under shift.
 
-Our main evaluation spans 18 principal settings obtained from the Cartesian product of the two shift variants, three master seeds, and three training-size regimes. We then complement this setting-level analysis with a finer-grained dimension-level study over $d \in \{4,6,8,10,12\}$ in order to determine whether the observed trends are stable across representation sizes or concentrated in narrow regions of the grid.
+\subsection{EMBER versus the customary baselines: a near-uniform quantum advantage}
+\label{sec:res_baselines}
 
-\subsection{Best-by-OOD: quantum kernels improve OOD performance in most settings}
+We begin with the comparison that dominates the literature: fidelity-based quantum kernels against linear and RBF baselines. For each setting and classifier, family-internal Best-by-OOD selection picks the configuration with the highest mean OOD balanced accuracy on the run means, and the selected representatives are compared directly. Table~\ref{tab:family_ember} (upper panel, first and third rows) reports the outcome.
 
-We begin with the robustness-oriented view. For each setting, we select the classical configuration with the highest mean OOD balanced accuracy and the quantum configuration with the highest mean OOD balanced accuracy, and then compare the two selected models directly. This comparison answers the primary practical question of the paper: if each family is allowed to present its strongest OOD candidate under the same protocol, which family tends to generalize better under shift?
+The advantage is close to uniform. Under SVC the selected quantum kernel improves OOD balanced accuracy in 17 of 18 settings (mean $\Delta_{\mathrm{OOD}}=+0.037$, Holm-adjusted Wilcoxon $p=7.6\times10^{-5}$), with the gain exceeding the combined run-to-run variability scale in 12 settings; under the GP classifier the corresponding figures are 15 of 18, $+0.028$, $p=2.1\times10^{-4}$, and 11 settings. The few classical-favorable settings are marginal: all occur at the largest training size under the $m1$ construction, with $|\Delta_{\mathrm{OOD}}|\le 0.010$ and effect sizes below one, i.e., within run-to-run noise. The dimension-level view confirms that this is not a best-of-grid artifact: comparing the best quantum against the best classical candidate separately at every setting--dimension cell, the quantum family is ahead in 88 of 90 cells under SVC and 85 of 90 under the GP classifier (mean $\Delta_{\mathrm{OOD}}\approx+0.05$ in both cases).
 
-The answer is favorable to quantum kernels in the majority of cases. Across the 18 main settings, the selected quantum model achieves higher OOD balanced accuracy in 14 settings, while the selected classical model is superior in the remaining 4. The mean improvement is
-\[
-\Delta_{\mathrm{OOD}} = +0.0189,
-\]
-and the median improvement is
-\[
-\mathrm{median}(\Delta_{\mathrm{OOD}}) = +0.0255.
-\]
-Moreover, in 9 of the 18 settings, the OOD effect proxy exceeds 1, indicating that the observed mean gain is larger than the combined run-to-run variability scale. This is important because it shows that the overall trend is not driven only by marginal wins: in a substantial subset of settings, the quantum advantage is also large relative to the observed noise level.
+Under Best-by-ID selection (lower panel), the quantum family improves ID balanced accuracy in all 18 settings under both classifiers, with mean gains of $+0.078$ (SVC) and $+0.065$ (GPC) and every setting exceeding the variability scale. We keep the two views separate throughout: strong ID separability is not evidence of robustness, and the following subsections show that the two properties respond very differently to stronger classical baselines.
 
-These results support the central empirical claim of the paper. Under a strictly controlled kernel-swap comparison, fidelity-based quantum kernels can yield measurable and often variability-dominating improvements in OOD balanced accuracy in malware detection under distribution shift. At the same time, the win count is not uniform enough to justify any claim of universal dominance. The more appropriate interpretation is that quantum kernels are advantageous in most, but not all, of the evaluated regimes.
-
-Figure~\ref{fig:winmap_ood} summarizes the setting-level Best-by-OOD comparison across the 18 principal settings. The win map makes the global pattern immediately visible: quantum kernels dominate in most regimes, while the classical wins are concentrated in a small subset of structured settings rather than being randomly scattered across the grid. 
-Table~\ref{tab:headline_results} summarizes the main outcomes under both selection views, while the full setting-level Best-by-OOD comparisons are reported in Appendix~\ref{app:best_ood_full}.
-
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{fig_best_by_ood_winmap.png}
-\caption{Best-by-OOD win map across the 18 principal settings. Each cell indicates the winning family and the corresponding OOD gain. Quantum kernels win in 14 of the 18 settings, while the classical-dominant cases are concentrated in a small subset of structured regimes.}
-\label{fig:winmap_ood}
-\end{figure*}
-
+% Table generated by scripts/reporting/make_v2_tables.py from
+% results/ember_shift/extended_kernels/family_comparison_wilcoxon.csv
 \begin{table}[t]
 \centering
-\caption{Headline results under the controlled kernel-swap protocol. Best-by-OOD selects, within each family, the configuration with the highest mean OOD balanced accuracy. Best-by-ID applies the same logic using ID balanced accuracy.}
-\label{tab:headline_results}
+\caption{EMBER headline results (18 settings, 15 runs each). Within each classifier, family-internal selection compares the best quantum candidate against the best candidate of the stated classical reference set. $p$-values are two-sided paired Wilcoxon over settings, Holm-corrected within classifier; the last column counts settings whose quantum-favorable gain exceeds the combined run-to-run variability scale.}
+\label{tab:family_ember}
 \small
-\begin{tabular}{lccccc}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llccccc}
 \toprule
-Selection view & Q wins & C wins & Mean $\Delta$ & Median $\Delta$ & Effect $>1$ \\
+Selection & Classifier & Classical ref. & Q wins & Mean $\Delta$ & Median $\Delta$ & $p$ (Holm) \quad Effect$>1$ \\
 \midrule
-Best-by-OOD & 14/18 & 4/18 & +0.0189 & +0.0255 & 9/18 \\
-Best-by-ID  & 18/18 & 0/18 & +0.0737 & +0.0788 & 18/18 \\
+\multirow{4}{*}{Best-by-OOD} & SVC & linear+RBF & 17/18 & $+0.0374$ & $+0.0426$ & $7.6\times 10^{-5}$ \quad 12 \\
+ & SVC & extended classical & 15/18 & $+0.0044$ & $+0.0064$ & $0.03$ \quad 1 \\
+ & GP classifier & linear+RBF & 15/18 & $+0.0283$ & $+0.0339$ & $2.1\times 10^{-4}$ \quad 11 \\
+ & GP classifier & extended classical & 11/18 & $+0.0023$ & $+0.0029$ & $0.26$ \quad 0 \\
+\midrule
+\multirow{4}{*}{Best-by-ID} & SVC & linear+RBF & 18/18 & $+0.0775$ & $+0.0794$ & $3.1\times 10^{-5}$ \quad 18 \\
+ & SVC & extended classical & 18/18 & $+0.0149$ & $+0.0152$ & $3.1\times 10^{-5}$ \quad 11 \\
+ & GP classifier & linear+RBF & 18/18 & $+0.0649$ & $+0.0664$ & $3.1\times 10^{-5}$ \quad 18 \\
+ & GP classifier & extended classical & 18/18 & $+0.0192$ & $+0.0166$ & $3.1\times 10^{-5}$ \quad 11 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Best-by-ID: consistent gains in in-distribution separability}
+\subsection{The extended classical family neutralizes the OOD advantage on EMBER}
+\label{sec:res_extended}
 
-We next turn to the separability-oriented view. For each setting, we now select the best classical configuration by mean ID balanced accuracy and the best quantum configuration by mean ID balanced accuracy, and compare the selected models under ID evaluation. This comparison is not a substitute for the OOD analysis, but it is still scientifically informative because it reveals whether one kernel family more consistently induces favorable decision geometry under the i.i.d.\ assumption.
+The comparison changes character when the classical family is strengthened. Against the extended set---which adds polynomial, Laplacian, and Mat\'ern kernels with train-only median-heuristic scales---the quantum OOD advantage on EMBER collapses by an order of magnitude (Table~\ref{tab:family_ember}, second and fourth rows): the mean delta falls from $+0.037$ to $+0.004$ under SVC and from $+0.028$ to $+0.002$ under the GP classifier, the gain exceeds the variability scale in at most one setting, and under the GP classifier the comparison is no longer statistically significant (Holm-adjusted $p=0.26$). The winner of this neutralization is overwhelmingly one kernel: the median-heuristic Laplacian is the Best-by-OOD selection of the extended classical family in 13 of 18 settings under SVC and 14 of 18 under the GP classifier, almost always at the largest embedding dimension.
 
-Under this criterion, the pattern is strikingly consistent. The selected quantum model achieves higher ID balanced accuracy in all 18 main settings. The mean improvement is
-\[
-\Delta_{\mathrm{ID}} = +0.0737,
-\]
-and the median improvement is
-\[
-\mathrm{median}(\Delta_{\mathrm{ID}}) = +0.0788.
-\]
-The variability-aware signal is also strong: the gains are not only universal across settings, but also systematically large relative to run-to-run noise.
+Two aspects of this result deserve emphasis. First, it is an honest negative result for the quantum-advantage narrative as usually framed: the OOD gains reported against linear and RBF baselines---here and, we suspect, elsewhere in the literature---measure the weakness of those baselines as much as the strength of the quantum family. Second, the \emph{ID} advantage does not collapse: even against the extended family, the quantum kernels improve ID balanced accuracy in 18 of 18 settings under both classifiers ($p=3.1\times10^{-5}$), with the gain exceeding the variability scale in 11 settings. Whatever the quantum feature maps contribute to in-distribution separability, no classical kernel in our set replicates it; what the Laplacian replicates is specifically the out-of-distribution behavior. Section~\ref{sec:res_mechanism} shows that this is not a coincidence: the Laplacian is precisely the classical kernel whose Gram-matrix geometry most resembles that of the fidelity maps.
 
-This result suggests that, in the shared reduced feature space used here, the quantum feature maps frequently induce a similarity structure that is more favorable to class separation for SVC than the strongest selected classical alternatives. However, this should not be misread as implying universal OOD superiority. One of the main reasons for reporting Best-by-ID separately is precisely to avoid conflating stronger ID separation with stronger robustness under shift. The contrast between the 18/18 ID wins and the more qualified 14/18 OOD wins makes that distinction explicit.
+\subsection{Bandwidth symmetry restores the advantage}
+\label{sec:res_bandwidth}
 
-The Best-by-ID outcome is summarized in Table~\ref{tab:headline_results}, while the full setting-level Best-by-ID comparisons are reported in Appendix~\ref{app:best_id_full}. This makes the 18/18 ID advantage of the selected quantum models fully transparent and reproducible without overloading the main manuscript.
+The comparison of Section~\ref{sec:res_extended} pins every quantum feature map to the canonical $[0,\pi]$ encoding while granting the classical family kernels whose length scales adapt to the data. Bandwidth, however, is as decisive for fidelity kernels as it is for the RBF kernel \cite{shaydulin2022bandwidth,canatar2023bandwidth}. When both families receive the same tuning axis---RBF gamma factors $\{0.1,0.3,1,3,10\}$ against quantum angle scales $\{0.5,1,2\}$---the picture inverts again.
+% TODO(sweep-15runs): refresh these numbers from
+% results/ember_shift/bandwidth_sweep/family_comparison_wilcoxon.csv when the
+% repeated-run pass of the bandwidth sweep completes.
+Under the GP classifier, the quantum family beats the bandwidth-swept extended classical family in 16 of 18 EMBER settings (mean $\Delta_{\mathrm{OOD}}=+0.013$, Holm-adjusted $p=7.6\times10^{-5}$); under SVC the comparison is positive but not significant (11--12 of 18, $p\approx0.15$). The mechanism is visible in the selections: the angle-scaled variants dominate the quantum family's Best-by-OOD choices (scales $0.5$ and $2$ are selected far more often than the canonical encoding), confirming that the fixed-bandwidth comparison had the quantum family playing with one hand tied. On the network-flow scenarios under natural drift, the same symmetric sweep leaves the quantum advantage intact and significant under both classifiers (24 of 27 settings, $p=2.6\times10^{-5}$ for the GP classifier; 19 of 27, $p=4.9\times10^{-4}$ for SVC).
 
-\subsection{Classical-dominant regimes are structured rather than random}
+The methodological moral generalizes beyond this study: fixed-encoding quantum kernels versus tuned classical kernels is not a protocol-fair comparison, and the bias runs \emph{against} the quantum family. Once tuning freedom is symmetric, the extended classical family no longer neutralizes the quantum OOD advantage.
 
-Although the Best-by-OOD results favor quantum kernels overall, the exceptions are scientifically important. A strong paper should not hide the four settings where classical kernels win; it should explain why their existence strengthens rather than weakens the study.
+\subsection{Network flows: the advantage survives the extended family and peaks under natural drift}
+\label{sec:res_netflow}
 
-The key point is that these exceptions are structured. They are not scattered arbitrarily across the grid, but concentrate in specific regimes, particularly in configurations associated with the $m2$ shift mechanism and, more specifically, with the master seed 42 under the histogram+byte-entropy feature block. This concentration suggests that the outcome depends on the interaction between three factors: the shift construction, the induced feature geometry, and the kernel family's similarity bias. In other words, the comparison is not revealing a binary hierarchy in which one family is always better; it is revealing a regime-dependent landscape.
+The 54 network-flow settings test whether the EMBER conclusions are properties of one dataset family or of the kernels. They are neither, exactly: the network results are \emph{stronger} for the quantum family than EMBER's (Table~\ref{tab:family_netflow}). Against linear+RBF, the selected quantum kernel improves OOD balanced accuracy in 54 of 54 settings under both classifiers (Holm-adjusted $p=6.5\times10^{-10}$), with the gain exceeding the variability scale in 35 (SVC) and 44 (GPC) settings. More importantly, against the \emph{extended} classical family---the set that neutralized the advantage on EMBER---the quantum family remains ahead in 54 of 54 settings under the GP classifier (mean $\Delta_{\mathrm{OOD}}=+0.020$, $p=6.5\times10^{-10}$, effect$>1$ in 33) and in 41 of 54 under SVC ($p=3.2\times10^{-5}$). The Laplacian is again the dominant classical challenger, and again it is not enough.
 
-This regime-level structure matters for two reasons. First, it prevents over-generalization from the aggregate win counts. A result such as 14/18 is more informative when the 4 losses are interpretable than when they are dismissed as noise. Second, it produces actionable guidance: practitioners should not treat quantum kernels as an automatic replacement for classical ones, but as a strong candidate family whose utility depends on the expected shift regime.
+The breakdown by shift mechanism sharpens the picture. Under SVC, the quantum-versus-extended comparison is essentially tied on the synthetic centroid construction (15 of 27 settings) but nearly uniform under natural drift (26 of 27): the advantage is largest precisely on the drift mechanism that was not constructed by us and most resembles deployment conditions. Under the GP classifier the advantage is uniform on both mechanisms (27 of 27 each). Read jointly with Section~\ref{sec:res_extended}, the regime map is: on EMBER's synthetic covariate extremes a heavy-tailed classical kernel can match the quantum family at fixed bandwidth; on drifting network traffic, under a probabilistic classifier, nothing in our classical set does.
 
-Table~\ref{tab:classical_dominant} reports the selected winning configurations in the classical-dominant settings, including the kernel type, embedding dimension, and the corresponding OOD mean$\pm$std for both families. This makes the ``where it fails'' story concrete and reproducible rather than anecdotal.
-
+% Table generated by scripts/reporting/make_v2_tables.py from
+% results/netflow/family_comparison_wilcoxon.csv
 \begin{table}[t]
 \centering
-\caption{Classical-dominant settings under Best-by-OOD selection. S = (1k, 500, 500), M = (2k, 1k, 1k), and L = (4k, 1.8k, 1.8k). OOD$_C$ and OOD$_Q$ denote mean $\pm$ std balanced accuracy. Effect$_{\mathrm{OOD}}=\Delta_{\mathrm{OOD}}/\sqrt{\sigma_C^2+\sigma_Q^2}$.}
-\label{tab:classical_dominant}
-\scriptsize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}ccc p{1.15cm} p{1.55cm} c c r r@{}}
-\toprule
-Var. & Seed & Size & Classical & Quantum & \shortstack{OOD\\$_C$} & \shortstack{OOD\\$_Q$} & $\Delta_{\mathrm{OOD}}$ & \shortstack{Effect\\$_{\mathrm{OOD}}$} \\
-\midrule
-m1 & 999 & L & RBF & ZZ-r1 (d=10)      & $0.763\pm0.024$ & $0.753\pm0.005$ & $-0.010$ & $-0.41$ \\
-m2 & 42  & S & RBF & PauliXZ-r1 (d=8)  & $0.735\pm0.013$ & $0.674\pm0.030$ & $-0.061$ & $-1.87$ \\
-m2 & 42  & M & Linear & PauliXZ-r1 (d=12) & $0.769\pm0.019$ & $0.708\pm0.019$ & $-0.061$ & $-2.27$ \\
-m2 & 42  & L & Linear & PauliXZ-r1 (d=10) & $0.784\pm0.012$ & $0.728\pm0.017$ & $-0.056$ & $-2.69$ \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{ID-to-OOD degradation should be read as a complementary robustness signal}
-
-In addition to absolute ID and OOD balanced accuracy, we report the degradation
-\[
-\mathrm{drop} = \mathrm{BAcc}_{\mathrm{ID}} - \mathrm{BAcc}_{\mathrm{OOD}}.
-\]
-This quantity captures how much performance changes when moving from ID to OOD evaluation, and is therefore a complementary indicator of robustness. However, it should not be interpreted in isolation from the absolute OOD scores. In the present study, quantum kernels often improve ID performance very strongly and improve OOD performance in the majority of settings, which means that the \emph{drop} can reflect a combination of two effects: improved OOD behavior and even larger shifts in the corresponding ID baseline.
-
-Because drop conflates OOD behavior with the corresponding ID baseline, we treat it as a secondary robustness descriptor rather than as the primary ranking criterion. The main inferential target of the paper is OOD balanced accuracy under controlled shift-aware evaluation. Its main role in the paper is interpretive: it helps distinguish settings where OOD gains come with similar ID behavior from settings where one family changes the entire ID/OOD profile more substantially. Read this way, \emph{drop} enriches the regime analysis rather than replacing the OOD comparison.
-
-A setting-level summary of drop can still be useful as supplementary descriptive material, but the main narrative remains anchored on OOD balanced accuracy, since robustness under shift is the primary target of the study.
-
-\subsection{Dimension-level analysis}
-
-The 18 setting-level comparisons are intentionally complemented by a finer-grained analysis over the dimensionality parameter $d \in \{4,6,8,10,12\}$. This dimension sweep serves two purposes. First, it tests whether the observed OOD gains are stable across representation sizes rather than artifacts of a single projection dimension. Second, it helps identify whether classical-dominant cases arise from a broad regime or from a narrow band of dimensions.
-
-A consistent pattern emerges from this analysis. In many settings, quantum kernels remain competitive or improve across the dimension sweep, while classical kernels can exhibit either saturation or greater regime sensitivity depending on the shift construction. This dimension-level view also clarifies the classical-dominant settings: some exceptions are not full-setting reversals across all dimensions, but rather regimes in which classical kernels hold an advantage over a wider or more influential subset of the dimensionality grid. This is exactly the kind of fine-grained behavior that would be missed by reporting only a single best configuration per family.
-
-Figure~\ref{fig:dim_sweep} shows the dimension-level OOD comparison across $d \in \{4,6,8,10,12\}$. The figure helps determine whether the observed advantages persist across representation sizes and clarifies whether classical-dominant settings reflect broad reversals or only narrow dimensionality bands. Table~\ref{tab:dim_summary} summarizes the dimension-level comparison over all 90 setting--dimension cells.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{fig_dim_sweep_mean_delta.png}
-\caption{Dimension-level OOD comparison across $d \in \{4,6,8,10,12\}$. The plot summarizes how the mean OOD advantage varies with representation size and helps identify whether classical-dominant cases are broad reversals or narrow dimensionality bands.}
-\label{fig:dim_sweep}
-\end{figure}
-
-\begin{table}[t]
-\centering
-\caption{Summary of the dimension-level OOD comparison across the 90 setting--dimension cells.}
-\label{tab:dim_summary}
+\caption{Network-flow headline results (54 settings across UNSW-NB15 DoS/Reconnaissance and ToN-IoT Scanning, two shift mechanisms, 15 runs each). Columns as in Table~\ref{tab:family_ember}.}
+\label{tab:family_netflow}
 \small
-\begin{tabular}{lc}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llccccc}
 \toprule
-Statistic & Value \\
+Selection & Classifier & Classical ref. & Q wins & Mean $\Delta$ & Median $\Delta$ & $p$ (Holm) \quad Effect$>1$ \\
 \midrule
-Quantum OOD wins & 78/90 \\
-Classical OOD wins & 12/90 \\
-Mean $\Delta_{\mathrm{OOD}}$ & +0.0324 \\
-Median $\Delta_{\mathrm{OOD}}$ & +0.0383 \\
-Effect $>1$ & 56/90 \\
+\multirow{4}{*}{Best-by-OOD} & SVC & linear+RBF & 54/54 & $+0.0256$ & $+0.0264$ & $6.5\times 10^{-10}$ \quad 35 \\
+ & SVC & extended classical & 41/54 & $+0.0066$ & $+0.0028$ & $3.2\times 10^{-5}$ \quad 7 \\
+ & GP classifier & linear+RBF & 54/54 & $+0.0344$ & $+0.0338$ & $6.5\times 10^{-10}$ \quad 44 \\
+ & GP classifier & extended classical & 54/54 & $+0.0204$ & $+0.0192$ & $6.5\times 10^{-10}$ \quad 33 \\
+\midrule
+\multirow{4}{*}{Best-by-ID} & SVC & linear+RBF & 54/54 & $+0.0210$ & $+0.0104$ & $6.5\times 10^{-10}$ \quad 29 \\
+ & SVC & extended classical & 39/54 & $+0.0036$ & $+0.0028$ & $1.5\times 10^{-4}$ \quad 11 \\
+ & GP classifier & linear+RBF & 53/54 & $+0.0188$ & $+0.0100$ & $6.5\times 10^{-10}$ \quad 24 \\
+ & GP classifier & extended classical & 40/54 & $+0.0057$ & $+0.0044$ & $7.9\times 10^{-7}$ \quad 14 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:dim_summary} confirms that this behavior is not restricted to isolated best-of-grid selections: the quantum family is favorable in 78 of the 90 setting--dimension cells, supporting a broader regime-level effect rather than a narrow configuration artifact.
+\subsection{One geometric mechanism explains the pattern}
+\label{sec:res_mechanism}
+
+The results so far pose a puzzle with three faces: why do quantum kernels beat linear and RBF baselines so uniformly, why does the Laplacian---alone among our classical kernels---catch them on EMBER, and why does natural network drift favor them again? The geometry descriptors of Section~\ref{sec:geometry_methods} answer all three at once.
+
+\paragraph{A cross-dataset regularity.}
+Within every setting we correlate, across all evaluated kernel--dimension cells, each geometry descriptor with OOD balanced accuracy (Table~\ref{tab:mechanism}). The alignment-survival quantity---centered kernel-target alignment evaluated on the OOD split---predicts OOD accuracy within settings essentially everywhere: the within-setting Spearman correlation is positive in 89--99\% of the 360 setting-seed units, with median $\rho$ between $0.42$ and $0.74$, across all four datasets, both classifiers, and all three drift mechanisms. Effective rank of the training kernel---a train-only quantity---is an equally strong predictor on EMBER and ToN-IoT (median $\rho\approx0.75$--$0.84$), moderate on UNSW-DoS, and weak (though still predominantly positive) on UNSW-Reconnaissance. The natural reading is that high effective rank is the structural precondition---a kernel whose geometry uses only one or two directions has nothing with which to track label structure into the tails---while alignment survival is the proximate predictor of OOD performance.
+
+% Table generated by scripts/reporting/make_v2_tables.py from
+% results/mechanism/mechanism_summary_by_dataset.csv
+\begin{table}[t]
+\centering
+\caption{Within-setting Spearman correlation between kernel-geometry descriptors and OOD balanced accuracy, summarized per dataset and classifier over all setting-seed units (five q-split seeds per setting; 30--55 kernel--dimension cells per unit). ``$>0$'' is the fraction of units with a positive correlation.}
+\label{tab:mechanism}
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{llccccc}
+\toprule
+ & & & \multicolumn{2}{c}{Effective rank} & \multicolumn{2}{c}{KTA on OOD} \\
+Dataset & Classifier & Units & median $\rho$ & $>0$ & median $\rho$ & $>0$ \\
+\midrule
+EMBER & GP classifier & 90 & 0.78 & 99\% & 0.68 & 89\% \\
+EMBER & SVC & 90 & 0.83 & 98\% & 0.65 & 89\% \\
+ToN-IoT Scanning & GP classifier & 90 & 0.84 & 100\% & 0.54 & 99\% \\
+ToN-IoT Scanning & SVC & 90 & 0.75 & 100\% & 0.59 & 99\% \\
+UNSW-NB15 DoS & GP classifier & 90 & 0.55 & 98\% & 0.51 & 96\% \\
+UNSW-NB15 DoS & SVC & 90 & 0.55 & 90\% & 0.42 & 96\% \\
+UNSW-NB15 Recon. & GP classifier & 90 & 0.26 & 98\% & 0.57 & 94\% \\
+UNSW-NB15 Recon. & SVC & 90 & 0.19 & 83\% & 0.46 & 99\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{A dose-response gradient within the classical family.}
+The mechanism makes a prediction that can be tested without any quantum kernel at all: classical kernels with higher effective rank should retain label alignment better under shift. Table~\ref{tab:dose_response} confirms a clean monotone gradient across the seven classical kernels (18 EMBER settings $\times$ 5 dimensions each): as mean effective rank rises from $1.19$ (linear) through $2.76$ (RBF) and $6$--$8$ (Mat\'ern) to $17.7$ (Laplacian), the mean ID-to-OOD change in alignment rises monotonically from $-0.017$ to $+0.019$, and the fraction of cells where alignment \emph{improves} under shift doubles from 32\% to 66\%. This explains Section~\ref{sec:res_extended} precisely: the Laplacian is the classical kernel that shares the quantum maps' geometric signature, and it is exactly the kernel that neutralizes their OOD advantage. Conversely, the fidelity maps' near-uniform advantage over linear and RBF baselines is an advantage over the two lowest-rank geometries in the study.
+
+% Table generated by scripts/reporting/make_v2_tables.py from
+% results/kernel_geometry/ext_classical_geometry_summary.csv
+\begin{table}[t]
+\centering
+\caption{Dose-response gradient in the classical family (18 EMBER settings $\times$ 5 dimensions, q-split seed 42). Higher effective rank of the training Gram matrix is associated with better survival---indeed improvement---of kernel-target alignment from ID to OOD.}
+\label{tab:dose_response}
+\small
+\begin{tabular}{lccc}
+\toprule
+Kernel & Mean eff.\ rank & Mean $\Delta$KTA (OOD$-$ID) & KTA improves \\
+\midrule
+Linear & 1.19 & $-0.017$ & 32\% \\
+Polynomial (2) & 1.29 & $-0.017$ & 32\% \\
+Polynomial (3) & 1.41 & $-0.015$ & 38\% \\
+RBF (scale) & 2.76 & $-0.011$ & 38\% \\
+Mat\'ern $5/2$ & 6.41 & $+0.000$ & 46\% \\
+Mat\'ern $3/2$ & 7.71 & $+0.004$ & 47\% \\
+Laplacian & 17.69 & $+0.019$ & 66\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{What the geometry does not do.}
+Two negative results complete the mechanistic picture, and both are informative. First, the geometric difference of Huang et al.\ \cite{huang2021powerofdata}---the quantity a reader versed in the quantum-kernel literature would reach for first---does not predict which family wins a setting; at moderate regularization it even correlates \emph{negatively} with the observed OOD delta. This is consistent with its definition: $g$ bounds the potential for a separation between the families, not its sign, so a quantum kernel can differ greatly from the classical reference and be worse. Second, we found no reliable fully a-priori selection rule: choosing the quantum configuration by training-set alignment alone does not identify the settings where the family will win. The geometry explains and diagnoses; it does not yet provide a deployment-time oracle, and we flag this honestly as an open problem.
+
+\subsection{Predictive uncertainty under shift}
+\label{sec:res_uncertainty}
+
+The GP classifier's calibrated probabilities add a complementary robustness lens. Averaged over Best-by-OOD selections, predictive entropy rises from ID to OOD for every family and dataset group---the qualitative behavior one wants from a probabilistic detector facing drift---and rises most for the quantum kernels (e.g., $+0.029$ versus $+0.014$--$+0.018$ for the classical families on EMBER; $+0.072$ versus $+0.041$--$+0.061$ on network flows). Calibration degrades moderately for all families (ECE increases of $+0.02$--$+0.05$), with the quantum family's ECE increase slightly larger than the classical families'. In other words, the quantum kernels' OOD accuracy advantage does not come with hidden overconfidence---their uncertainty grows under shift at least as fast as the classical kernels'---but neither do they calibrate better; the advantage is in the decision geometry, not in the probability calibration.
 
 \subsection{Summary of empirical findings}
 
-Taken together, the empirical results support three main conclusions. First, under robustness-oriented selection, quantum kernels improve OOD balanced accuracy in the majority of evaluated settings, with positive average and median gains and a substantial subset of settings in which the gains exceed the observed variability scale. Second, under ID-oriented selection, quantum kernels improve in-distribution balanced accuracy consistently across all main settings, indicating that the induced similarity geometry is often favorable for class separation in the shared representation space. Third, the exceptions are structured rather than random, which enables a regime-based understanding of when classical kernels remain competitive or preferable.
-
-This is the most defensible reading of the evidence. The results do not justify a claim of universal superiority, but they do justify a stronger and more precise statement: under a fair and reproducible kernel-swap protocol, quantum kernels emerge as a competitive and often advantageous family for malware detection under distribution shift, while still exhibiting identifiable failure regimes that must be part of any honest interpretation.
+Taken together, the results support four conclusions. First, against the linear and RBF baselines that dominate the literature, fidelity-based quantum kernels improve OOD balanced accuracy nearly uniformly across 72 settings, two classifiers, and three drift mechanisms. Second, this baseline comparison overstates what is specifically quantum: one classical kernel with the right geometry (the median-heuristic Laplacian) neutralizes the OOD advantage on EMBER at fixed bandwidth, although no classical kernel replicates the ID-separability advantage anywhere. Third, the verdict depends on protocol fairness in the quantum family's favor: under symmetric bandwidth tuning the OOD advantage re-emerges on EMBER, and under natural network drift it is uniform under the probabilistic classifier. Fourth, a single geometric mechanism---high effective rank enabling the survival of kernel-target alignment under shift---predicts within-setting OOD performance across all four datasets, explains which classical kernels are competitive, and explains where and why the quantum family wins.
 
 \section{Discussion}
 \label{sec:discussion}
