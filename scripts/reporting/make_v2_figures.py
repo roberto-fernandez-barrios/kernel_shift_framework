@@ -210,11 +210,14 @@ def fig_protocol() -> None:
                                     fc=face, ec=edge, lw=1.0))
         ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs, color="#222222")
 
+    PAD = 0.7  # visual expansion of FancyBboxPatch (boxstyle pad) in data units
+
     def arrow(x0, y0, x1, y1):
-        # shrinkB compensates the visual pad of FancyBboxPatch so arrowheads
-        # stop at the drawn border instead of entering the box.
+        # Endpoints are given at the *visual* border of the boxes (nominal
+        # edge +/- PAD), so heads and tails touch the drawn outline exactly.
         ax.annotate("", (x1, y1), (x0, y0),
-                    arrowprops=dict(arrowstyle="-|>", lw=0.9, color="#555555", shrinkA=2, shrinkB=7))
+                    arrowprops=dict(arrowstyle="-|>", lw=0.9, color="#555555",
+                                    shrinkA=0.5, shrinkB=0.5, mutation_scale=9))
 
     box(1, 26, 16, 13, "Benchmarks\nEMBER (malware)\nUNSW / ToN-IoT\n(network flows)", fs=6.5)
     box(21, 26, 17, 13, "Shift construction\n$m1$ $\\cdot$ $m2$ $\\cdot$ natural\n$T,\\ S_{\\mathrm{ID}},\\ S_{\\mathrm{OOD}}$\n15 runs / setting", fs=6.5)
@@ -228,14 +231,14 @@ def fig_protocol() -> None:
     box(6, 3, 40, 12, "Gram-matrix geometry\neffective rank $\\cdot$ KTA (ID/OOD) $\\cdot$ $g(K_C{\\to}K_Q)$\n$\\Rightarrow$ mechanism analysis", face="#fdf3ec", edge=C_QUANTUM, fs=6.5)
     box(53, 3, 46, 12, "Family-internal selection on run means\nBest-by-OOD / Best-by-ID\npaired Wilcoxon + Holm over settings", fs=6.5)
 
-    arrow(17, 32.5, 21, 32.5)
-    arrow(38, 32.5, 42, 32.5)
-    arrow(58, 32.5, 62, 37)
-    arrow(58, 32.5, 62, 28)
-    arrow(80, 37.5, 84, 34)
-    arrow(80, 27.5, 84, 31)
-    arrow(66, 24, 30, 15)
-    arrow(91, 26, 80, 15)
+    arrow(17 + PAD, 32.5, 21 - PAD, 32.5)
+    arrow(38 + PAD, 32.5, 42 - PAD, 32.5)
+    arrow(58 + PAD, 34.5, 62 - PAD, 37.5)
+    arrow(58 + PAD, 30.5, 62 - PAD, 27.5)
+    arrow(80 + PAD, 37.5, 84 - PAD, 35.5)
+    arrow(80 + PAD, 27.5, 84 - PAD, 29.5)
+    arrow(68, 24 - PAD, 30, 15 + PAD)
+    arrow(91.5, 26 - PAD, 80, 15 + PAD)
 
     fig.savefig(OUT / "fig_v2_protocol.pdf", bbox_inches="tight")
     plt.close(fig)
