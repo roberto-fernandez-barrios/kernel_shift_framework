@@ -184,13 +184,15 @@ A particularly important development in this regard is the move toward benchmark
 
 These works are directly relevant to the present study, not because malware detection is a standard DG benchmark, but because they establish a methodological principle: if the goal is to compare robustness under shift, then fairness of protocol is part of the contribution, not a secondary implementation detail. Our work adopts this perspective by focusing on a comparison in which the classifier family, preprocessing, and split definitions are fixed, so that the role of the kernel can be interpreted with minimal confounding.
 
-\subsection{Malware detection under drift and evolving evaluation benchmarks}
+\subsection{Security detection under drift and evolving evaluation benchmarks}
 
 In malware detection, the relevance of distribution shift is especially acute. Malware ecosystems evolve continuously as attackers modify payloads, packers, obfuscation strategies, delivery mechanisms, and development toolchains. Static detection models are therefore exposed to changing distributions in ways that are operationally consequential rather than merely academic. Public benchmarks have played an important role in making this problem more reproducible. EMBER remains one of the most widely used open datasets for static PE malware detection and helped standardize large-scale evaluation in this area \cite{anderson2018ember}. More recent resources such as EMBER2024 push this effort further by broadening scope, increasing scale, and enabling more holistic evaluation across multiple malware-related tasks \cite{joyce2025ember2024}. Other datasets such as BODMAS and SOREL-20M likewise reflect the field's effort to move toward larger and more realistic benchmark settings \cite{yang2021bodmas,harang2020sorel20m}.
 
 At the same time, a growing body of work has shown that strong laboratory performance does not guarantee robustness to evolving malware. Barbero et al.\ revisited malware classification under concept drift and showed that deployment-oriented settings raise challenges that are obscured by simpler static evaluations \cite{barbero2022transcending}. More recently, Li et al.\ studied adaptation to real drifted malware under limited post-drift supervision, reinforcing the point that temporal degradation is not hypothetical and that realistic recovery from drift may be data-constrained \cite{li2025revisitingdrift}. Taken together, these studies support a clear conclusion: in malware detection, robustness under shift is not a niche desideratum but a primary evaluation target.
 
-Our work differs from this line in emphasis. Rather than proposing a new drift-adaptation mechanism, drift detector, or continual-update strategy, we ask a narrower but complementary question: under a tightly controlled protocol, does the choice of kernel family itself materially affect OOD robustness? This question is well motivated by the malware literature, yet comparatively underexplored in a way that isolates kernels from the many other moving parts of the pipeline.
+The same structural problem, with faster drift dynamics, defines network intrusion detection: benchmark corpora such as UNSW-NB15 and ToN-IoT capture traffic whose attack composition and background behavior change across collection regimes \cite{moustafa2015unsw,alsaedi2020toniot}, and adaptive NIDS pipelines are routinely retrained for exactly this reason. Using both modalities in one protocol lets us ask whether kernel-level robustness effects are properties of a dataset family or of the kernels.
+
+Our work differs from this line in emphasis. Rather than proposing a new drift-adaptation mechanism, drift detector, or continual-update strategy, we ask a narrower but complementary question: under a tightly controlled protocol, does the choice of kernel family itself materially affect OOD robustness? This question is well motivated by the security literature, yet comparatively underexplored in a way that isolates kernels from the many other moving parts of the pipeline.
 
 \subsection{Kernel methods, quantum kernels, and careful benchmarking in QML}
 
@@ -332,11 +334,11 @@ Our primary metric is balanced accuracy, reported separately on ID and OOD test 
 \]
 Balanced accuracy is preferred because it remains informative under moderate class imbalance and is straightforward to interpret in both settings.
 
-We quantify robustness under shift through the ID-to-OOD degradation
+The ID-to-OOD degradation
 \[
-\mathrm{drop} = \mathrm{BAcc}_{\mathrm{ID}} - \mathrm{BAcc}_{\mathrm{OOD}}.
+\mathrm{drop} = \mathrm{BAcc}_{\mathrm{ID}} - \mathrm{BAcc}_{\mathrm{OOD}}
 \]
-Lower values indicate greater robustness, as they correspond to smaller degradation when moving from ID to OOD evaluation.
+is recorded for every configuration and available in the artifact; because it conflates OOD behavior with the corresponding ID baseline, we treat OOD balanced accuracy as the primary inferential target and use drop only as a secondary descriptor.
 
 To compare families after selection, we compute family deltas:
 \begin{align}
@@ -399,7 +401,7 @@ For clarity and reproducibility, Table~\ref{tab:protocol_summary} summarizes the
 \label{tab:protocol_summary}
 \small
 \setlength{\tabcolsep}{5pt}
-\begin{tabular}{lp{8.4cm}}
+\begin{tabular}{lp{7.6cm}}
 \toprule
 Component & Specification \\
 \midrule
@@ -456,23 +458,23 @@ Under Best-by-ID selection (lower panel), the quantum family improves ID balance
 % results/ember_shift/extended_kernels/family_comparison_wilcoxon.csv
 \begin{table}[t]
 \centering
-\caption{EMBER headline results (18 settings, 15 runs each). Within each classifier, family-internal selection compares the best quantum candidate against the best candidate of the stated classical reference set. $p$-values are two-sided paired Wilcoxon over settings, Holm-corrected within classifier; the last column counts settings whose quantum-favorable gain exceeds the combined run-to-run variability scale.}
+\caption{EMBER headline results (18 settings, 15 runs each). Within each classifier (GPC = Laplace Gaussian process classifier), family-internal selection compares the best quantum candidate against the best candidate of the stated classical reference set. $p$-values are two-sided paired Wilcoxon over settings, Holm-corrected within classifier; the last column counts settings whose quantum-favorable gain exceeds the combined run-to-run variability scale.}
 \label{tab:family_ember}
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{llccccc}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llcccccc@{}}
 \toprule
-Selection & Classifier & Classical ref. & Q wins & Mean $\Delta$ & Median $\Delta$ & $p$ (Holm) \quad Effect$>1$ \\
+Selection & Classifier & Classical ref. & Q wins & Mean $\Delta$ & Median $\Delta$ & $p$ (Holm) & Eff.$>1$ \\
 \midrule
-\multirow{4}{*}{Best-by-OOD} & SVC & linear+RBF & 17/18 & $+0.0374$ & $+0.0426$ & $7.6\times 10^{-5}$ \quad 12 \\
- & SVC & extended classical & 15/18 & $+0.0044$ & $+0.0064$ & $0.03$ \quad 1 \\
- & GP classifier & linear+RBF & 15/18 & $+0.0283$ & $+0.0339$ & $2.1\times 10^{-4}$ \quad 11 \\
- & GP classifier & extended classical & 11/18 & $+0.0023$ & $+0.0029$ & $0.26$ \quad 0 \\
+\multirow{4}{*}{Best-by-OOD} & SVC & linear+RBF & 17/18 & $+0.0374$ & $+0.0426$ & $7.6\times 10^{-5}$ & 12 \\
+ & SVC & extended & 15/18 & $+0.0044$ & $+0.0064$ & $0.03$ & 1 \\
+ & GPC & linear+RBF & 15/18 & $+0.0283$ & $+0.0339$ & $2.1\times 10^{-4}$ & 11 \\
+ & GPC & extended & 11/18 & $+0.0023$ & $+0.0029$ & $0.26$ & 0 \\
 \midrule
-\multirow{4}{*}{Best-by-ID} & SVC & linear+RBF & 18/18 & $+0.0775$ & $+0.0794$ & $3.1\times 10^{-5}$ \quad 18 \\
- & SVC & extended classical & 18/18 & $+0.0149$ & $+0.0152$ & $3.1\times 10^{-5}$ \quad 11 \\
- & GP classifier & linear+RBF & 18/18 & $+0.0649$ & $+0.0664$ & $3.1\times 10^{-5}$ \quad 18 \\
- & GP classifier & extended classical & 18/18 & $+0.0192$ & $+0.0166$ & $3.1\times 10^{-5}$ \quad 11 \\
+\multirow{4}{*}{Best-by-ID} & SVC & linear+RBF & 18/18 & $+0.0775$ & $+0.0794$ & $3.1\times 10^{-5}$ & 18 \\
+ & SVC & extended & 18/18 & $+0.0149$ & $+0.0152$ & $3.1\times 10^{-5}$ & 11 \\
+ & GPC & linear+RBF & 18/18 & $+0.0649$ & $+0.0664$ & $3.1\times 10^{-5}$ & 18 \\
+ & GPC & extended & 18/18 & $+0.0192$ & $+0.0166$ & $3.1\times 10^{-5}$ & 11 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -491,7 +493,7 @@ The comparison of Section~\ref{sec:res_extended} pins every quantum feature map 
 % TODO(sweep-15runs): refresh these numbers from
 % results/ember_shift/bandwidth_sweep/family_comparison_wilcoxon.csv when the
 % repeated-run pass of the bandwidth sweep completes.
-Under the GP classifier, the quantum family beats the bandwidth-swept extended classical family in 16 of 18 EMBER settings (mean $\Delta_{\mathrm{OOD}}=+0.013$, Holm-adjusted $p=7.6\times10^{-5}$); under SVC the comparison is positive but not significant (11--12 of 18, $p\approx0.15$). The mechanism is visible in the selections: the angle-scaled variants dominate the quantum family's Best-by-OOD choices (scales $0.5$ and $2$ are selected far more often than the canonical encoding), confirming that the fixed-bandwidth comparison had the quantum family playing with one hand tied. On the network-flow scenarios under natural drift, the same symmetric sweep leaves the quantum advantage intact and significant under both classifiers (24 of 27 settings, $p=2.6\times10^{-5}$ for the GP classifier; 19 of 27, $p=4.9\times10^{-4}$ for SVC).
+Under the GP classifier, the quantum family beats the bandwidth-swept extended classical family in 16 of 18 EMBER settings (mean $\Delta_{\mathrm{OOD}}=+0.013$, Holm-adjusted $p=7.6\times10^{-5}$); under SVC the comparison is positive but not significant (11--12 of 18, $p\approx0.15$). The mechanism is visible in the selections: the angle-scaled variants dominate the quantum family's Best-by-OOD choices (scales $0.5$ and $2$ are selected far more often than the canonical encoding), confirming that the fixed-bandwidth comparison had the quantum family playing with one hand tied. On the network-flow scenarios under natural drift, the same symmetric sweep leaves the quantum advantage intact and significant under both classifiers (24 of 27 settings, Holm-adjusted $p=5.2\times10^{-5}$ for the GP classifier; 19 of 27, $p=9.8\times10^{-4}$ for SVC).
 
 The methodological moral generalizes beyond this study: fixed-encoding quantum kernels versus tuned classical kernels is not a protocol-fair comparison, and the bias runs \emph{against} the quantum family. Once tuning freedom is symmetric, the extended classical family no longer neutralizes the quantum OOD advantage.
 
@@ -508,21 +510,21 @@ The breakdown by shift mechanism sharpens the picture. Under SVC, the quantum-ve
 \centering
 \caption{Network-flow headline results (54 settings across UNSW-NB15 DoS/Reconnaissance and ToN-IoT Scanning, two shift mechanisms, 15 runs each). Columns as in Table~\ref{tab:family_ember}.}
 \label{tab:family_netflow}
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{llccccc}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llcccccc@{}}
 \toprule
-Selection & Classifier & Classical ref. & Q wins & Mean $\Delta$ & Median $\Delta$ & $p$ (Holm) \quad Effect$>1$ \\
+Selection & Classifier & Classical ref. & Q wins & Mean $\Delta$ & Median $\Delta$ & $p$ (Holm) & Eff.$>1$ \\
 \midrule
-\multirow{4}{*}{Best-by-OOD} & SVC & linear+RBF & 54/54 & $+0.0256$ & $+0.0264$ & $6.5\times 10^{-10}$ \quad 35 \\
- & SVC & extended classical & 41/54 & $+0.0066$ & $+0.0028$ & $3.2\times 10^{-5}$ \quad 7 \\
- & GP classifier & linear+RBF & 54/54 & $+0.0344$ & $+0.0338$ & $6.5\times 10^{-10}$ \quad 44 \\
- & GP classifier & extended classical & 54/54 & $+0.0204$ & $+0.0192$ & $6.5\times 10^{-10}$ \quad 33 \\
+\multirow{4}{*}{Best-by-OOD} & SVC & linear+RBF & 54/54 & $+0.0256$ & $+0.0264$ & $6.5\times 10^{-10}$ & 35 \\
+ & SVC & extended & 41/54 & $+0.0066$ & $+0.0028$ & $3.2\times 10^{-5}$ & 7 \\
+ & GPC & linear+RBF & 54/54 & $+0.0344$ & $+0.0338$ & $6.5\times 10^{-10}$ & 44 \\
+ & GPC & extended & 54/54 & $+0.0204$ & $+0.0192$ & $6.5\times 10^{-10}$ & 33 \\
 \midrule
-\multirow{4}{*}{Best-by-ID} & SVC & linear+RBF & 54/54 & $+0.0210$ & $+0.0104$ & $6.5\times 10^{-10}$ \quad 29 \\
- & SVC & extended classical & 39/54 & $+0.0036$ & $+0.0028$ & $1.5\times 10^{-4}$ \quad 11 \\
- & GP classifier & linear+RBF & 53/54 & $+0.0188$ & $+0.0100$ & $6.5\times 10^{-10}$ \quad 24 \\
- & GP classifier & extended classical & 40/54 & $+0.0057$ & $+0.0044$ & $7.9\times 10^{-7}$ \quad 14 \\
+\multirow{4}{*}{Best-by-ID} & SVC & linear+RBF & 54/54 & $+0.0210$ & $+0.0104$ & $6.5\times 10^{-10}$ & 29 \\
+ & SVC & extended & 39/54 & $+0.0036$ & $+0.0028$ & $1.5\times 10^{-4}$ & 11 \\
+ & GPC & linear+RBF & 53/54 & $+0.0188$ & $+0.0100$ & $6.5\times 10^{-10}$ & 24 \\
+ & GPC & extended & 40/54 & $+0.0057$ & $+0.0044$ & $7.9\times 10^{-7}$ & 14 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -688,7 +690,7 @@ The most important open problems are two. Practically, turning alignment surviva
 \section{Additional Results}
 \label{app:additional_results}
 
-This appendix reports the full setting-level Best-by-OOD comparisons between the selected quantum kernel and the best kernel of the \emph{extended} classical family (the strongest comparison in the study), for both classifiers and all 72 principal settings. Every value is a mean $\pm$ standard deviation over 15 repeated runs; Effect denotes $\Delta_{\mathrm{OOD}}/\sqrt{\sigma_C^2+\sigma_Q^2}$. Size labels denote $(n_{\mathrm{train}}, n_{\mathrm{ID}}, n_{\mathrm{OOD}})$: S = (1k, 500, 500), M = (2k, 1k, 1k), L = (4k, 1.8k, 1.8k). Shift labels for the network scenarios abbreviate scenario/mechanism (e.g., U-DoS/nat is UNSW-NB15 DoS under natural drift; m2c is the centroid construction). All tables are generated directly from the public artifact by \texttt{scripts/reporting/make\_v2\_tables.py}.
+This appendix reports the full setting-level Best-by-OOD comparisons between the selected quantum kernel and the best kernel of the \emph{extended} classical family (the strongest comparison in the study), for both classifiers and all 72 principal settings. Every value is a mean $\pm$ standard deviation over 15 repeated runs; Effect denotes $\Delta_{\mathrm{OOD}}/\sqrt{\sigma_C^2+\sigma_Q^2}$. Size labels denote $(n_{\mathrm{train}}, n_{\mathrm{ID}}, n_{\mathrm{OOD}})$: S = (1k, 500, 500), M = (2k, 1k, 1k), L = (4k, 1.8k, 1.8k). Shift labels for the network scenarios abbreviate scenario/mechanism: UD = UNSW-NB15 DoS, UR = UNSW-NB15 Reconnaissance, TS = ToN-IoT Scanning; /m2 is the centroid construction and /nat is natural drift. Quantum kernel names carry the angle scale after \texttt{@} where it differs from 1. All tables are generated directly from the public artifact by \texttt{scripts/reporting/make\_v2\_tables.py}.
 
 
 \begin{table}[p]
@@ -696,10 +698,10 @@ This appendix reports the full setting-level Best-by-OOD comparisons between the
 \caption{EMBER, SVC: full Best-by-OOD comparison against the extended classical family.}
 \label{app:ember_svc}
 \scriptsize
-\setlength{\tabcolsep}{3pt}
+\setlength{\tabcolsep}{2pt}
 \begin{tabular}{@{}ccc ll cc rr@{}}
 \toprule
-Shift & Seed & Size & Best classical (ext.) & Best quantum & \shortstack{OOD\\C} & \shortstack{OOD\\Q} & $\Delta_{\mathrm{OOD}}$ & Effect \\
+Shift & Seed & Size & Classical & Quantum & \shortstack{OOD\\C} & \shortstack{OOD\\Q} & $\Delta_{\mathrm{OOD}}$ & Eff. \\
 \midrule
 m1 & 42 & S & Laplacian (d4) & PauliXZ (d12) & $0.756\pm0.007$ & $0.758\pm0.020$ & $+0.002$ & $+0.09$ \\
 m1 & 42 & M & Laplacian (d12) & ZZ-r1 (d12) & $0.753\pm0.019$ & $0.761\pm0.007$ & $+0.009$ & $+0.42$ \\
@@ -727,10 +729,10 @@ m2 & 999 & L & Laplacian (d12) & ZZ-r2 (d12) & $0.787\pm0.013$ & $0.803\pm0.009$
 \caption{EMBER, GP classifier: full Best-by-OOD comparison against the extended classical family.}
 \label{app:ember_gpc}
 \scriptsize
-\setlength{\tabcolsep}{3pt}
+\setlength{\tabcolsep}{2pt}
 \begin{tabular}{@{}ccc ll cc rr@{}}
 \toprule
-Shift & Seed & Size & Best classical (ext.) & Best quantum & \shortstack{OOD\\C} & \shortstack{OOD\\Q} & $\Delta_{\mathrm{OOD}}$ & Effect \\
+Shift & Seed & Size & Classical & Quantum & \shortstack{OOD\\C} & \shortstack{OOD\\Q} & $\Delta_{\mathrm{OOD}}$ & Eff. \\
 \midrule
 m1 & 42 & S & Laplacian (d12) & PauliXZ (d12) & $0.767\pm0.018$ & $0.760\pm0.017$ & $-0.007$ & $-0.29$ \\
 m1 & 42 & M & Laplacian (d12) & ZZ-r1 (d12) & $0.765\pm0.021$ & $0.766\pm0.011$ & $+0.002$ & $+0.07$ \\
@@ -758,65 +760,65 @@ m2 & 999 & L & Laplacian (d12) & ZZ-r2 (d12) & $0.786\pm0.013$ & $0.798\pm0.011$
 \caption{Network flows, SVC: full Best-by-OOD comparison against the extended classical family.}
 \label{app:netflow_svc}
 \scriptsize
-\setlength{\tabcolsep}{3pt}
+\setlength{\tabcolsep}{2pt}
 \begin{tabular}{@{}ccc ll cc rr@{}}
 \toprule
-Shift & Seed & Size & Best classical (ext.) & Best quantum & \shortstack{OOD\\C} & \shortstack{OOD\\Q} & $\Delta_{\mathrm{OOD}}$ & Effect \\
+Shift & Seed & Size & Classical & Quantum & \shortstack{OOD\\C} & \shortstack{OOD\\Q} & $\Delta_{\mathrm{OOD}}$ & Eff. \\
 \midrule
-T-Scan/m2c & 42 & S & Laplacian (d12) & ZZ-r1 (d6) & $0.941\pm0.013$ & $0.954\pm0.009$ & $+0.014$ & $+0.90$ \\
-T-Scan/m2c & 42 & M & Laplacian (d12) & ZZ-r1 (d10) & $0.941\pm0.014$ & $0.958\pm0.005$ & $+0.017$ & $+1.15$ \\
-T-Scan/m2c & 42 & L & Laplacian (d12) & ZZ-r1 (d8) & $0.959\pm0.009$ & $0.964\pm0.006$ & $+0.005$ & $+0.44$ \\
-T-Scan/m2c & 123 & S & Laplacian (d12) & ZZ-r1 (d8) & $0.943\pm0.017$ & $0.959\pm0.011$ & $+0.015$ & $+0.75$ \\
-T-Scan/m2c & 123 & M & Laplacian (d12) & ZZ-r1 (d6) & $0.954\pm0.007$ & $0.958\pm0.006$ & $+0.003$ & $+0.35$ \\
-T-Scan/m2c & 123 & L & Laplacian (d10) & ZZ-r1 (d8) & $0.955\pm0.003$ & $0.959\pm0.003$ & $+0.003$ & $+0.72$ \\
-T-Scan/m2c & 999 & S & Laplacian (d10) & ZZ-r1 (d10) & $0.936\pm0.011$ & $0.957\pm0.003$ & $+0.021$ & $+1.80$ \\
-T-Scan/m2c & 999 & M & Laplacian (d12) & ZZ-r1 (d8) & $0.954\pm0.009$ & $0.962\pm0.007$ & $+0.008$ & $+0.72$ \\
-T-Scan/m2c & 999 & L & Laplacian (d12) & ZZ-r1 (d10) & $0.965\pm0.004$ & $0.969\pm0.003$ & $+0.003$ & $+0.71$ \\
-T-Scan/nat & 42 & S & Laplacian (d8) & ZZ-r1 (d10) & $0.987\pm0.003$ & $0.988\pm0.005$ & $+0.001$ & $+0.10$ \\
-T-Scan/nat & 42 & M & Laplacian (d10) & ZZ-r1 (d12) & $0.989\pm0.004$ & $0.990\pm0.002$ & $+0.001$ & $+0.24$ \\
-T-Scan/nat & 42 & L & Laplacian (d12) & Z-map (d12) & $0.989\pm0.005$ & $0.991\pm0.003$ & $+0.002$ & $+0.31$ \\
-T-Scan/nat & 123 & S & Laplacian (d8) & ZZ-r1 (d12) & $0.990\pm0.005$ & $0.992\pm0.005$ & $+0.002$ & $+0.36$ \\
-T-Scan/nat & 123 & M & Laplacian (d12) & Z-map (d10) & $0.989\pm0.003$ & $0.992\pm0.002$ & $+0.003$ & $+0.61$ \\
-T-Scan/nat & 123 & L & Laplacian (d10) & Z-map (d12) & $0.990\pm0.002$ & $0.991\pm0.003$ & $+0.002$ & $+0.40$ \\
-T-Scan/nat & 999 & S & Laplacian (d12) & Z-map (d12) & $0.979\pm0.006$ & $0.985\pm0.002$ & $+0.006$ & $+1.05$ \\
-T-Scan/nat & 999 & M & Laplacian (d10) & Z-map (d10) & $0.990\pm0.002$ & $0.991\pm0.004$ & $+0.002$ & $+0.38$ \\
-T-Scan/nat & 999 & L & Laplacian (d10) & Z-map (d12) & $0.992\pm0.002$ & $0.992\pm0.003$ & $+0.000$ & $+0.12$ \\
-U-DoS/m2c & 42 & S & Laplacian (d12) & PauliXZ (d12) & $0.920\pm0.016$ & $0.919\pm0.014$ & $-0.001$ & $-0.06$ \\
-U-DoS/m2c & 42 & M & Laplacian (d12) & PauliXZ (d12) & $0.934\pm0.017$ & $0.937\pm0.007$ & $+0.003$ & $+0.16$ \\
-U-DoS/m2c & 42 & L & Laplacian (d12) & PauliXZ (d10) & $0.942\pm0.008$ & $0.940\pm0.006$ & $-0.002$ & $-0.18$ \\
-U-DoS/m2c & 123 & S & Laplacian (d12) & PauliXZ (d12) & $0.917\pm0.020$ & $0.926\pm0.013$ & $+0.008$ & $+0.33$ \\
-U-DoS/m2c & 123 & M & Laplacian (d12) & PauliXZ (d12) & $0.943\pm0.007$ & $0.940\pm0.010$ & $-0.004$ & $-0.28$ \\
-U-DoS/m2c & 123 & L & Laplacian (d12) & Z-map (d12) & $0.948\pm0.003$ & $0.947\pm0.005$ & $-0.001$ & $-0.20$ \\
-U-DoS/m2c & 999 & S & Laplacian (d12) & PauliXZ (d12) & $0.923\pm0.023$ & $0.927\pm0.009$ & $+0.004$ & $+0.16$ \\
-U-DoS/m2c & 999 & M & Laplacian (d12) & PauliXZ (d12) & $0.935\pm0.013$ & $0.939\pm0.007$ & $+0.004$ & $+0.26$ \\
-U-DoS/m2c & 999 & L & Laplacian (d12) & Z-map (d12) & $0.947\pm0.004$ & $0.946\pm0.004$ & $-0.001$ & $-0.22$ \\
-U-DoS/nat & 42 & S & Linear (d4) & ZZ-r2 (d10) & $0.781\pm0.040$ & $0.809\pm0.017$ & $+0.028$ & $+0.65$ \\
-U-DoS/nat & 42 & M & Laplacian (d12) & Z-map (d12) & $0.829\pm0.019$ & $0.838\pm0.014$ & $+0.009$ & $+0.38$ \\
-U-DoS/nat & 42 & L & Laplacian (d12) & Z-map (d12) & $0.829\pm0.011$ & $0.829\pm0.008$ & $+0.000$ & $+0.01$ \\
-U-DoS/nat & 123 & S & Laplacian (d12) & ZZ-r2 (d6) & $0.775\pm0.026$ & $0.818\pm0.018$ & $+0.043$ & $+1.37$ \\
-U-DoS/nat & 123 & M & Laplacian (d12) & ZZ-r1 (d10) & $0.790\pm0.020$ & $0.812\pm0.007$ & $+0.022$ & $+1.04$ \\
-U-DoS/nat & 123 & L & Laplacian (d12) & ZZ-r1 (d12) & $0.809\pm0.012$ & $0.825\pm0.011$ & $+0.016$ & $+0.97$ \\
-U-DoS/nat & 999 & S & Linear (d4) & ZZ-r2 (d6) & $0.759\pm0.051$ & $0.800\pm0.018$ & $+0.042$ & $+0.77$ \\
-U-DoS/nat & 999 & M & Laplacian (d12) & ZZ-r2 (d10) & $0.788\pm0.016$ & $0.809\pm0.014$ & $+0.021$ & $+0.95$ \\
-U-DoS/nat & 999 & L & Laplacian (d12) & ZZ-r1 (d12) & $0.804\pm0.006$ & $0.826\pm0.013$ & $+0.023$ & $+1.63$ \\
-U-Rec/m2c & 42 & S & Laplacian (d12) & Z-map (d12) & $0.909\pm0.025$ & $0.909\pm0.015$ & $-0.000$ & $-0.01$ \\
-U-Rec/m2c & 42 & M & Laplacian (d12) & PauliXZ (d12) & $0.931\pm0.019$ & $0.935\pm0.008$ & $+0.004$ & $+0.18$ \\
-U-Rec/m2c & 42 & L & Laplacian (d12) & PauliXZ (d12) & $0.944\pm0.005$ & $0.943\pm0.006$ & $-0.001$ & $-0.12$ \\
-U-Rec/m2c & 123 & S & Laplacian (d12) & PauliXZ (d12) & $0.946\pm0.014$ & $0.942\pm0.007$ & $-0.004$ & $-0.24$ \\
-U-Rec/m2c & 123 & M & Laplacian (d12) & PauliXZ (d12) & $0.951\pm0.011$ & $0.948\pm0.008$ & $-0.004$ & $-0.26$ \\
-U-Rec/m2c & 123 & L & Laplacian (d12) & Z-map (d12) & $0.954\pm0.007$ & $0.954\pm0.006$ & $-0.000$ & $-0.03$ \\
-U-Rec/m2c & 999 & S & Laplacian (d12) & Z-map (d12) & $0.915\pm0.016$ & $0.918\pm0.014$ & $+0.003$ & $+0.12$ \\
-U-Rec/m2c & 999 & M & Laplacian (d12) & Z-map (d12) & $0.947\pm0.006$ & $0.944\pm0.008$ & $-0.003$ & $-0.33$ \\
-U-Rec/m2c & 999 & L & Laplacian (d12) & Z-map (d12) & $0.956\pm0.003$ & $0.948\pm0.007$ & $-0.008$ & $-1.03$ \\
-U-Rec/nat & 42 & S & Linear (d12) & ZZ-r2 (d6) & $0.770\pm0.019$ & $0.778\pm0.013$ & $+0.008$ & $+0.36$ \\
-U-Rec/nat & 42 & M & Laplacian (d10) & ZZ-r1 (d4) & $0.809\pm0.035$ & $0.815\pm0.010$ & $+0.007$ & $+0.18$ \\
-U-Rec/nat & 42 & L & Laplacian (d10) & ZZ-r1 (d4) & $0.812\pm0.020$ & $0.815\pm0.008$ & $+0.003$ & $+0.12$ \\
-U-Rec/nat & 123 & S & Linear (d12) & ZZ-r1 (d6) & $0.795\pm0.012$ & $0.797\pm0.018$ & $+0.002$ & $+0.11$ \\
-U-Rec/nat & 123 & M & Linear (d10) & ZZ-r1 (d4) & $0.800\pm0.018$ & $0.802\pm0.024$ & $+0.003$ & $+0.09$ \\
-U-Rec/nat & 123 & L & Laplacian (d12) & ZZ-r1 (d4) & $0.818\pm0.018$ & $0.811\pm0.009$ & $-0.007$ & $-0.34$ \\
-U-Rec/nat & 999 & S & Linear (d12) & ZZ-r1 (d6) & $0.780\pm0.020$ & $0.781\pm0.008$ & $+0.000$ & $+0.02$ \\
-U-Rec/nat & 999 & M & Linear (d12) & ZZ-r2 (d6) & $0.783\pm0.014$ & $0.809\pm0.015$ & $+0.026$ & $+1.26$ \\
-U-Rec/nat & 999 & L & Laplacian (d8) & ZZ-r2 (d6) & $0.804\pm0.015$ & $0.814\pm0.008$ & $+0.010$ & $+0.59$ \\\bottomrule
+TS/m2 & 42 & S & Laplacian (d12) & ZZ-r1 (d6) & $0.941\pm0.013$ & $0.954\pm0.009$ & $+0.014$ & $+0.90$ \\
+TS/m2 & 42 & M & Laplacian (d12) & ZZ-r1 (d10) & $0.941\pm0.014$ & $0.958\pm0.005$ & $+0.017$ & $+1.15$ \\
+TS/m2 & 42 & L & Laplacian (d12) & ZZ-r1 (d8) & $0.959\pm0.009$ & $0.964\pm0.006$ & $+0.005$ & $+0.44$ \\
+TS/m2 & 123 & S & Laplacian (d12) & ZZ-r1 (d8) & $0.943\pm0.017$ & $0.959\pm0.011$ & $+0.015$ & $+0.75$ \\
+TS/m2 & 123 & M & Laplacian (d12) & ZZ-r1 (d6) & $0.954\pm0.007$ & $0.958\pm0.006$ & $+0.003$ & $+0.35$ \\
+TS/m2 & 123 & L & Laplacian (d10) & ZZ-r1 (d8) & $0.955\pm0.003$ & $0.959\pm0.003$ & $+0.003$ & $+0.72$ \\
+TS/m2 & 999 & S & Laplacian (d10) & ZZ-r1 (d10) & $0.936\pm0.011$ & $0.957\pm0.003$ & $+0.021$ & $+1.80$ \\
+TS/m2 & 999 & M & Laplacian (d12) & ZZ-r1 (d8) & $0.954\pm0.009$ & $0.962\pm0.007$ & $+0.008$ & $+0.72$ \\
+TS/m2 & 999 & L & Laplacian (d12) & ZZ-r1 (d10) & $0.965\pm0.004$ & $0.969\pm0.003$ & $+0.003$ & $+0.71$ \\
+TS/nat & 42 & S & Laplacian (d8) & ZZ-r1 (d10) & $0.987\pm0.003$ & $0.988\pm0.005$ & $+0.001$ & $+0.10$ \\
+TS/nat & 42 & M & Laplacian (d10) & ZZ-r1 (d12) & $0.989\pm0.004$ & $0.990\pm0.002$ & $+0.001$ & $+0.24$ \\
+TS/nat & 42 & L & Laplacian (d12) & Z-map (d12) & $0.989\pm0.005$ & $0.991\pm0.003$ & $+0.002$ & $+0.31$ \\
+TS/nat & 123 & S & Laplacian (d8) & ZZ-r1 (d12) & $0.990\pm0.005$ & $0.992\pm0.005$ & $+0.002$ & $+0.36$ \\
+TS/nat & 123 & M & Laplacian (d12) & Z-map (d10) & $0.989\pm0.003$ & $0.992\pm0.002$ & $+0.003$ & $+0.61$ \\
+TS/nat & 123 & L & Laplacian (d10) & Z-map (d12) & $0.990\pm0.002$ & $0.991\pm0.003$ & $+0.002$ & $+0.40$ \\
+TS/nat & 999 & S & Laplacian (d12) & Z-map (d12) & $0.979\pm0.006$ & $0.985\pm0.002$ & $+0.006$ & $+1.05$ \\
+TS/nat & 999 & M & Laplacian (d10) & Z-map (d10) & $0.990\pm0.002$ & $0.991\pm0.004$ & $+0.002$ & $+0.38$ \\
+TS/nat & 999 & L & Laplacian (d10) & Z-map (d12) & $0.992\pm0.002$ & $0.992\pm0.003$ & $+0.000$ & $+0.12$ \\
+UD/m2 & 42 & S & Laplacian (d12) & PauliXZ (d12) & $0.920\pm0.016$ & $0.919\pm0.014$ & $-0.001$ & $-0.06$ \\
+UD/m2 & 42 & M & Laplacian (d12) & PauliXZ (d12) & $0.934\pm0.017$ & $0.937\pm0.007$ & $+0.003$ & $+0.16$ \\
+UD/m2 & 42 & L & Laplacian (d12) & PauliXZ (d10) & $0.942\pm0.008$ & $0.940\pm0.006$ & $-0.002$ & $-0.18$ \\
+UD/m2 & 123 & S & Laplacian (d12) & PauliXZ (d12) & $0.917\pm0.020$ & $0.926\pm0.013$ & $+0.008$ & $+0.33$ \\
+UD/m2 & 123 & M & Laplacian (d12) & PauliXZ (d12) & $0.943\pm0.007$ & $0.940\pm0.010$ & $-0.004$ & $-0.28$ \\
+UD/m2 & 123 & L & Laplacian (d12) & Z-map (d12) & $0.948\pm0.003$ & $0.947\pm0.005$ & $-0.001$ & $-0.20$ \\
+UD/m2 & 999 & S & Laplacian (d12) & PauliXZ (d12) & $0.923\pm0.023$ & $0.927\pm0.009$ & $+0.004$ & $+0.16$ \\
+UD/m2 & 999 & M & Laplacian (d12) & PauliXZ (d12) & $0.935\pm0.013$ & $0.939\pm0.007$ & $+0.004$ & $+0.26$ \\
+UD/m2 & 999 & L & Laplacian (d12) & Z-map (d12) & $0.947\pm0.004$ & $0.946\pm0.004$ & $-0.001$ & $-0.22$ \\
+UD/nat & 42 & S & Linear (d4) & ZZ-r2 (d10) & $0.781\pm0.040$ & $0.809\pm0.017$ & $+0.028$ & $+0.65$ \\
+UD/nat & 42 & M & Laplacian (d12) & Z-map (d12) & $0.829\pm0.019$ & $0.838\pm0.014$ & $+0.009$ & $+0.38$ \\
+UD/nat & 42 & L & Laplacian (d12) & Z-map (d12) & $0.829\pm0.011$ & $0.829\pm0.008$ & $+0.000$ & $+0.01$ \\
+UD/nat & 123 & S & Laplacian (d12) & ZZ-r2 (d6) & $0.775\pm0.026$ & $0.818\pm0.018$ & $+0.043$ & $+1.37$ \\
+UD/nat & 123 & M & Laplacian (d12) & ZZ-r1 (d10) & $0.790\pm0.020$ & $0.812\pm0.007$ & $+0.022$ & $+1.04$ \\
+UD/nat & 123 & L & Laplacian (d12) & ZZ-r1 (d12) & $0.809\pm0.012$ & $0.825\pm0.011$ & $+0.016$ & $+0.97$ \\
+UD/nat & 999 & S & Linear (d4) & ZZ-r2 (d6) & $0.759\pm0.051$ & $0.800\pm0.018$ & $+0.042$ & $+0.77$ \\
+UD/nat & 999 & M & Laplacian (d12) & ZZ-r2 (d10) & $0.788\pm0.016$ & $0.809\pm0.014$ & $+0.021$ & $+0.95$ \\
+UD/nat & 999 & L & Laplacian (d12) & ZZ-r1 (d12) & $0.804\pm0.006$ & $0.826\pm0.013$ & $+0.023$ & $+1.63$ \\
+UR/m2 & 42 & S & Laplacian (d12) & Z-map (d12) & $0.909\pm0.025$ & $0.909\pm0.015$ & $-0.000$ & $-0.01$ \\
+UR/m2 & 42 & M & Laplacian (d12) & PauliXZ (d12) & $0.931\pm0.019$ & $0.935\pm0.008$ & $+0.004$ & $+0.18$ \\
+UR/m2 & 42 & L & Laplacian (d12) & PauliXZ (d12) & $0.944\pm0.005$ & $0.943\pm0.006$ & $-0.001$ & $-0.12$ \\
+UR/m2 & 123 & S & Laplacian (d12) & PauliXZ (d12) & $0.946\pm0.014$ & $0.942\pm0.007$ & $-0.004$ & $-0.24$ \\
+UR/m2 & 123 & M & Laplacian (d12) & PauliXZ (d12) & $0.951\pm0.011$ & $0.948\pm0.008$ & $-0.004$ & $-0.26$ \\
+UR/m2 & 123 & L & Laplacian (d12) & Z-map (d12) & $0.954\pm0.007$ & $0.954\pm0.006$ & $-0.000$ & $-0.03$ \\
+UR/m2 & 999 & S & Laplacian (d12) & Z-map (d12) & $0.915\pm0.016$ & $0.918\pm0.014$ & $+0.003$ & $+0.12$ \\
+UR/m2 & 999 & M & Laplacian (d12) & Z-map (d12) & $0.947\pm0.006$ & $0.944\pm0.008$ & $-0.003$ & $-0.33$ \\
+UR/m2 & 999 & L & Laplacian (d12) & Z-map (d12) & $0.956\pm0.003$ & $0.948\pm0.007$ & $-0.008$ & $-1.03$ \\
+UR/nat & 42 & S & Linear (d12) & ZZ-r2 (d6) & $0.770\pm0.019$ & $0.778\pm0.013$ & $+0.008$ & $+0.36$ \\
+UR/nat & 42 & M & Laplacian (d10) & ZZ-r1 (d4) & $0.809\pm0.035$ & $0.815\pm0.010$ & $+0.007$ & $+0.18$ \\
+UR/nat & 42 & L & Laplacian (d10) & ZZ-r1 (d4) & $0.812\pm0.020$ & $0.815\pm0.008$ & $+0.003$ & $+0.12$ \\
+UR/nat & 123 & S & Linear (d12) & ZZ-r1 (d6) & $0.795\pm0.012$ & $0.797\pm0.018$ & $+0.002$ & $+0.11$ \\
+UR/nat & 123 & M & Linear (d10) & ZZ-r1 (d4) & $0.800\pm0.018$ & $0.802\pm0.024$ & $+0.003$ & $+0.09$ \\
+UR/nat & 123 & L & Laplacian (d12) & ZZ-r1 (d4) & $0.818\pm0.018$ & $0.811\pm0.009$ & $-0.007$ & $-0.34$ \\
+UR/nat & 999 & S & Linear (d12) & ZZ-r1 (d6) & $0.780\pm0.020$ & $0.781\pm0.008$ & $+0.000$ & $+0.02$ \\
+UR/nat & 999 & M & Linear (d12) & ZZ-r2 (d6) & $0.783\pm0.014$ & $0.809\pm0.015$ & $+0.026$ & $+1.26$ \\
+UR/nat & 999 & L & Laplacian (d8) & ZZ-r2 (d6) & $0.804\pm0.015$ & $0.814\pm0.008$ & $+0.010$ & $+0.59$ \\\bottomrule
 \end{tabular}
 \end{table}
 
@@ -825,65 +827,65 @@ U-Rec/nat & 999 & L & Laplacian (d8) & ZZ-r2 (d6) & $0.804\pm0.015$ & $0.814\pm0
 \caption{Network flows, GP classifier: full Best-by-OOD comparison against the extended classical family.}
 \label{app:netflow_gpc}
 \scriptsize
-\setlength{\tabcolsep}{3pt}
+\setlength{\tabcolsep}{2pt}
 \begin{tabular}{@{}ccc ll cc rr@{}}
 \toprule
-Shift & Seed & Size & Best classical (ext.) & Best quantum & \shortstack{OOD\\C} & \shortstack{OOD\\Q} & $\Delta_{\mathrm{OOD}}$ & Effect \\
+Shift & Seed & Size & Classical & Quantum & \shortstack{OOD\\C} & \shortstack{OOD\\Q} & $\Delta_{\mathrm{OOD}}$ & Eff. \\
 \midrule
-T-Scan/m2c & 42 & S & Laplacian (d12) & ZZ-r1 (d8) & $0.906\pm0.019$ & $0.954\pm0.011$ & $+0.049$ & $+2.27$ \\
-T-Scan/m2c & 42 & M & Laplacian (d8) & ZZ-r1 (d12) & $0.921\pm0.004$ & $0.957\pm0.005$ & $+0.037$ & $+5.70$ \\
-T-Scan/m2c & 42 & L & Laplacian (d8) & ZZ-r1 (d8) & $0.931\pm0.007$ & $0.964\pm0.006$ & $+0.034$ & $+3.58$ \\
-T-Scan/m2c & 123 & S & Laplacian (d8) & ZZ-r1 (d10) & $0.910\pm0.056$ & $0.958\pm0.006$ & $+0.048$ & $+0.86$ \\
-T-Scan/m2c & 123 & M & Laplacian (d4) & ZZ-r1 (d12) & $0.932\pm0.007$ & $0.958\pm0.007$ & $+0.025$ & $+2.59$ \\
-T-Scan/m2c & 123 & L & Laplacian (d4) & ZZ-r1 (d10) & $0.934\pm0.004$ & $0.960\pm0.003$ & $+0.026$ & $+4.84$ \\
-T-Scan/m2c & 999 & S & Laplacian (d6) & ZZ-r1 (d10) & $0.918\pm0.021$ & $0.954\pm0.009$ & $+0.036$ & $+1.58$ \\
-T-Scan/m2c & 999 & M & Laplacian (d4) & ZZ-r1 (d10) & $0.931\pm0.002$ & $0.961\pm0.006$ & $+0.030$ & $+4.49$ \\
-T-Scan/m2c & 999 & L & Laplacian (d8) & ZZ-r1 (d10) & $0.941\pm0.003$ & $0.968\pm0.003$ & $+0.027$ & $+6.65$ \\
-T-Scan/nat & 42 & S & Laplacian (d8) & ZZ-r1 (d8) & $0.981\pm0.005$ & $0.990\pm0.002$ & $+0.009$ & $+1.67$ \\
-T-Scan/nat & 42 & M & Laplacian (d8) & ZZ-r1 (d10) & $0.987\pm0.002$ & $0.991\pm0.003$ & $+0.004$ & $+1.08$ \\
-T-Scan/nat & 42 & L & Laplacian (d8) & ZZ-r1 (d12) & $0.983\pm0.003$ & $0.992\pm0.002$ & $+0.009$ & $+2.30$ \\
-T-Scan/nat & 123 & S & Laplacian (d8) & ZZ-r1 (d8) & $0.981\pm0.017$ & $0.992\pm0.003$ & $+0.011$ & $+0.65$ \\
-T-Scan/nat & 123 & M & Laplacian (d8) & ZZ-r1 (d10) & $0.985\pm0.004$ & $0.993\pm0.002$ & $+0.008$ & $+1.72$ \\
-T-Scan/nat & 123 & L & Laplacian (d8) & ZZ-r1 (d12) & $0.985\pm0.004$ & $0.992\pm0.002$ & $+0.007$ & $+1.64$ \\
-T-Scan/nat & 999 & S & Laplacian (d10) & ZZ-r1 (d10) & $0.965\pm0.027$ & $0.980\pm0.015$ & $+0.015$ & $+0.48$ \\
-T-Scan/nat & 999 & M & Laplacian (d8) & ZZ-r1 (d10) & $0.984\pm0.005$ & $0.991\pm0.003$ & $+0.007$ & $+1.20$ \\
-T-Scan/nat & 999 & L & Laplacian (d8) & ZZ-r1 (d10) & $0.988\pm0.002$ & $0.992\pm0.003$ & $+0.004$ & $+1.41$ \\
-U-DoS/m2c & 42 & S & Laplacian (d12) & PauliXZ (d12) & $0.894\pm0.028$ & $0.904\pm0.016$ & $+0.009$ & $+0.29$ \\
-U-DoS/m2c & 42 & M & Laplacian (d12) & PauliXZ (d12) & $0.911\pm0.007$ & $0.934\pm0.009$ & $+0.023$ & $+1.96$ \\
-U-DoS/m2c & 42 & L & Laplacian (d12) & Z-map (d12) & $0.927\pm0.008$ & $0.939\pm0.010$ & $+0.013$ & $+1.02$ \\
-U-DoS/m2c & 123 & S & Laplacian (d12) & Z-map (d12) & $0.889\pm0.019$ & $0.917\pm0.019$ & $+0.028$ & $+1.04$ \\
-U-DoS/m2c & 123 & M & Laplacian (d12) & PauliXZ (d12) & $0.916\pm0.016$ & $0.937\pm0.007$ & $+0.022$ & $+1.24$ \\
-U-DoS/m2c & 123 & L & Laplacian (d12) & Z-map (d12) & $0.932\pm0.014$ & $0.945\pm0.007$ & $+0.013$ & $+0.86$ \\
-U-DoS/m2c & 999 & S & Laplacian (d12) & Z-map (d12) & $0.878\pm0.022$ & $0.911\pm0.031$ & $+0.033$ & $+0.87$ \\
-U-DoS/m2c & 999 & M & Laplacian (d12) & PauliXZ (d12) & $0.914\pm0.011$ & $0.931\pm0.009$ & $+0.017$ & $+1.19$ \\
-U-DoS/m2c & 999 & L & Laplacian (d12) & PauliXZ (d12) & $0.936\pm0.009$ & $0.944\pm0.003$ & $+0.008$ & $+0.82$ \\
-U-DoS/nat & 42 & S & Laplacian (d12) & ZZ-r2 (d6) & $0.764\pm0.023$ & $0.801\pm0.023$ & $+0.037$ & $+1.13$ \\
-U-DoS/nat & 42 & M & Laplacian (d12) & PauliXZ (d12) & $0.813\pm0.010$ & $0.829\pm0.008$ & $+0.016$ & $+1.20$ \\
-U-DoS/nat & 42 & L & Laplacian (d12) & Z-map (d12) & $0.818\pm0.010$ & $0.831\pm0.009$ & $+0.013$ & $+0.97$ \\
-U-DoS/nat & 123 & S & Laplacian (d12) & ZZ-r2 (d10) & $0.775\pm0.027$ & $0.813\pm0.017$ & $+0.038$ & $+1.20$ \\
-U-DoS/nat & 123 & M & Laplacian (d12) & ZZ-r2 (d6) & $0.781\pm0.020$ & $0.805\pm0.016$ & $+0.024$ & $+0.93$ \\
-U-DoS/nat & 123 & L & Laplacian (d12) & ZZ-r1 (d12) & $0.800\pm0.005$ & $0.816\pm0.006$ & $+0.016$ & $+2.09$ \\
-U-DoS/nat & 999 & S & Linear (d4) & ZZ-r2 (d6) & $0.766\pm0.053$ & $0.797\pm0.021$ & $+0.032$ & $+0.55$ \\
-U-DoS/nat & 999 & M & Laplacian (d12) & ZZ-r2 (d12) & $0.784\pm0.018$ & $0.806\pm0.013$ & $+0.022$ & $+1.02$ \\
-U-DoS/nat & 999 & L & Laplacian (d12) & ZZ-r2 (d12) & $0.805\pm0.006$ & $0.822\pm0.012$ & $+0.017$ & $+1.31$ \\
-U-Rec/m2c & 42 & S & Laplacian (d12) & Z-map (d12) & $0.880\pm0.021$ & $0.902\pm0.022$ & $+0.022$ & $+0.73$ \\
-U-Rec/m2c & 42 & M & Laplacian (d12) & Z-map (d12) & $0.901\pm0.008$ & $0.925\pm0.009$ & $+0.024$ & $+1.99$ \\
-U-Rec/m2c & 42 & L & Laplacian (d12) & PauliXZ (d12) & $0.929\pm0.012$ & $0.942\pm0.003$ & $+0.013$ & $+1.05$ \\
-U-Rec/m2c & 123 & S & Laplacian (d12) & Z-map (d12) & $0.905\pm0.012$ & $0.926\pm0.023$ & $+0.021$ & $+0.81$ \\
-U-Rec/m2c & 123 & M & Laplacian (d12) & Z-map (d12) & $0.914\pm0.010$ & $0.946\pm0.010$ & $+0.032$ & $+2.29$ \\
-U-Rec/m2c & 123 & L & Laplacian (d12) & PauliXZ (d12) & $0.946\pm0.004$ & $0.953\pm0.006$ & $+0.007$ & $+0.91$ \\
-U-Rec/m2c & 999 & S & Laplacian (d10) & PauliXZ (d12) & $0.883\pm0.023$ & $0.910\pm0.025$ & $+0.027$ & $+0.81$ \\
-U-Rec/m2c & 999 & M & Laplacian (d12) & Z-map (d12) & $0.912\pm0.004$ & $0.941\pm0.008$ & $+0.029$ & $+3.13$ \\
-U-Rec/m2c & 999 & L & Laplacian (d10) & PauliXZ (d12) & $0.937\pm0.014$ & $0.949\pm0.003$ & $+0.012$ & $+0.84$ \\
-U-Rec/nat & 42 & S & Poly-2 (d4) & PauliXZ (d6) & $0.760\pm0.020$ & $0.784\pm0.024$ & $+0.025$ & $+0.79$ \\
-U-Rec/nat & 42 & M & Laplacian (d10) & ZZ-r1 (d4) & $0.795\pm0.040$ & $0.817\pm0.013$ & $+0.022$ & $+0.51$ \\
-U-Rec/nat & 42 & L & Laplacian (d8) & ZZ-r1 (d4) & $0.796\pm0.007$ & $0.813\pm0.005$ & $+0.017$ & $+1.95$ \\
-U-Rec/nat & 123 & S & Poly-2 (d12) & ZZ-r2 (d6) & $0.780\pm0.024$ & $0.797\pm0.016$ & $+0.017$ & $+0.59$ \\
-U-Rec/nat & 123 & M & Linear (d12) & ZZ-r1 (d4) & $0.794\pm0.014$ & $0.803\pm0.020$ & $+0.008$ & $+0.34$ \\
-U-Rec/nat & 123 & L & Laplacian (d12) & ZZ-r2 (d12) & $0.810\pm0.023$ & $0.812\pm0.019$ & $+0.002$ & $+0.06$ \\
-U-Rec/nat & 999 & S & Poly-2 (d12) & ZZ-r2 (d6) & $0.777\pm0.016$ & $0.782\pm0.005$ & $+0.005$ & $+0.30$ \\
-U-Rec/nat & 999 & M & Poly-2 (d12) & ZZ-r2 (d6) & $0.780\pm0.017$ & $0.814\pm0.016$ & $+0.034$ & $+1.51$ \\
-U-Rec/nat & 999 & L & Laplacian (d8) & ZZ-r1 (d4) & $0.790\pm0.010$ & $0.807\pm0.011$ & $+0.017$ & $+1.10$ \\\bottomrule
+TS/m2 & 42 & S & Laplacian (d12) & ZZ-r1 (d8) & $0.906\pm0.019$ & $0.954\pm0.011$ & $+0.049$ & $+2.27$ \\
+TS/m2 & 42 & M & Laplacian (d8) & ZZ-r1 (d12) & $0.921\pm0.004$ & $0.957\pm0.005$ & $+0.037$ & $+5.70$ \\
+TS/m2 & 42 & L & Laplacian (d8) & ZZ-r1 (d8) & $0.931\pm0.007$ & $0.964\pm0.006$ & $+0.034$ & $+3.58$ \\
+TS/m2 & 123 & S & Laplacian (d8) & ZZ-r1 (d10) & $0.910\pm0.056$ & $0.958\pm0.006$ & $+0.048$ & $+0.86$ \\
+TS/m2 & 123 & M & Laplacian (d4) & ZZ-r1 (d12) & $0.932\pm0.007$ & $0.958\pm0.007$ & $+0.025$ & $+2.59$ \\
+TS/m2 & 123 & L & Laplacian (d4) & ZZ-r1 (d10) & $0.934\pm0.004$ & $0.960\pm0.003$ & $+0.026$ & $+4.84$ \\
+TS/m2 & 999 & S & Laplacian (d6) & ZZ-r1 (d10) & $0.918\pm0.021$ & $0.954\pm0.009$ & $+0.036$ & $+1.58$ \\
+TS/m2 & 999 & M & Laplacian (d4) & ZZ-r1 (d10) & $0.931\pm0.002$ & $0.961\pm0.006$ & $+0.030$ & $+4.49$ \\
+TS/m2 & 999 & L & Laplacian (d8) & ZZ-r1 (d10) & $0.941\pm0.003$ & $0.968\pm0.003$ & $+0.027$ & $+6.65$ \\
+TS/nat & 42 & S & Laplacian (d8) & ZZ-r1 (d8) & $0.981\pm0.005$ & $0.990\pm0.002$ & $+0.009$ & $+1.67$ \\
+TS/nat & 42 & M & Laplacian (d8) & ZZ-r1 (d10) & $0.987\pm0.002$ & $0.991\pm0.003$ & $+0.004$ & $+1.08$ \\
+TS/nat & 42 & L & Laplacian (d8) & ZZ-r1 (d12) & $0.983\pm0.003$ & $0.992\pm0.002$ & $+0.009$ & $+2.30$ \\
+TS/nat & 123 & S & Laplacian (d8) & ZZ-r1 (d8) & $0.981\pm0.017$ & $0.992\pm0.003$ & $+0.011$ & $+0.65$ \\
+TS/nat & 123 & M & Laplacian (d8) & ZZ-r1 (d10) & $0.985\pm0.004$ & $0.993\pm0.002$ & $+0.008$ & $+1.72$ \\
+TS/nat & 123 & L & Laplacian (d8) & ZZ-r1 (d12) & $0.985\pm0.004$ & $0.992\pm0.002$ & $+0.007$ & $+1.64$ \\
+TS/nat & 999 & S & Laplacian (d10) & ZZ-r1 (d10) & $0.965\pm0.027$ & $0.980\pm0.015$ & $+0.015$ & $+0.48$ \\
+TS/nat & 999 & M & Laplacian (d8) & ZZ-r1 (d10) & $0.984\pm0.005$ & $0.991\pm0.003$ & $+0.007$ & $+1.20$ \\
+TS/nat & 999 & L & Laplacian (d8) & ZZ-r1 (d10) & $0.988\pm0.002$ & $0.992\pm0.003$ & $+0.004$ & $+1.41$ \\
+UD/m2 & 42 & S & Laplacian (d12) & PauliXZ (d12) & $0.894\pm0.028$ & $0.904\pm0.016$ & $+0.009$ & $+0.29$ \\
+UD/m2 & 42 & M & Laplacian (d12) & PauliXZ (d12) & $0.911\pm0.007$ & $0.934\pm0.009$ & $+0.023$ & $+1.96$ \\
+UD/m2 & 42 & L & Laplacian (d12) & Z-map (d12) & $0.927\pm0.008$ & $0.939\pm0.010$ & $+0.013$ & $+1.02$ \\
+UD/m2 & 123 & S & Laplacian (d12) & Z-map (d12) & $0.889\pm0.019$ & $0.917\pm0.019$ & $+0.028$ & $+1.04$ \\
+UD/m2 & 123 & M & Laplacian (d12) & PauliXZ (d12) & $0.916\pm0.016$ & $0.937\pm0.007$ & $+0.022$ & $+1.24$ \\
+UD/m2 & 123 & L & Laplacian (d12) & Z-map (d12) & $0.932\pm0.014$ & $0.945\pm0.007$ & $+0.013$ & $+0.86$ \\
+UD/m2 & 999 & S & Laplacian (d12) & Z-map (d12) & $0.878\pm0.022$ & $0.911\pm0.031$ & $+0.033$ & $+0.87$ \\
+UD/m2 & 999 & M & Laplacian (d12) & PauliXZ (d12) & $0.914\pm0.011$ & $0.931\pm0.009$ & $+0.017$ & $+1.19$ \\
+UD/m2 & 999 & L & Laplacian (d12) & PauliXZ (d12) & $0.936\pm0.009$ & $0.944\pm0.003$ & $+0.008$ & $+0.82$ \\
+UD/nat & 42 & S & Laplacian (d12) & ZZ-r2 (d6) & $0.764\pm0.023$ & $0.801\pm0.023$ & $+0.037$ & $+1.13$ \\
+UD/nat & 42 & M & Laplacian (d12) & PauliXZ (d12) & $0.813\pm0.010$ & $0.829\pm0.008$ & $+0.016$ & $+1.20$ \\
+UD/nat & 42 & L & Laplacian (d12) & Z-map (d12) & $0.818\pm0.010$ & $0.831\pm0.009$ & $+0.013$ & $+0.97$ \\
+UD/nat & 123 & S & Laplacian (d12) & ZZ-r2 (d10) & $0.775\pm0.027$ & $0.813\pm0.017$ & $+0.038$ & $+1.20$ \\
+UD/nat & 123 & M & Laplacian (d12) & ZZ-r2 (d6) & $0.781\pm0.020$ & $0.805\pm0.016$ & $+0.024$ & $+0.93$ \\
+UD/nat & 123 & L & Laplacian (d12) & ZZ-r1 (d12) & $0.800\pm0.005$ & $0.816\pm0.006$ & $+0.016$ & $+2.09$ \\
+UD/nat & 999 & S & Linear (d4) & ZZ-r2 (d6) & $0.766\pm0.053$ & $0.797\pm0.021$ & $+0.032$ & $+0.55$ \\
+UD/nat & 999 & M & Laplacian (d12) & ZZ-r2 (d12) & $0.784\pm0.018$ & $0.806\pm0.013$ & $+0.022$ & $+1.02$ \\
+UD/nat & 999 & L & Laplacian (d12) & ZZ-r2 (d12) & $0.805\pm0.006$ & $0.822\pm0.012$ & $+0.017$ & $+1.31$ \\
+UR/m2 & 42 & S & Laplacian (d12) & Z-map (d12) & $0.880\pm0.021$ & $0.902\pm0.022$ & $+0.022$ & $+0.73$ \\
+UR/m2 & 42 & M & Laplacian (d12) & Z-map (d12) & $0.901\pm0.008$ & $0.925\pm0.009$ & $+0.024$ & $+1.99$ \\
+UR/m2 & 42 & L & Laplacian (d12) & PauliXZ (d12) & $0.929\pm0.012$ & $0.942\pm0.003$ & $+0.013$ & $+1.05$ \\
+UR/m2 & 123 & S & Laplacian (d12) & Z-map (d12) & $0.905\pm0.012$ & $0.926\pm0.023$ & $+0.021$ & $+0.81$ \\
+UR/m2 & 123 & M & Laplacian (d12) & Z-map (d12) & $0.914\pm0.010$ & $0.946\pm0.010$ & $+0.032$ & $+2.29$ \\
+UR/m2 & 123 & L & Laplacian (d12) & PauliXZ (d12) & $0.946\pm0.004$ & $0.953\pm0.006$ & $+0.007$ & $+0.91$ \\
+UR/m2 & 999 & S & Laplacian (d10) & PauliXZ (d12) & $0.883\pm0.023$ & $0.910\pm0.025$ & $+0.027$ & $+0.81$ \\
+UR/m2 & 999 & M & Laplacian (d12) & Z-map (d12) & $0.912\pm0.004$ & $0.941\pm0.008$ & $+0.029$ & $+3.13$ \\
+UR/m2 & 999 & L & Laplacian (d10) & PauliXZ (d12) & $0.937\pm0.014$ & $0.949\pm0.003$ & $+0.012$ & $+0.84$ \\
+UR/nat & 42 & S & Poly-2 (d4) & PauliXZ (d6) & $0.760\pm0.020$ & $0.784\pm0.024$ & $+0.025$ & $+0.79$ \\
+UR/nat & 42 & M & Laplacian (d10) & ZZ-r1 (d4) & $0.795\pm0.040$ & $0.817\pm0.013$ & $+0.022$ & $+0.51$ \\
+UR/nat & 42 & L & Laplacian (d8) & ZZ-r1 (d4) & $0.796\pm0.007$ & $0.813\pm0.005$ & $+0.017$ & $+1.95$ \\
+UR/nat & 123 & S & Poly-2 (d12) & ZZ-r2 (d6) & $0.780\pm0.024$ & $0.797\pm0.016$ & $+0.017$ & $+0.59$ \\
+UR/nat & 123 & M & Linear (d12) & ZZ-r1 (d4) & $0.794\pm0.014$ & $0.803\pm0.020$ & $+0.008$ & $+0.34$ \\
+UR/nat & 123 & L & Laplacian (d12) & ZZ-r2 (d12) & $0.810\pm0.023$ & $0.812\pm0.019$ & $+0.002$ & $+0.06$ \\
+UR/nat & 999 & S & Poly-2 (d12) & ZZ-r2 (d6) & $0.777\pm0.016$ & $0.782\pm0.005$ & $+0.005$ & $+0.30$ \\
+UR/nat & 999 & M & Poly-2 (d12) & ZZ-r2 (d6) & $0.780\pm0.017$ & $0.814\pm0.016$ & $+0.034$ & $+1.51$ \\
+UR/nat & 999 & L & Laplacian (d8) & ZZ-r1 (d4) & $0.790\pm0.010$ & $0.807\pm0.011$ & $+0.017$ & $+1.10$ \\\bottomrule
 \end{tabular}
 \end{table}
 

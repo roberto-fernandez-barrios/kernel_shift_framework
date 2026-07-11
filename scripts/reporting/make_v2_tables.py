@@ -97,9 +97,9 @@ KERNEL_SHORT = {
 SIZE_SHORT = {"size_q1000_id500_ood500": "S", "size_q2000_id1000_ood1000": "M", "size_q4000_id1800_ood1800": "L"}
 VARIANT_SHORT = {
     "m1_hist_byteent": "m1", "m2_hist_byteent": "m2",
-    "unsw_dos__m2_centroid": "U-DoS/m2c", "unsw_dos__natural_cur": "U-DoS/nat",
-    "unsw_recon__m2_centroid": "U-Rec/m2c", "unsw_recon__natural_cur": "U-Rec/nat",
-    "toniot_scanning__m2_centroid": "T-Scan/m2c", "toniot_scanning__natural_cur": "T-Scan/nat",
+    "unsw_dos__m2_centroid": "UD/m2", "unsw_dos__natural_cur": "UD/nat",
+    "unsw_recon__m2_centroid": "UR/m2", "unsw_recon__natural_cur": "UR/nat",
+    "toniot_scanning__m2_centroid": "TS/m2", "toniot_scanning__natural_cur": "TS/nat",
 }
 
 
