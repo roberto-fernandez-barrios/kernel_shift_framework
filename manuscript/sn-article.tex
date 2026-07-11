@@ -43,7 +43,7 @@
 
 %%\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
 
-\documentclass[referee,pdflatex,sn-mathphys-ay]{sn-jnl}
+\documentclass[referee,lineno,pdflatex,sn-mathphys-ay]{sn-jnl}
 
 
 \usepackage{graphicx}%
@@ -98,7 +98,7 @@
 
 \begin{document}
 
-\title[Kernel Geometry Governs Robustness under Shift]{Kernel Geometry Governs Robustness under Distribution Shift: A Controlled Multi-Dataset Study of Quantum and Classical Kernels}
+\title[Kernel Geometry Governs Robustness under Shift]{Quantum and Classical Kernels under Distribution Shift: Kernel Geometry Governs Out-of-Distribution Robustness}
 
 
 %%=============================================================%%
@@ -437,7 +437,7 @@ Under Best-by-ID selection (lower panel), the quantum family improves ID balance
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{fig_v2_arc.pdf}
-\caption{Per-setting Best-by-OOD deltas (quantum minus best classical, mean over 15 runs) across the four movements of the study, for SVC (left) and the GP classifier (right). Black bars mark medians. Against linear+RBF the quantum advantage is large and nearly uniform; the extended classical family collapses it on EMBER; symmetric bandwidth tuning partially restores it; on network flows (54 settings, including natural drift) it persists against the extended family, uniformly so under the GP classifier.}
+\caption{The four movements of the study. Per-setting Best-by-OOD deltas (quantum minus best classical, mean over 15 runs), for SVC (left) and the GP classifier (right); black bars mark medians. Against linear+RBF the quantum advantage is large and nearly uniform; the extended classical family collapses it on EMBER; symmetric bandwidth tuning partially restores it; on network flows (54 settings, including natural drift) it persists against the extended family, uniformly so under the GP classifier.}
 \label{fig:arc}
 \end{figure*}
 
@@ -561,7 +561,7 @@ UNSW-NB15 Recon. & SVC & 90 & 0.19 & 83\% & 0.46 & 99\% \\
 \begin{figure}[t]
 \centering
 \includegraphics[width=\columnwidth]{fig_v2_dose_response.pdf}
-\caption{Effective rank versus alignment survival for every kernel in the study (means over the 18 EMBER settings and 5 dimensions; bars span interquartile ranges). The relationship is monotone across both families: the classical kernels that retain alignment under shift are exactly the heavy-tailed ones, and the fidelity maps occupy the high-rank end of the same continuum.}
+\caption{Effective rank versus alignment survival across both kernel families. Markers are means over the 18 EMBER settings and 5 dimensions; bars span interquartile ranges. The relationship is monotone across both families: the classical kernels that retain alignment under shift are exactly the heavy-tailed ones, and the fidelity maps occupy the high-rank end of the same continuum.}
 \label{fig:dose_response}
 \end{figure}
 
@@ -875,35 +875,33 @@ UR/nat & 999 & L & Laplacian (d8) & ZZ-r1 (d4) & $0.790\pm0.010$ & $0.807\pm0.01
 
 \end{appendices}
 
-\clearpage
 \backmatter
-\bmhead{Statements and Declarations}
+
+\section*{Declarations}
+
+\bmhead{Availability of data and materials}
+This study is based on the public EMBER \cite{anderson2018ember}, UNSW-NB15 \cite{moustafa2015unsw}, and ToN-IoT \cite{alsaedi2020toniot} benchmark datasets. The datasets supporting the conclusions of this article---derived split definitions, shift constructions, experiment manifests, aggregated results, and summary tables---are available in the Zenodo repository, \url{https://doi.org/10.5281/zenodo.19152497}. All code used to generate the splits, run the classical and quantum kernel experiments, and reproduce every table and figure in this article is part of the same artifact:
+\begin{itemize}
+    \item Project name: Controlled Kernel Evaluation under Distribution Shift
+    \item Project home page: \url{https://github.com/roberto-fernandez-barrios/kernel_shift_framework}
+    \item Archived version: \url{https://doi.org/10.5281/zenodo.19152497}
+    \item Operating system(s): platform independent
+    \item Programming language: Python (3.12)
+    \item Other requirements: pinned environment provided (\texttt{environment.lock.yml}); qiskit 2.3.1
+    \item License: BSD-3-Clause
+    \item Any restrictions to use by non-academics: none
+\end{itemize}
+
+\bmhead{Competing interests}
+The authors declare that they have no competing interests.
 
 \bmhead{Funding}
 The authors received no specific funding for the submitted work.
 
-\bmhead{Competing Interests}
-The authors declare that they have no competing interests.
+\bmhead{Authors' contributions}
+RFB: conceptualization, methodology, software, data curation, formal analysis, visualization, investigation, writing---original draft, writing---review and editing. IPL: supervision, validation, writing---review and editing. AGS: validation, project administration, writing---review and editing. PGB: supervision, resources, writing---review and editing. All authors read and approved the final manuscript.
 
-\bmhead{Author Contributions}
-Roberto Fernández-Barrios: Conceptualization, Methodology, Software, Data curation, Formal analysis, Visualization, Investigation, Writing--original draft, Writing--review \& editing.
-Iker Pastor-López: Supervision, Validation, Writing--review \& editing.
-Asier González-Santocildes: Validation, Project administration, Writing--review \& editing.
-Pablo Garcia Bringas: Supervision, Resources, Writing--review \& editing.
-
-\bmhead{Data Availability}
-This study is based on the public EMBER \cite{anderson2018ember}, UNSW-NB15 \cite{moustafa2015unsw}, and ToN-IoT \cite{alsaedi2020toniot} benchmark datasets. The derived split definitions, exporters, shift constructions, aggregated results, experiment manifests, and summary tables used in this work are publicly available in the archived project repository: \url{https://github.com/roberto-fernandez-barrios/kernel_shift_framework}. Release DOI: \url{https://doi.org/10.5281/zenodo.19152497}.
-
-\bmhead{Code Availability}
-The code used to generate the shift splits, create q-splits, run the classical and quantum kernel experiments, aggregate repeated-run results, and reproduce the reported tables and figures is publicly available at \url{https://github.com/roberto-fernandez-barrios/kernel_shift_framework}. Archived release DOI: \url{https://doi.org/10.5281/zenodo.19152497}.
-
-\bmhead{Ethics Approval}
-Not applicable.
-
-\bmhead{Consent to Participate}
-Not applicable.
-
-\bmhead{Consent for Publication}
+\bmhead{Acknowledgements}
 Not applicable.
 
 
@@ -915,7 +913,6 @@ Not applicable.
 %% file, and delete the associated \verb+\bibliography+ commands.                            %%
 %%===========================================================================================%%
 
-\clearpage
 \bibliography{sn-bibliography}% common bib file
 %% if required, the content of .bbl file can be included here once bbl is generated
 %%\input sn-article.bbl
