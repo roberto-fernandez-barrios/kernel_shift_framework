@@ -98,7 +98,7 @@ def fig_mechanism_scatter() -> None:
         kg_hi=("kta_gain", lambda s: s.quantile(0.75)),
     )
 
-    fig, ax = plt.subplots(figsize=(3.5, 2.9))
+    fig, ax = plt.subplots(figsize=(5.2, 3.2))
     ax.axhline(0, color=C_NEUTRAL, lw=0.8, ls="--", zorder=1)
     for _, r in agg.iterrows():
         if r.kernel in CLASSICAL_KERNELS:
@@ -110,20 +110,38 @@ def fig_mechanism_scatter() -> None:
         ax.errorbar(r.eff_rank, r.kta_gain,
                     xerr=[[r.eff_rank - r.er_lo], [r.er_hi - r.eff_rank]],
                     yerr=[[r.kta_gain - r.kg_lo], [r.kg_hi - r.kta_gain]],
-                    fmt=marker, ms=5, color=color, elinewidth=0.7, capsize=0, zorder=3)
-        offsets = {"linear": (2, -18), "rbf_gscale": (5, -3), "laplacian_med": (-12, 9),
-                   "zz_r2_full": (3, 8), "zz_r1_full": (5, -11), "pauli_xz_r1_full": (5, -12),
-                   "zmap_r2": (8, 1), "matern15_med": (-38, 9), "matern25_med": (-20, -14),
-                   "poly2": (2, 6), "poly3": (12, -10)}
-        dx, dy = offsets.get(r.kernel, (3, 3))
-        ax.annotate(KLABEL[r.kernel], (r.eff_rank, r.kta_gain),
-                    textcoords="offset points", xytext=(dx, dy), fontsize=6.5, color="#333333")
+                    fmt=marker, ms=6, color=color, elinewidth=0.6, capsize=0,
+                    alpha=0.4, zorder=3)
+        ax.errorbar(r.eff_rank, r.kta_gain, fmt=marker, ms=6, color=color, zorder=4)
+
+    # Direct labels: the three lowest-rank classical kernels are collectively
+    # labeled (their values are nearly identical); ambiguous labels get leader lines.
+    a = agg.set_index("kernel")
+
+    def label(kernel, text, dx, dy, leader=False):
+        r = a.loc[kernel]
+        arrow = dict(arrowstyle="-", lw=0.5, color="#999999", shrinkA=0, shrinkB=3) if leader else None
+        ax.annotate(text, (r.eff_rank, r.kta_gain), textcoords="offset points",
+                    xytext=(dx, dy), fontsize=7, color="#333333", arrowprops=arrow)
+
+    label("poly2", "Linear, Poly-2/3", 6, 14, leader=True)
+    label("rbf_gscale", "RBF", 8, -4, leader=True)
+    label("matern25_med", "Matérn-5/2", -8, -22, leader=True)
+    label("matern15_med", "Matérn-3/2", -28, 16, leader=True)
+    label("laplacian_med", "Laplacian", -14, 13, leader=True)
+    label("pauli_xz_r1_full", "PauliXZ", 10, -16, leader=True)
+    label("zmap_r2", "Z-map", 12, 4, leader=True)
+    label("zz_r1_full", "ZZ-r1", 8, -12)
+    label("zz_r2_full", "ZZ-r2", 8, 8)
+
     ax.set_xscale("log")
-    ax.set_xlabel("Effective rank of training kernel (log)")
+    ax.set_xlim(0.85, 220)
+    ax.set_ylim(-0.055, 0.085)
+    ax.set_xlabel("Effective rank of the training kernel (log scale)")
     ax.set_ylabel(r"Alignment survival: $\Delta$KTA (OOD $-$ ID)")
     handles = [
-        plt.Line2D([], [], marker="o", ls="", color=C_CLASSICAL, ms=5, label="Classical"),
-        plt.Line2D([], [], marker="^", ls="", color=C_QUANTUM, ms=5, label="Quantum"),
+        plt.Line2D([], [], marker="o", ls="", color=C_CLASSICAL, ms=6, label="Classical"),
+        plt.Line2D([], [], marker="^", ls="", color=C_QUANTUM, ms=6, label="Quantum"),
     ]
     ax.legend(handles=handles, frameon=False, loc="upper left")
     fig.tight_layout()
@@ -175,7 +193,99 @@ def fig_mechanism_law() -> None:
     print("[✓] fig_v2_mechanism_law.pdf")
 
 
+# ----------------------------------------------------------------------------
+# Figure: protocol schematic (kernel-swap pipeline)
+# ----------------------------------------------------------------------------
+def fig_protocol() -> None:
+    from matplotlib.patches import FancyBboxPatch
+
+    fig, ax = plt.subplots(figsize=(7.0, 2.9))
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 42)
+    ax.axis("off")
+
+    def box(x, y, w, h, text, edge="#555555", face="#f7f7f7", fs=7):
+        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.6,rounding_size=1.2",
+                                    fc=face, ec=edge, lw=1.0))
+        ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs, color="#222222")
+
+    def arrow(x0, y0, x1, y1):
+        ax.annotate("", (x1, y1), (x0, y0),
+                    arrowprops=dict(arrowstyle="-|>", lw=0.9, color="#555555", shrinkA=1, shrinkB=1))
+
+    box(1, 26, 16, 13, "Benchmarks\nEMBER (malware)\nUNSW / ToN-IoT\n(network flows)", fs=6.5)
+    box(21, 26, 17, 13, "Shift construction\n$m1$ $\\cdot$ $m2$ $\\cdot$ natural\n$T,\\ S_{\\mathrm{ID}},\\ S_{\\mathrm{OOD}}$\n15 runs / setting", fs=6.5)
+    box(42, 26, 16, 13, "Shared embedding\nMaxAbs, SVD($d$),\nangles $[0,\\pi]$", fs=6.5)
+
+    box(62, 34, 18, 7, "Classical kernels\n7 + $\\gamma$ sweep", edge=C_CLASSICAL, fs=6.5)
+    box(62, 24, 18, 7, "Quantum kernels\n4 maps, 3 scales", edge=C_QUANTUM, fs=6.5)
+
+    box(84, 26, 15, 13, "Same classifier\nSVC / GPC\n(precomputed $K$)", fs=6.5)
+
+    box(6, 3, 40, 12, "Gram-matrix geometry\neffective rank $\\cdot$ KTA (ID/OOD) $\\cdot$ $g(K_C{\\to}K_Q)$\n$\\Rightarrow$ mechanism analysis", face="#fdf3ec", edge=C_QUANTUM, fs=6.5)
+    box(53, 3, 46, 12, "Family-internal selection on run means\nBest-by-OOD / Best-by-ID\npaired Wilcoxon + Holm over settings", fs=6.5)
+
+    arrow(17, 32.5, 21, 32.5)
+    arrow(38, 32.5, 42, 32.5)
+    arrow(58, 32.5, 62, 37)
+    arrow(58, 32.5, 62, 28)
+    arrow(80, 37.5, 84, 34)
+    arrow(80, 27.5, 84, 31)
+    arrow(66, 24, 30, 15)
+    arrow(91, 26, 80, 15)
+
+    fig.savefig(OUT / "fig_v2_protocol.pdf", bbox_inches="tight")
+    plt.close(fig)
+    print("[✓] fig_v2_protocol.pdf")
+
+
+# ----------------------------------------------------------------------------
+# Figure: predictive uncertainty under shift (GPC)
+# ----------------------------------------------------------------------------
+def fig_uncertainty() -> None:
+    ember = pd.read_csv("results/ember_shift/extended_kernels/family_comparison_by_setting.csv")
+    net = pd.read_csv("results/netflow/family_comparison_by_setting.csv")
+    fams = ["classical_orig", "classical_ext", "quantum"]
+    flabel = {"classical_orig": "lin+RBF", "classical_ext": "extended", "quantum": "quantum"}
+    fcolor = {"classical_orig": "#9ecae1", "classical_ext": C_CLASSICAL, "quantum": C_QUANTUM}
+
+    fig, axes = plt.subplots(1, 2, figsize=(7.0, 2.4))
+    rng = np.random.default_rng(1)
+    for ax, metric, title in [
+        (axes[0], "entropy", "Predictive entropy rises under shift"),
+        (axes[1], "ece", "Calibration degrades moderately"),
+    ]:
+        ax.axhline(0, color=C_NEUTRAL, lw=0.8, ls="--", zorder=1)
+        pos = 0.0
+        ticks, ticklabels = [], []
+        for gname, df in [("EMBER", ember), ("Network flows", net)]:
+            r = df[df.model == "gpc"]
+            for fam in fams:
+                vals = (r[f"gpc_{metric}_ood_{fam}"] - r[f"gpc_{metric}_id_{fam}"]).to_numpy()
+                x = pos + rng.uniform(-0.13, 0.13, size=vals.size)
+                ax.scatter(x, vals, s=8, alpha=0.55, color=fcolor[fam], edgecolors="none", zorder=2)
+                ax.hlines(np.median(vals), pos - 0.25, pos + 0.25, color="black", lw=1.3, zorder=3)
+                ticks.append(pos)
+                ticklabels.append(flabel[fam])
+                pos += 1.45
+            pos += 1.1
+        ax.set_xticks(ticks)
+        ax.set_xticklabels(ticklabels, fontsize=6.5, rotation=20, ha="right")
+        ax.set_title(title, pad=4)
+        mid = ((ticks[0] + ticks[2]) / 2, (ticks[3] + ticks[5]) / 2)
+        for m, g in zip(mid, ["EMBER", "Network flows"]):
+            ax.annotate(g, (m, -0.30), xycoords=("data", "axes fraction"),
+                        ha="center", fontsize=7.2, color="#555555", annotation_clip=False)
+    axes[0].set_ylabel("OOD $-$ ID (per setting)")
+    fig.tight_layout()
+    fig.savefig(OUT / "fig_v2_uncertainty.pdf", bbox_inches="tight")
+    plt.close(fig)
+    print("[✓] fig_v2_uncertainty.pdf")
+
+
 if __name__ == "__main__":
     fig_arc()
     fig_mechanism_scatter()
     fig_mechanism_law()
+    fig_protocol()
+    fig_uncertainty()
