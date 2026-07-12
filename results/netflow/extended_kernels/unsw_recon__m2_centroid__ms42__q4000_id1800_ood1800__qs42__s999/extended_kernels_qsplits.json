@@ -1,0 +1,6702 @@
+{
+  "dim_4": {
+    "linear__svc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "linear",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.38336077985835265,
+          "poly_gamma": 0.25,
+          "poly_coef0": 1.0,
+          "l1_median": 3.5041614174842834,
+          "l2_median": 2.1181099316858742
+        },
+        "fit_seconds": 0.08433961868286133
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8383333333333334,
+          "balanced_accuracy": 0.8356827312460866,
+          "f1_macro": 0.8342949897169887,
+          "f1_pos": 0.8084265964450297,
+          "confusion_matrix": [
+            [
+              895,
+              22
+            ],
+            [
+              269,
+              614
+            ]
+          ],
+          "roc_auc": 0.8781466473840668,
+          "pr_auc": 0.913185339107656
+        },
+        "ood_test": {
+          "accuracy": 0.6505555555555556,
+          "balanced_accuracy": 0.6468725868725869,
+          "f1_macro": 0.6424510012287786,
+          "f1_pos": 0.5886200130804448,
+          "confusion_matrix": [
+            [
+              721,
+              204
+            ],
+            [
+              425,
+              450
+            ]
+          ],
+          "roc_auc": 0.4839450193050193,
+          "pr_auc": 0.49201979969888565
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.18881014437349974
+      }
+    },
+    "linear__gpc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "linear",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.38336077985835265,
+          "poly_gamma": 0.25,
+          "poly_coef0": 1.0,
+          "l1_median": 3.5041614174842834,
+          "l2_median": 2.1181099316858742
+        },
+        "fit_seconds": 11.060248851776123
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8388888888888889,
+          "balanced_accuracy": 0.8362279875165337,
+          "f1_macro": 0.834835005866205,
+          "f1_pos": 0.8089591567852438,
+          "confusion_matrix": [
+            [
+              896,
+              21
+            ],
+            [
+              269,
+              614
+            ]
+          ],
+          "roc_auc": 0.873803122348591,
+          "pr_auc": 0.8964061140930213,
+          "log_loss": 0.4358381267581193,
+          "brier": 0.13218629239264237,
+          "ece": 0.19642027018744337,
+          "mean_predictive_entropy": 0.5339614463259306
+        },
+        "ood_test": {
+          "accuracy": 0.6522222222222223,
+          "balanced_accuracy": 0.6484942084942085,
+          "f1_macro": 0.6439724934943145,
+          "f1_pos": 0.5897771952817824,
+          "confusion_matrix": [
+            [
+              724,
+              201
+            ],
+            [
+              425,
+              450
+            ]
+          ],
+          "roc_auc": 0.4850125096525097,
+          "pr_auc": 0.49229877311441494,
+          "log_loss": 0.8169866132398905,
+          "brier": 0.2794402804550056,
+          "ece": 0.3593544006679113,
+          "mean_predictive_entropy": 0.4865458783558871
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.18773377902232524,
+        "ece_ood_minus_id": 0.16293413048046793,
+        "entropy_ood_minus_id": -0.04741556797004348
+      }
+    },
+    "rbf_gscale__svc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "rbf_gscale",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.38336077985835265,
+          "poly_gamma": 0.25,
+          "poly_coef0": 1.0,
+          "l1_median": 3.5041614174842834,
+          "l2_median": 2.1181099316858742
+        },
+        "fit_seconds": 0.05684828758239746
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8844444444444445,
+          "balanced_accuracy": 0.8864817200210939,
+          "f1_macro": 0.8834771610256001,
+          "f1_pos": 0.8940936863543788,
+          "confusion_matrix": [
+            [
+              714,
+              203
+            ],
+            [
+              5,
+              878
+            ]
+          ],
+          "roc_auc": 0.9555619227106954,
+          "pr_auc": 0.9210487989584528
+        },
+        "ood_test": {
+          "accuracy": 0.91,
+          "balanced_accuracy": 0.9122779922779922,
+          "f1_macro": 0.9097100689993423,
+          "f1_pos": 0.9148264984227129,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              5,
+              870
+            ]
+          ],
+          "roc_auc": 0.9663382239382239,
+          "pr_auc": 0.9597214431007275
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.02579627225689829
+      }
+    },
+    "rbf_gscale__gpc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "rbf_gscale",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.38336077985835265,
+          "poly_gamma": 0.25,
+          "poly_coef0": 1.0,
+          "l1_median": 3.5041614174842834,
+          "l2_median": 2.1181099316858742
+        },
+        "fit_seconds": 15.253149032592773
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8877777777777778,
+          "balanced_accuracy": 0.8893963401756924,
+          "f1_macro": 0.887242667672262,
+          "f1_pos": 0.895010395010395,
+          "confusion_matrix": [
+            [
+              737,
+              180
+            ],
+            [
+              22,
+              861
+            ]
+          ],
+          "roc_auc": 0.9676217811046164,
+          "pr_auc": 0.9649391697049154,
+          "log_loss": 0.23013219891092063,
+          "brier": 0.07125749462791463,
+          "ece": 0.04501474740306494,
+          "mean_predictive_entropy": 0.2929243500487617
+        },
+        "ood_test": {
+          "accuracy": 0.9055555555555556,
+          "balanced_accuracy": 0.9078918918918919,
+          "f1_macro": 0.9052268917765436,
+          "f1_pos": 0.9108079748163693,
+          "confusion_matrix": [
+            [
+              762,
+              163
+            ],
+            [
+              7,
+              868
+            ]
+          ],
+          "roc_auc": 0.8940651737451737,
+          "pr_auc": 0.7650065738541407,
+          "log_loss": 0.30804832433853413,
+          "brier": 0.08752555642863337,
+          "ece": 0.09753551644986669,
+          "mean_predictive_entropy": 0.29523572498657086
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.018495551716199543,
+        "ece_ood_minus_id": 0.052520769046801745,
+        "entropy_ood_minus_id": 0.002311374937809141
+      }
+    },
+    "poly2__svc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "poly2",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.38336077985835265,
+          "poly_gamma": 0.25,
+          "poly_coef0": 1.0,
+          "l1_median": 3.5041614174842834,
+          "l2_median": 2.1181099316858742
+        },
+        "fit_seconds": 0.0899665355682373
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8777777777777778,
+          "balanced_accuracy": 0.8800016302112729,
+          "f1_macro": 0.8765153376681856,
+          "f1_pos": 0.8890010090817356,
+          "confusion_matrix": [
+            [
+              699,
+              218
+            ],
+            [
+              2,
+              881
+            ]
+          ],
+          "roc_auc": 0.931839878672761,
+          "pr_auc": 0.8742925297873311
+        },
+        "ood_test": {
+          "accuracy": 0.8922222222222222,
+          "balanced_accuracy": 0.8951351351351351,
+          "f1_macro": 0.8915280014313831,
+          "f1_pos": 0.9002057613168725,
+          "confusion_matrix": [
+            [
+              731,
+              194
+            ],
+            [
+              0,
+              875
+            ]
+          ],
+          "roc_auc": 0.8821102702702703,
+          "pr_auc": 0.7969066730587475
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.015133504923862229
+      }
+    },
+    "poly2__gpc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "poly2",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.38336077985835265,
+          "poly_gamma": 0.25,
+          "poly_coef0": 1.0,
+          "l1_median": 3.5041614174842834,
+          "l2_median": 2.1181099316858742
+        },
+        "fit_seconds": 13.126577138900757
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8755555555555555,
+          "balanced_accuracy": 0.8777156294035773,
+          "f1_macro": 0.8743543208153008,
+          "f1_pos": 0.8866396761133604,
+          "confusion_matrix": [
+            [
+              700,
+              217
+            ],
+            [
+              7,
+              876
+            ]
+          ],
+          "roc_auc": 0.9534278279534303,
+          "pr_auc": 0.9520742012906117,
+          "log_loss": 0.27301886566913164,
+          "brier": 0.08188880515553944,
+          "ece": 0.07486633963146115,
+          "mean_predictive_entropy": 0.38253270057936756
+        },
+        "ood_test": {
+          "accuracy": 0.8016666666666666,
+          "balanced_accuracy": 0.8034131274131274,
+          "f1_macro": 0.801339919886752,
+          "f1_pos": 0.8093966898024559,
+          "confusion_matrix": [
+            [
+              685,
+              240
+            ],
+            [
+              117,
+              758
+            ]
+          ],
+          "roc_auc": 0.8258050965250965,
+          "pr_auc": 0.7026163279239432,
+          "log_loss": 0.4369131857918794,
+          "brier": 0.14247212896430103,
+          "ece": 0.18866355608697635,
+          "mean_predictive_entropy": 0.4138512618580764
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.07430250199044985,
+        "ece_ood_minus_id": 0.1137972164555152,
+        "entropy_ood_minus_id": 0.031318561278708856
+      }
+    },
+    "poly3__svc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "poly3",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.38336077985835265,
+          "poly_gamma": 0.25,
+          "poly_coef0": 1.0,
+          "l1_median": 3.5041614174842834,
+          "l2_median": 2.1181099316858742
+        },
+        "fit_seconds": 0.0999751091003418
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8777777777777778,
+          "balanced_accuracy": 0.8800016302112729,
+          "f1_macro": 0.8765153376681856,
+          "f1_pos": 0.8890010090817356,
+          "confusion_matrix": [
+            [
+              699,
+              218
+            ],
+            [
+              2,
+              881
+            ]
+          ],
+          "roc_auc": 0.9434353738556103,
+          "pr_auc": 0.8736746272347587
+        },
+        "ood_test": {
+          "accuracy": 0.9116666666666666,
+          "balanced_accuracy": 0.913992277992278,
+          "f1_macro": 0.9113650616681764,
+          "f1_pos": 0.9165354330708662,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              2,
+              873
+            ]
+          ],
+          "roc_auc": 0.93492138996139,
+          "pr_auc": 0.9086107937695512
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.033990647781005134
+      }
+    },
+    "poly3__gpc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "poly3",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.38336077985835265,
+          "poly_gamma": 0.25,
+          "poly_coef0": 1.0,
+          "l1_median": 3.5041614174842834,
+          "l2_median": 2.1181099316858742
+        },
+        "fit_seconds": 13.20134449005127
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8822222222222222,
+          "balanced_accuracy": 0.884321690084487,
+          "f1_macro": 0.8811622185543895,
+          "f1_pos": 0.8923857868020305,
+          "confusion_matrix": [
+            [
+              709,
+              208
+            ],
+            [
+              4,
+              879
+            ]
+          ],
+          "roc_auc": 0.9624693254753856,
+          "pr_auc": 0.9598611409667667,
+          "log_loss": 0.25434925972393413,
+          "brier": 0.07666851301727466,
+          "ece": 0.05787445084760519,
+          "mean_predictive_entropy": 0.352419900295688
+        },
+        "ood_test": {
+          "accuracy": 0.85,
+          "balanced_accuracy": 0.853003861003861,
+          "f1_macro": 0.8489226882062709,
+          "f1_pos": 0.8616803278688525,
+          "confusion_matrix": [
+            [
+              689,
+              236
+            ],
+            [
+              34,
+              841
+            ]
+          ],
+          "roc_auc": 0.8666662548262549,
+          "pr_auc": 0.732896460102739,
+          "log_loss": 0.38498962077503573,
+          "brier": 0.11826637337862865,
+          "ece": 0.11006952470558645,
+          "mean_predictive_entropy": 0.3801285643846795
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.03131782908062597,
+        "ece_ood_minus_id": 0.052195073857981264,
+        "entropy_ood_minus_id": 0.02770866408899153
+      }
+    },
+    "laplacian_med__svc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "laplacian_med",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.38336077985835265,
+          "poly_gamma": 0.25,
+          "poly_coef0": 1.0,
+          "l1_median": 3.5041614174842834,
+          "l2_median": 2.1181099316858742
+        },
+        "fit_seconds": 0.059507131576538086
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8861111111111111,
+          "balanced_accuracy": 0.8880964936872539,
+          "f1_macro": 0.8852154729542457,
+          "f1_pos": 0.8953547728432873,
+          "confusion_matrix": [
+            [
+              718,
+              199
+            ],
+            [
+              6,
+              877
+            ]
+          ],
+          "roc_auc": 0.9605068969051921,
+          "pr_auc": 0.9314097747850046
+        },
+        "ood_test": {
+          "accuracy": 0.9072222222222223,
+          "balanced_accuracy": 0.9094208494208493,
+          "f1_macro": 0.9069520097096786,
+          "f1_pos": 0.9119662625197681,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              10,
+              865
+            ]
+          ],
+          "roc_auc": 0.9636979150579151,
+          "pr_auc": 0.9545617502937249
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.02132435573359548
+      }
+    },
+    "laplacian_med__gpc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "laplacian_med",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.38336077985835265,
+          "poly_gamma": 0.25,
+          "poly_coef0": 1.0,
+          "l1_median": 3.5041614174842834,
+          "l2_median": 2.1181099316858742
+        },
+        "fit_seconds": 15.248984813690186
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8877777777777778,
+          "balanced_accuracy": 0.8892493741594223,
+          "f1_macro": 0.8873571052387002,
+          "f1_pos": 0.8942408376963351,
+          "confusion_matrix": [
+            [
+              744,
+              173
+            ],
+            [
+              29,
+              854
+            ]
+          ],
+          "roc_auc": 0.9695088741538648,
+          "pr_auc": 0.967627951612604,
+          "log_loss": 0.23043379397928385,
+          "brier": 0.07049066727614473,
+          "ece": 0.04578053597052011,
+          "mean_predictive_entropy": 0.30425785578528536
+        },
+        "ood_test": {
+          "accuracy": 0.9,
+          "balanced_accuracy": 0.9024247104247105,
+          "f1_macro": 0.8996113347478634,
+          "f1_pos": 0.9058577405857741,
+          "confusion_matrix": [
+            [
+              754,
+              171
+            ],
+            [
+              9,
+              866
+            ]
+          ],
+          "roc_auc": 0.894222084942085,
+          "pr_auc": 0.7626531248600426,
+          "log_loss": 0.30072595538239927,
+          "brier": 0.08712792549605916,
+          "ece": 0.054895074332131186,
+          "mean_predictive_entropy": 0.3054055828567087
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.013175336265288218,
+        "ece_ood_minus_id": 0.009114538361611073,
+        "entropy_ood_minus_id": 0.0011477270714233545
+      }
+    },
+    "matern15_med__svc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "matern15_med",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.38336077985835265,
+          "poly_gamma": 0.25,
+          "poly_coef0": 1.0,
+          "l1_median": 3.5041614174842834,
+          "l2_median": 2.1181099316858742
+        },
+        "fit_seconds": 0.07506561279296875
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8827777777777778,
+          "balanced_accuracy": 0.8848879415001155,
+          "f1_macro": 0.8817102124450947,
+          "f1_pos": 0.8929477422628107,
+          "confusion_matrix": [
+            [
+              709,
+              208
+            ],
+            [
+              3,
+              880
+            ]
+          ],
+          "roc_auc": 0.9603216456241797,
+          "pr_auc": 0.9339774579967071
+        },
+        "ood_test": {
+          "accuracy": 0.9105555555555556,
+          "balanced_accuracy": 0.9128494208494209,
+          "f1_macro": 0.9102617180762564,
+          "f1_pos": 0.9153967419863374,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              4,
+              871
+            ]
+          ],
+          "roc_auc": 0.9698050965250965,
+          "pr_auc": 0.9640020199399181
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.027961479349305374
+      }
+    },
+    "matern15_med__gpc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "matern15_med",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.38336077985835265,
+          "poly_gamma": 0.25,
+          "poly_coef0": 1.0,
+          "l1_median": 3.5041614174842834,
+          "l2_median": 2.1181099316858742
+        },
+        "fit_seconds": 15.13433289527893
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8894444444444445,
+          "balanced_accuracy": 0.8911370847129407,
+          "f1_macro": 0.8888557572996976,
+          "f1_pos": 0.8969445882962196,
+          "confusion_matrix": [
+            [
+              735,
+              182
+            ],
+            [
+              17,
+              866
+            ]
+          ],
+          "roc_auc": 0.967028977005376,
+          "pr_auc": 0.9641110560435512,
+          "log_loss": 0.2348041389621544,
+          "brier": 0.07217334774096974,
+          "ece": 0.05048855076277628,
+          "mean_predictive_entropy": 0.3070250212437065
+        },
+        "ood_test": {
+          "accuracy": 0.905,
+          "balanced_accuracy": 0.9073513513513514,
+          "f1_macro": 0.9046631135763381,
+          "f1_pos": 0.9103303618248558,
+          "confusion_matrix": [
+            [
+              761,
+              164
+            ],
+            [
+              7,
+              868
+            ]
+          ],
+          "roc_auc": 0.892809884169884,
+          "pr_auc": 0.7623872764392132,
+          "log_loss": 0.31827085879955064,
+          "brier": 0.09146571485817076,
+          "ece": 0.10369844337299931,
+          "mean_predictive_entropy": 0.3168402904101871
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.016214266638410635,
+        "ece_ood_minus_id": 0.053209892610223034,
+        "entropy_ood_minus_id": 0.009815269166480567
+      }
+    },
+    "matern25_med__svc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "matern25_med",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.38336077985835265,
+          "poly_gamma": 0.25,
+          "poly_coef0": 1.0,
+          "l1_median": 3.5041614174842834,
+          "l2_median": 2.1181099316858742
+        },
+        "fit_seconds": 0.07155370712280273
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8788888888888889,
+          "balanced_accuracy": 0.8810711476069857,
+          "f1_macro": 0.8776928457171924,
+          "f1_pos": 0.8897876643073812,
+          "confusion_matrix": [
+            [
+              702,
+              215
+            ],
+            [
+              3,
+              880
+            ]
+          ],
+          "roc_auc": 0.9551432548156071,
+          "pr_auc": 0.9220794728712319
+        },
+        "ood_test": {
+          "accuracy": 0.9111111111111111,
+          "balanced_accuracy": 0.9134208494208493,
+          "f1_macro": 0.9108133819565563,
+          "f1_pos": 0.9159663865546218,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              3,
+              872
+            ]
+          ],
+          "roc_auc": 0.9637559845559844,
+          "pr_auc": 0.9565561936299358
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.03234970181386365
+      }
+    },
+    "matern25_med__gpc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "matern25_med",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.38336077985835265,
+          "poly_gamma": 0.25,
+          "poly_coef0": 1.0,
+          "l1_median": 3.5041614174842834,
+          "l2_median": 2.1181099316858742
+        },
+        "fit_seconds": 15.050580263137817
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8888888888888888,
+          "balanced_accuracy": 0.8906758090232194,
+          "f1_macro": 0.888212644392001,
+          "f1_pos": 0.8969072164948454,
+          "confusion_matrix": [
+            [
+              730,
+              187
+            ],
+            [
+              13,
+              870
+            ]
+          ],
+          "roc_auc": 0.9662521566336632,
+          "pr_auc": 0.9634187204352319,
+          "log_loss": 0.23877773021480708,
+          "brier": 0.0732821384976888,
+          "ece": 0.04976170044238506,
+          "mean_predictive_entropy": 0.31370955636137904
+        },
+        "ood_test": {
+          "accuracy": 0.9033333333333333,
+          "balanced_accuracy": 0.9056370656370656,
+          "f1_macro": 0.9030095528777549,
+          "f1_pos": 0.9086134453781513,
+          "confusion_matrix": [
+            [
+              761,
+              164
+            ],
+            [
+              10,
+              865
+            ]
+          ],
+          "roc_auc": 0.8859416216216216,
+          "pr_auc": 0.7525444099231605,
+          "log_loss": 0.32922246567589697,
+          "brier": 0.09553852222546237,
+          "ece": 0.10966340156823023,
+          "mean_predictive_entropy": 0.3263965806265918
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.014961256613846174,
+        "ece_ood_minus_id": 0.059901701125845176,
+        "entropy_ood_minus_id": 0.012687024265212787
+      }
+    },
+    "zz_r1_full__svc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "zz_r1_full",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.07713532447814941
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.9,
+          "balanced_accuracy": 0.9011400363833516,
+          "f1_macro": 0.8998118689539245,
+          "f1_pos": 0.9041533546325878,
+          "confusion_matrix": [
+            [
+              771,
+              146
+            ],
+            [
+              34,
+              849
+            ]
+          ],
+          "roc_auc": 0.9584160274468299,
+          "pr_auc": 0.9326601533522907
+        },
+        "ood_test": {
+          "accuracy": 0.8994444444444445,
+          "balanced_accuracy": 0.9014208494208493,
+          "f1_macro": 0.8992301841786441,
+          "f1_pos": 0.9038767923526287,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              24,
+              851
+            ]
+          ],
+          "roc_auc": 0.9369698841698841,
+          "pr_auc": 0.9099493380864498
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.000280813037497718
+      }
+    },
+    "zz_r1_full__gpc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "zz_r1_full",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 15.510822296142578
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8972222222222223,
+          "balanced_accuracy": 0.8981618132889388,
+          "f1_macro": 0.8971116807903801,
+          "f1_pos": 0.900484131253362,
+          "confusion_matrix": [
+            [
+              778,
+              139
+            ],
+            [
+              46,
+              837
+            ]
+          ],
+          "roc_auc": 0.9696187899139322,
+          "pr_auc": 0.9653365852256239,
+          "log_loss": 0.22808972819353376,
+          "brier": 0.06838717306578428,
+          "ece": 0.04520646134767814,
+          "mean_predictive_entropy": 0.30365744415906115
+        },
+        "ood_test": {
+          "accuracy": 0.8866666666666667,
+          "balanced_accuracy": 0.8887104247104247,
+          "f1_macro": 0.88639513701885,
+          "f1_pos": 0.8919491525423728,
+          "confusion_matrix": [
+            [
+              754,
+              171
+            ],
+            [
+              33,
+              842
+            ]
+          ],
+          "roc_auc": 0.921024247104247,
+          "pr_auc": 0.8686531960291535,
+          "log_loss": 0.29594861426165253,
+          "brier": 0.08836663488003275,
+          "ece": 0.05004070393343529,
+          "mean_predictive_entropy": 0.306055218508772
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.00945138857851413,
+        "ece_ood_minus_id": 0.004834242585757154,
+        "entropy_ood_minus_id": 0.002397774349710835
+      }
+    },
+    "zz_r2_full__svc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "zz_r2_full",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.08436059951782227
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8922222222222222,
+          "balanced_accuracy": 0.8939053563555392,
+          "f1_macro": 0.8916571003071577,
+          "f1_pos": 0.8994818652849741,
+          "confusion_matrix": [
+            [
+              738,
+              179
+            ],
+            [
+              15,
+              868
+            ]
+          ],
+          "roc_auc": 0.9619926121789131,
+          "pr_auc": 0.9468804852847853
+        },
+        "ood_test": {
+          "accuracy": 0.8966666666666666,
+          "balanced_accuracy": 0.8988108108108108,
+          "f1_macro": 0.8963840894488797,
+          "f1_pos": 0.9017951425554382,
+          "confusion_matrix": [
+            [
+              760,
+              165
+            ],
+            [
+              21,
+              854
+            ]
+          ],
+          "roc_auc": 0.9308318146718146,
+          "pr_auc": 0.8902112392703734
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.004905454455271574
+      }
+    },
+    "zz_r2_full__gpc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "zz_r2_full",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 13.135105848312378
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8916666666666667,
+          "balanced_accuracy": 0.8928352214555564,
+          "f1_macro": 0.8914468465308918,
+          "f1_pos": 0.8963317384370016,
+          "confusion_matrix": [
+            [
+              762,
+              155
+            ],
+            [
+              40,
+              843
+            ]
+          ],
+          "roc_auc": 0.9674019495844814,
+          "pr_auc": 0.9619850502021862,
+          "log_loss": 0.2507984393705875,
+          "brier": 0.0737612003213178,
+          "ece": 0.062181402789144136,
+          "mean_predictive_entropy": 0.3503829128466601
+        },
+        "ood_test": {
+          "accuracy": 0.8922222222222222,
+          "balanced_accuracy": 0.894023166023166,
+          "f1_macro": 0.8920495014245015,
+          "f1_pos": 0.8963675213675214,
+          "confusion_matrix": [
+            [
+              767,
+              158
+            ],
+            [
+              36,
+              839
+            ]
+          ],
+          "roc_auc": 0.9105927413127413,
+          "pr_auc": 0.8313649844481044,
+          "log_loss": 0.3083603044531599,
+          "brier": 0.08982169208733351,
+          "ece": 0.058516286917972796,
+          "mean_predictive_entropy": 0.346630017027571
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.0011879445676096223,
+        "ece_ood_minus_id": -0.00366511587117134,
+        "entropy_ood_minus_id": -0.003752895819089108
+      }
+    },
+    "pauli_xz_r1_full__svc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "pauli_xz_r1_full",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.0727396011352539
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8933333333333333,
+          "balanced_accuracy": 0.8949958688964335,
+          "f1_macro": 0.8927912009370843,
+          "f1_pos": 0.9004149377593361,
+          "confusion_matrix": [
+            [
+              740,
+              177
+            ],
+            [
+              15,
+              868
+            ]
+          ],
+          "roc_auc": 0.9543911346146958,
+          "pr_auc": 0.9084766649754333
+        },
+        "ood_test": {
+          "accuracy": 0.905,
+          "balanced_accuracy": 0.9071042471042471,
+          "f1_macro": 0.9047565707290763,
+          "f1_pos": 0.9095716552088842,
+          "confusion_matrix": [
+            [
+              769,
+              156
+            ],
+            [
+              15,
+              860
+            ]
+          ],
+          "roc_auc": 0.9581318918918917,
+          "pr_auc": 0.9420017957384749
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.01210837820781363
+      }
+    },
+    "pauli_xz_r1_full__gpc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "pauli_xz_r1_full",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 17.944355964660645
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8922222222222222,
+          "balanced_accuracy": 0.8936534146133621,
+          "f1_macro": 0.8918471588508792,
+          "f1_pos": 0.8982161594963274,
+          "confusion_matrix": [
+            [
+              750,
+              167
+            ],
+            [
+              27,
+              856
+            ]
+          ],
+          "roc_auc": 0.9687579889614937,
+          "pr_auc": 0.9651949955631349,
+          "log_loss": 0.22327204059759576,
+          "brier": 0.06878729843694951,
+          "ece": 0.03233879715734672,
+          "mean_predictive_entropy": 0.2821155639430825
+        },
+        "ood_test": {
+          "accuracy": 0.9027777777777778,
+          "balanced_accuracy": 0.9048494208494209,
+          "f1_macro": 0.9025395109463599,
+          "f1_pos": 0.907358390682901,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              18,
+              857
+            ]
+          ],
+          "roc_auc": 0.9100898841698841,
+          "pr_auc": 0.8005888548344063,
+          "log_loss": 0.28900349211713156,
+          "brier": 0.08374294986641184,
+          "ece": 0.057551879188955324,
+          "mean_predictive_entropy": 0.2763905998938315
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.011196006236058764,
+        "ece_ood_minus_id": 0.025213082031608602,
+        "entropy_ood_minus_id": -0.005724964049250991
+      }
+    },
+    "zmap_r2__svc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "zmap_r2",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.06634783744812012
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8877777777777778,
+          "balanced_accuracy": 0.8897112673534138,
+          "f1_macro": 0.8869502817537258,
+          "f1_pos": 0.8966223132036848,
+          "confusion_matrix": [
+            [
+              722,
+              195
+            ],
+            [
+              7,
+              876
+            ]
+          ],
+          "roc_auc": 0.9631078248906092,
+          "pr_auc": 0.9442799438517469
+        },
+        "ood_test": {
+          "accuracy": 0.9066666666666666,
+          "balanced_accuracy": 0.9088494208494209,
+          "f1_macro": 0.9064004278837583,
+          "f1_pos": 0.9113924050632911,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              11,
+              864
+            ]
+          ],
+          "roc_auc": 0.9249952123552123,
+          "pr_auc": 0.8788459886009261
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.019138153496007115
+      }
+    },
+    "zmap_r2__gpc__d4": {
+      "config": {
+        "dim": 4,
+        "kernel": "zmap_r2",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 14.890261173248291
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8883333333333333,
+          "balanced_accuracy": 0.889920601300958,
+          "f1_macro": 0.8878264404055487,
+          "f1_pos": 0.8953669963560645,
+          "confusion_matrix": [
+            [
+              739,
+              178
+            ],
+            [
+              23,
+              860
+            ]
+          ],
+          "roc_auc": 0.9683146208956034,
+          "pr_auc": 0.9649672599311083,
+          "log_loss": 0.23778103047294835,
+          "brier": 0.07223955308607152,
+          "ece": 0.04470081163300922,
+          "mean_predictive_entropy": 0.31178304624488945
+        },
+        "ood_test": {
+          "accuracy": 0.9066666666666666,
+          "balanced_accuracy": 0.9088494208494209,
+          "f1_macro": 0.9064004278837583,
+          "f1_pos": 0.9113924050632911,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              11,
+              864
+            ]
+          ],
+          "roc_auc": 0.8971206177606178,
+          "pr_auc": 0.7659173334769567,
+          "log_loss": 0.2965530226460792,
+          "brier": 0.08396809895778196,
+          "ece": 0.05998651610308679,
+          "mean_predictive_entropy": 0.2975231525910144
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.018928819548462927,
+        "ece_ood_minus_id": 0.015285704470077571,
+        "entropy_ood_minus_id": -0.014259893653875033
+      }
+    }
+  },
+  "dim_6": {
+    "linear__svc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "linear",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.24534555197224328,
+          "poly_gamma": 0.16666666666666666,
+          "poly_coef0": 1.0,
+          "l1_median": 4.219335548579693,
+          "l2_median": 2.332828088443647
+        },
+        "fit_seconds": 0.11341738700866699
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8505555555555555,
+          "balanced_accuracy": 0.8512685390219473,
+          "f1_macro": 0.8504853667416092,
+          "f1_pos": 0.8537248504622077,
+          "confusion_matrix": [
+            [
+              746,
+              171
+            ],
+            [
+              98,
+              785
+            ]
+          ],
+          "roc_auc": 0.922687230382198,
+          "pr_auc": 0.9264407228674146
+        },
+        "ood_test": {
+          "accuracy": 0.6633333333333333,
+          "balanced_accuracy": 0.6606023166023166,
+          "f1_macro": 0.6586876936074345,
+          "f1_pos": 0.6188679245283019,
+          "confusion_matrix": [
+            [
+              702,
+              223
+            ],
+            [
+              383,
+              492
+            ]
+          ],
+          "roc_auc": 0.6739583011583011,
+          "pr_auc": 0.597405636397737
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.19066622241963072
+      }
+    },
+    "linear__gpc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "linear",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.24534555197224328,
+          "poly_gamma": 0.16666666666666666,
+          "poly_coef0": 1.0,
+          "l1_median": 4.219335548579693,
+          "l2_median": 2.332828088443647
+        },
+        "fit_seconds": 12.861926078796387
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8505555555555555,
+          "balanced_accuracy": 0.850323757488783,
+          "f1_macro": 0.8504354884893706,
+          "f1_pos": 0.8461978273299028,
+          "confusion_matrix": [
+            [
+              791,
+              126
+            ],
+            [
+              143,
+              740
+            ]
+          ],
+          "roc_auc": 0.9274753584921039,
+          "pr_auc": 0.9367380830835992,
+          "log_loss": 0.3828639705147815,
+          "brier": 0.11653640620833418,
+          "ece": 0.11570525098517384,
+          "mean_predictive_entropy": 0.4929057454408006
+        },
+        "ood_test": {
+          "accuracy": 0.6461111111111111,
+          "balanced_accuracy": 0.6428880308880309,
+          "f1_macro": 0.6396514179022156,
+          "f1_pos": 0.5914047466324567,
+          "confusion_matrix": [
+            [
+              702,
+              223
+            ],
+            [
+              414,
+              461
+            ]
+          ],
+          "roc_auc": 0.6551524324324325,
+          "pr_auc": 0.5508339662233929,
+          "log_loss": 0.7347992845757353,
+          "brier": 0.25566153365814626,
+          "ece": 0.18702574140539555,
+          "mean_predictive_entropy": 0.4143849290180366
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.20743572660075205,
+        "ece_ood_minus_id": 0.0713204904202217,
+        "entropy_ood_minus_id": -0.07852081642276404
+      }
+    },
+    "rbf_gscale__svc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "rbf_gscale",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.24534555197224328,
+          "poly_gamma": 0.16666666666666666,
+          "poly_coef0": 1.0,
+          "l1_median": 4.219335548579693,
+          "l2_median": 2.332828088443647
+        },
+        "fit_seconds": 0.05765819549560547
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8827777777777778,
+          "balanced_accuracy": 0.8848669463549341,
+          "f1_macro": 0.8817352594895933,
+          "f1_pos": 0.8928390045708482,
+          "confusion_matrix": [
+            [
+              710,
+              207
+            ],
+            [
+              4,
+              879
+            ]
+          ],
+          "roc_auc": 0.9628472380886514,
+          "pr_auc": 0.938133862248324
+        },
+        "ood_test": {
+          "accuracy": 0.9105555555555556,
+          "balanced_accuracy": 0.9128494208494209,
+          "f1_macro": 0.9102617180762564,
+          "f1_pos": 0.9153967419863374,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              4,
+              871
+            ]
+          ],
+          "roc_auc": 0.9427731274131274,
+          "pr_auc": 0.9244232302939226
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.027982474494486764
+      }
+    },
+    "rbf_gscale__gpc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "rbf_gscale",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.24534555197224328,
+          "poly_gamma": 0.16666666666666666,
+          "poly_coef0": 1.0,
+          "l1_median": 4.219335548579693,
+          "l2_median": 2.332828088443647
+        },
+        "fit_seconds": 15.191972494125366
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8883333333333333,
+          "balanced_accuracy": 0.8900465721720465,
+          "f1_macro": 0.8877203348776701,
+          "f1_pos": 0.8960165545783756,
+          "confusion_matrix": [
+            [
+              733,
+              184
+            ],
+            [
+              17,
+              866
+            ]
+          ],
+          "roc_auc": 0.9681096094779496,
+          "pr_auc": 0.9654929889126243,
+          "log_loss": 0.2326663377080818,
+          "brier": 0.07139024732883766,
+          "ece": 0.04933932066056093,
+          "mean_predictive_entropy": 0.3040446578225744
+        },
+        "ood_test": {
+          "accuracy": 0.9083333333333333,
+          "balanced_accuracy": 0.9105019305019305,
+          "f1_macro": 0.9080772831730359,
+          "f1_pos": 0.9129287598944591,
+          "confusion_matrix": [
+            [
+              770,
+              155
+            ],
+            [
+              10,
+              865
+            ]
+          ],
+          "roc_auc": 0.8805942857142858,
+          "pr_auc": 0.7410563364124672,
+          "log_loss": 0.32922541320815235,
+          "brier": 0.09384342922617621,
+          "ece": 0.11289366006070646,
+          "mean_predictive_entropy": 0.31094685321184345
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.020455358329883988,
+        "ece_ood_minus_id": 0.06355433940014553,
+        "entropy_ood_minus_id": 0.006902195389269061
+      }
+    },
+    "poly2__svc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "poly2",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.24534555197224328,
+          "poly_gamma": 0.16666666666666666,
+          "poly_coef0": 1.0,
+          "l1_median": 4.219335548579693,
+          "l2_median": 2.332828088443647
+        },
+        "fit_seconds": 0.08232402801513672
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8777777777777778,
+          "balanced_accuracy": 0.8800016302112729,
+          "f1_macro": 0.8765153376681856,
+          "f1_pos": 0.8890010090817356,
+          "confusion_matrix": [
+            [
+              699,
+              218
+            ],
+            [
+              2,
+              881
+            ]
+          ],
+          "roc_auc": 0.9304332039456052,
+          "pr_auc": 0.8828227617999367
+        },
+        "ood_test": {
+          "accuracy": 0.9111111111111111,
+          "balanced_accuracy": 0.9135135135135135,
+          "f1_macro": 0.9107779051395644,
+          "f1_pos": 0.9162303664921466,
+          "confusion_matrix": [
+            [
+              765,
+              160
+            ],
+            [
+              0,
+              875
+            ]
+          ],
+          "roc_auc": 0.8580694980694981,
+          "pr_auc": 0.7140751469575839
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.03351188330224064
+      }
+    },
+    "poly2__gpc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "poly2",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.24534555197224328,
+          "poly_gamma": 0.16666666666666666,
+          "poly_coef0": 1.0,
+          "l1_median": 4.219335548579693,
+          "l2_median": 2.332828088443647
+        },
+        "fit_seconds": 13.01749563217163
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8755555555555555,
+          "balanced_accuracy": 0.8773587119354931,
+          "f1_macro": 0.8747762308390863,
+          "f1_pos": 0.8846549948506695,
+          "confusion_matrix": [
+            [
+              717,
+              200
+            ],
+            [
+              24,
+              859
+            ]
+          ],
+          "roc_auc": 0.9535142785512362,
+          "pr_auc": 0.9517580316882053,
+          "log_loss": 0.2849218643470457,
+          "brier": 0.08506122097683655,
+          "ece": 0.09877685885684387,
+          "mean_predictive_entropy": 0.3980126914992737
+        },
+        "ood_test": {
+          "accuracy": 0.6972222222222222,
+          "balanced_accuracy": 0.696015444015444,
+          "f1_macro": 0.6960242387359319,
+          "f1_pos": 0.6769413159454654,
+          "confusion_matrix": [
+            [
+              684,
+              241
+            ],
+            [
+              304,
+              571
+            ]
+          ],
+          "roc_auc": 0.8291484169884169,
+          "pr_auc": 0.7095283276939179,
+          "log_loss": 0.4543237661211936,
+          "brier": 0.15398527012998323,
+          "ece": 0.17488878614287331,
+          "mean_predictive_entropy": 0.4057038817476627
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.18134326792004907,
+        "ece_ood_minus_id": 0.07611192728602945,
+        "entropy_ood_minus_id": 0.0076911902483889905
+      }
+    },
+    "poly3__svc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "poly3",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.24534555197224328,
+          "poly_gamma": 0.16666666666666666,
+          "poly_coef0": 1.0,
+          "l1_median": 4.219335548579693,
+          "l2_median": 2.332828088443647
+        },
+        "fit_seconds": 0.06524014472961426
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8777777777777778,
+          "balanced_accuracy": 0.8800016302112729,
+          "f1_macro": 0.8765153376681856,
+          "f1_pos": 0.8890010090817356,
+          "confusion_matrix": [
+            [
+              699,
+              218
+            ],
+            [
+              2,
+              881
+            ]
+          ],
+          "roc_auc": 0.9433723884200658,
+          "pr_auc": 0.8938237708058622
+        },
+        "ood_test": {
+          "accuracy": 0.9111111111111111,
+          "balanced_accuracy": 0.9135135135135135,
+          "f1_macro": 0.9107779051395644,
+          "f1_pos": 0.9162303664921466,
+          "confusion_matrix": [
+            [
+              765,
+              160
+            ],
+            [
+              0,
+              875
+            ]
+          ],
+          "roc_auc": 0.8790647104247105,
+          "pr_auc": 0.7877740315134991
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.03351188330224064
+      }
+    },
+    "poly3__gpc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "poly3",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.24534555197224328,
+          "poly_gamma": 0.16666666666666666,
+          "poly_coef0": 1.0,
+          "l1_median": 4.219335548579693,
+          "l2_median": 2.332828088443647
+        },
+        "fit_seconds": 13.576910972595215
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8788888888888889,
+          "balanced_accuracy": 0.8810711476069857,
+          "f1_macro": 0.8776928457171924,
+          "f1_pos": 0.8897876643073812,
+          "confusion_matrix": [
+            [
+              702,
+              215
+            ],
+            [
+              3,
+              880
+            ]
+          ],
+          "roc_auc": 0.962209973681968,
+          "pr_auc": 0.9597369869531535,
+          "log_loss": 0.2609764091355144,
+          "brier": 0.07786593999606788,
+          "ece": 0.05990560414972479,
+          "mean_predictive_entropy": 0.36695291666073127
+        },
+        "ood_test": {
+          "accuracy": 0.85,
+          "balanced_accuracy": 0.8511814671814671,
+          "f1_macro": 0.8499464623797874,
+          "f1_pos": 0.8527808069792803,
+          "confusion_matrix": [
+            [
+              748,
+              177
+            ],
+            [
+              93,
+              782
+            ]
+          ],
+          "roc_auc": 0.8611953667953668,
+          "pr_auc": 0.7278166106402191,
+          "log_loss": 0.4017644925673628,
+          "brier": 0.1277529256750983,
+          "ece": 0.1261451978508258,
+          "mean_predictive_entropy": 0.38067076377148895
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.02988968042551854,
+        "ece_ood_minus_id": 0.06623959370110102,
+        "entropy_ood_minus_id": 0.013717847110757686
+      }
+    },
+    "laplacian_med__svc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "laplacian_med",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.24534555197224328,
+          "poly_gamma": 0.16666666666666666,
+          "poly_coef0": 1.0,
+          "l1_median": 4.219335548579693,
+          "l2_median": 2.332828088443647
+        },
+        "fit_seconds": 0.05942249298095703
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8905555555555555,
+          "balanced_accuracy": 0.8925005341411936,
+          "f1_macro": 0.8897379488335575,
+          "f1_pos": 0.89923273657289,
+          "confusion_matrix": [
+            [
+              724,
+              193
+            ],
+            [
+              4,
+              879
+            ]
+          ],
+          "roc_auc": 0.9604426764611078,
+          "pr_auc": 0.9294500271400089
+        },
+        "ood_test": {
+          "accuracy": 0.9072222222222223,
+          "balanced_accuracy": 0.9094208494208493,
+          "f1_macro": 0.9069520097096786,
+          "f1_pos": 0.9119662625197681,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              10,
+              865
+            ]
+          ],
+          "roc_auc": 0.9447153667953667,
+          "pr_auc": 0.9171157393297164
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.016920315279655762
+      }
+    },
+    "laplacian_med__gpc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "laplacian_med",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.24534555197224328,
+          "poly_gamma": 0.16666666666666666,
+          "poly_coef0": 1.0,
+          "l1_median": 4.219335548579693,
+          "l2_median": 2.332828088443647
+        },
+        "fit_seconds": 15.533735036849976
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8877777777777778,
+          "balanced_accuracy": 0.8893753450305109,
+          "f1_macro": 0.8872598691023827,
+          "f1_pos": 0.894901144640999,
+          "confusion_matrix": [
+            [
+              738,
+              179
+            ],
+            [
+              23,
+              860
+            ]
+          ],
+          "roc_auc": 0.97134656686151,
+          "pr_auc": 0.9692234096639363,
+          "log_loss": 0.22832283093604888,
+          "brier": 0.06932130284215618,
+          "ece": 0.04765586890950539,
+          "mean_predictive_entropy": 0.3090310083831459
+        },
+        "ood_test": {
+          "accuracy": 0.9027777777777778,
+          "balanced_accuracy": 0.9050656370656371,
+          "f1_macro": 0.9024583892133222,
+          "f1_pos": 0.9080399369416711,
+          "confusion_matrix": [
+            [
+              761,
+              164
+            ],
+            [
+              11,
+              864
+            ]
+          ],
+          "roc_auc": 0.8914248648648648,
+          "pr_auc": 0.7588957068485244,
+          "log_loss": 0.306147630308622,
+          "brier": 0.08819698167586479,
+          "ece": 0.0656640779951115,
+          "mean_predictive_entropy": 0.3081012403457694
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.015690292035126285,
+        "ece_ood_minus_id": 0.018008209085606103,
+        "entropy_ood_minus_id": -0.0009297680373764883
+      }
+    },
+    "matern15_med__svc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "matern15_med",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.24534555197224328,
+          "poly_gamma": 0.16666666666666666,
+          "poly_coef0": 1.0,
+          "l1_median": 4.219335548579693,
+          "l2_median": 2.332828088443647
+        },
+        "fit_seconds": 0.07861018180847168
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8827777777777778,
+          "balanced_accuracy": 0.8848879415001155,
+          "f1_macro": 0.8817102124450947,
+          "f1_pos": 0.8929477422628107,
+          "confusion_matrix": [
+            [
+              709,
+              208
+            ],
+            [
+              3,
+              880
+            ]
+          ],
+          "roc_auc": 0.9613429976868291,
+          "pr_auc": 0.9360781329072998
+        },
+        "ood_test": {
+          "accuracy": 0.9105555555555556,
+          "balanced_accuracy": 0.9128494208494209,
+          "f1_macro": 0.9102617180762564,
+          "f1_pos": 0.9153967419863374,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              4,
+              871
+            ]
+          ],
+          "roc_auc": 0.9483490347490348,
+          "pr_auc": 0.9340215662689806
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.027961479349305374
+      }
+    },
+    "matern15_med__gpc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "matern15_med",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.24534555197224328,
+          "poly_gamma": 0.16666666666666666,
+          "poly_coef0": 1.0,
+          "l1_median": 4.219335548579693,
+          "l2_median": 2.332828088443647
+        },
+        "fit_seconds": 15.089268207550049
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8888888888888888,
+          "balanced_accuracy": 0.8907387944587637,
+          "f1_macro": 0.88815304640033,
+          "f1_pos": 0.8972250770811921,
+          "confusion_matrix": [
+            [
+              727,
+              190
+            ],
+            [
+              10,
+              873
+            ]
+          ],
+          "roc_auc": 0.9671574178935446,
+          "pr_auc": 0.9642365703441418,
+          "log_loss": 0.23717296462524964,
+          "brier": 0.07239676154350014,
+          "ece": 0.05364293469601196,
+          "mean_predictive_entropy": 0.31580944005277756
+        },
+        "ood_test": {
+          "accuracy": 0.9077777777777778,
+          "balanced_accuracy": 0.9099613899613899,
+          "f1_macro": 0.9075147085041897,
+          "f1_pos": 0.9124472573839663,
+          "confusion_matrix": [
+            [
+              769,
+              156
+            ],
+            [
+              10,
+              865
+            ]
+          ],
+          "roc_auc": 0.886516138996139,
+          "pr_auc": 0.7505049647848033,
+          "log_loss": 0.33401106779707423,
+          "brier": 0.09647943561379808,
+          "ece": 0.12208648739127327,
+          "mean_predictive_entropy": 0.3261240011109985
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.019222595502626172,
+        "ece_ood_minus_id": 0.06844355269526131,
+        "entropy_ood_minus_id": 0.010314561058220928
+      }
+    },
+    "matern25_med__svc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "matern25_med",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.24534555197224328,
+          "poly_gamma": 0.16666666666666666,
+          "poly_coef0": 1.0,
+          "l1_median": 4.219335548579693,
+          "l2_median": 2.332828088443647
+        },
+        "fit_seconds": 0.07464790344238281
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8788888888888889,
+          "balanced_accuracy": 0.8810921427521672,
+          "f1_macro": 0.877665544332211,
+          "f1_pos": 0.8898989898989899,
+          "confusion_matrix": [
+            [
+              701,
+              216
+            ],
+            [
+              2,
+              881
+            ]
+          ],
+          "roc_auc": 0.9621235230841622,
+          "pr_auc": 0.9379822748160325
+        },
+        "ood_test": {
+          "accuracy": 0.9111111111111111,
+          "balanced_accuracy": 0.9134208494208493,
+          "f1_macro": 0.9108133819565563,
+          "f1_pos": 0.9159663865546218,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              3,
+              872
+            ]
+          ],
+          "roc_auc": 0.9233359073359073,
+          "pr_auc": 0.8884053262372159
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.03232870666868215
+      }
+    },
+    "matern25_med__gpc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "matern25_med",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.24534555197224328,
+          "poly_gamma": 0.16666666666666666,
+          "poly_coef0": 1.0,
+          "l1_median": 4.219335548579693,
+          "l2_median": 2.332828088443647
+        },
+        "fit_seconds": 15.076417446136475
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8838888888888888,
+          "balanced_accuracy": 0.8858944734602839,
+          "f1_macro": 0.8829524725434564,
+          "f1_pos": 0.8934217236104028,
+          "confusion_matrix": [
+            [
+              715,
+              202
+            ],
+            [
+              7,
+              876
+            ]
+          ],
+          "roc_auc": 0.9672809187475531,
+          "pr_auc": 0.9644648960451674,
+          "log_loss": 0.24027058480729988,
+          "brier": 0.07310867518464186,
+          "ece": 0.05583232775139635,
+          "mean_predictive_entropy": 0.32236343038532583
+        },
+        "ood_test": {
+          "accuracy": 0.9077777777777778,
+          "balanced_accuracy": 0.909992277992278,
+          "f1_macro": 0.907503600177811,
+          "f1_pos": 0.9125395152792413,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              9,
+              866
+            ]
+          ],
+          "roc_auc": 0.8809834749034748,
+          "pr_auc": 0.7417483854234386,
+          "log_loss": 0.3431517580852496,
+          "brier": 0.10005069167120291,
+          "ece": 0.1249201745678595,
+          "mean_predictive_entropy": 0.333644925184225
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.02409780453199406,
+        "ece_ood_minus_id": 0.06908784681646316,
+        "entropy_ood_minus_id": 0.011281494798899172
+      }
+    },
+    "zz_r1_full__svc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "zz_r1_full",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.09512901306152344
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8822222222222222,
+          "balanced_accuracy": 0.883733826019407,
+          "f1_macro": 0.8817478999096375,
+          "f1_pos": 0.8892371995820272,
+          "confusion_matrix": [
+            [
+              737,
+              180
+            ],
+            [
+              32,
+              851
+            ]
+          ],
+          "roc_auc": 0.9518297269025615,
+          "pr_auc": 0.911059033944685
+        },
+        "ood_test": {
+          "accuracy": 0.9011111111111111,
+          "balanced_accuracy": 0.9030733590733591,
+          "f1_macro": 0.9009054593545369,
+          "f1_pos": 0.9054197662061636,
+          "confusion_matrix": [
+            [
+              770,
+              155
+            ],
+            [
+              23,
+              852
+            ]
+          ],
+          "roc_auc": 0.9375061003861004,
+          "pr_auc": 0.8863064872303634
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.019339533053952085
+      }
+    },
+    "zz_r1_full__gpc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "zz_r1_full",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 15.03307318687439
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8827777777777778,
+          "balanced_accuracy": 0.8837332085151369,
+          "f1_macro": 0.882642998332344,
+          "f1_pos": 0.8866200967221923,
+          "confusion_matrix": [
+            [
+              764,
+              153
+            ],
+            [
+              58,
+              825
+            ]
+          ],
+          "roc_auc": 0.9636981589727693,
+          "pr_auc": 0.9599656940624945,
+          "log_loss": 0.2610140766002652,
+          "brier": 0.07723032558080652,
+          "ece": 0.06356487133680586,
+          "mean_predictive_entropy": 0.36683750864577563
+        },
+        "ood_test": {
+          "accuracy": 0.8966666666666666,
+          "balanced_accuracy": 0.8983783783783783,
+          "f1_macro": 0.8965275537111005,
+          "f1_pos": 0.9003215434083601,
+          "confusion_matrix": [
+            [
+              774,
+              151
+            ],
+            [
+              35,
+              840
+            ]
+          ],
+          "roc_auc": 0.9163218532818532,
+          "pr_auc": 0.8535615882122061,
+          "log_loss": 0.31529972011393664,
+          "brier": 0.09297750491091235,
+          "ece": 0.09810629418977936,
+          "mean_predictive_entropy": 0.37753143246242
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.01464516986324138,
+        "ece_ood_minus_id": 0.0345414228529735,
+        "entropy_ood_minus_id": 0.010693923816644357
+      }
+    },
+    "zz_r2_full__svc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "zz_r2_full",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.10989022254943848
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8883333333333333,
+          "balanced_accuracy": 0.889479703252148,
+          "f1_macro": 0.8881178220145658,
+          "f1_pos": 0.8930282064928153,
+          "confusion_matrix": [
+            [
+              760,
+              157
+            ],
+            [
+              44,
+              839
+            ]
+          ],
+          "roc_auc": 0.9573489800681972,
+          "pr_auc": 0.9372751747900644
+        },
+        "ood_test": {
+          "accuracy": 0.8905555555555555,
+          "balanced_accuracy": 0.8920617760617761,
+          "f1_macro": 0.8904605875896727,
+          "f1_pos": 0.8936859147328656,
+          "confusion_matrix": [
+            [
+              775,
+              150
+            ],
+            [
+              47,
+              828
+            ]
+          ],
+          "roc_auc": 0.9416710424710423,
+          "pr_auc": 0.9128146303081895
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.0025820728096280776
+      }
+    },
+    "zz_r2_full__gpc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "zz_r2_full",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 13.263945817947388
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8894444444444445,
+          "balanced_accuracy": 0.8901293177442322,
+          "f1_macro": 0.8894026290804393,
+          "f1_pos": 0.8915531335149863,
+          "confusion_matrix": [
+            [
+              783,
+              134
+            ],
+            [
+              65,
+              818
+            ]
+          ],
+          "roc_auc": 0.9639291055697651,
+          "pr_auc": 0.9598903036481573,
+          "log_loss": 0.28757512896202836,
+          "brier": 0.08389698436797499,
+          "ece": 0.0822075684258946,
+          "mean_predictive_entropy": 0.4137407044952873
+        },
+        "ood_test": {
+          "accuracy": 0.8705555555555555,
+          "balanced_accuracy": 0.8712432432432433,
+          "f1_macro": 0.8705555156035543,
+          "f1_pos": 0.8706274292059967,
+          "confusion_matrix": [
+            [
+              783,
+              142
+            ],
+            [
+              91,
+              784
+            ]
+          ],
+          "roc_auc": 0.9255141312741313,
+          "pr_auc": 0.8776975345027447,
+          "log_loss": 0.34556195472005075,
+          "brier": 0.10300350509843666,
+          "ece": 0.13489024348067533,
+          "mean_predictive_entropy": 0.43952605198354466
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.018886074500988892,
+        "ece_ood_minus_id": 0.05268267505478072,
+        "entropy_ood_minus_id": 0.025785347488257337
+      }
+    },
+    "pauli_xz_r1_full__svc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "pauli_xz_r1_full",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.07797431945800781
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8905555555555555,
+          "balanced_accuracy": 0.8923325729797422,
+          "f1_macro": 0.8898989933489181,
+          "f1_pos": 0.8984012377514182,
+          "confusion_matrix": [
+            [
+              732,
+              185
+            ],
+            [
+              12,
+              871
+            ]
+          ],
+          "roc_auc": 0.9570291128563154,
+          "pr_auc": 0.917464295296121
+        },
+        "ood_test": {
+          "accuracy": 0.9044444444444445,
+          "balanced_accuracy": 0.9065637065637066,
+          "f1_macro": 0.9041941664892484,
+          "f1_pos": 0.9090909090909091,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              15,
+              860
+            ]
+          ],
+          "roc_auc": 0.9614196138996142,
+          "pr_auc": 0.9533618567035367
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.014231133583964328
+      }
+    },
+    "pauli_xz_r1_full__gpc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "pauli_xz_r1_full",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 15.288418531417847
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8888888888888888,
+          "balanced_accuracy": 0.890360881845498,
+          "f1_macro": 0.8884723814244555,
+          "f1_pos": 0.8952879581151832,
+          "confusion_matrix": [
+            [
+              745,
+              172
+            ],
+            [
+              28,
+              855
+            ]
+          ],
+          "roc_auc": 0.9687666340212742,
+          "pr_auc": 0.9653208969899876,
+          "log_loss": 0.2272877075349604,
+          "brier": 0.0698405421979879,
+          "ece": 0.042484345742538024,
+          "mean_predictive_entropy": 0.2936949148903949
+        },
+        "ood_test": {
+          "accuracy": 0.9033333333333333,
+          "balanced_accuracy": 0.9055444015444015,
+          "f1_macro": 0.903045942355055,
+          "f1_pos": 0.9083245521601686,
+          "confusion_matrix": [
+            [
+              764,
+              161
+            ],
+            [
+              13,
+              862
+            ]
+          ],
+          "roc_auc": 0.9052750579150579,
+          "pr_auc": 0.7904889251010867,
+          "log_loss": 0.29453782198597134,
+          "brier": 0.08491262003648584,
+          "ece": 0.07584626573521602,
+          "mean_predictive_entropy": 0.28131986553848104
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.015183519698903525,
+        "ece_ood_minus_id": 0.033361919992678,
+        "entropy_ood_minus_id": -0.012375049351913858
+      }
+    },
+    "zmap_r2__svc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "zmap_r2",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.08306694030761719
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8938888888888888,
+          "balanced_accuracy": 0.8957090863283319,
+          "f1_macro": 0.8932149234474,
+          "f1_pos": 0.9016984045290788,
+          "confusion_matrix": [
+            [
+              733,
+              184
+            ],
+            [
+              7,
+              876
+            ]
+          ],
+          "roc_auc": 0.9575638715541718,
+          "pr_auc": 0.9218593759681493
+        },
+        "ood_test": {
+          "accuracy": 0.9061111111111111,
+          "balanced_accuracy": 0.9083088803088804,
+          "f1_macro": 0.9058376625205729,
+          "f1_pos": 0.9109119662625198,
+          "confusion_matrix": [
+            [
+              767,
+              158
+            ],
+            [
+              11,
+              864
+            ]
+          ],
+          "roc_auc": 0.9249766795366796,
+          "pr_auc": 0.8924761556308156
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.012599793980548446
+      }
+    },
+    "zmap_r2__gpc__d6": {
+      "config": {
+        "dim": 6,
+        "kernel": "zmap_r2",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 15.254852533340454
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8905555555555555,
+          "balanced_accuracy": 0.8921436166731094,
+          "f1_macro": 0.8900587500492194,
+          "f1_pos": 0.8974492451847996,
+          "confusion_matrix": [
+            [
+              741,
+              176
+            ],
+            [
+              21,
+              862
+            ]
+          ],
+          "roc_auc": 0.9677650420952661,
+          "pr_auc": 0.964770779673797,
+          "log_loss": 0.23891787844899876,
+          "brier": 0.07261157906442955,
+          "ece": 0.045484897062718264,
+          "mean_predictive_entropy": 0.31596572194191735
+        },
+        "ood_test": {
+          "accuracy": 0.9077777777777778,
+          "balanced_accuracy": 0.909992277992278,
+          "f1_macro": 0.907503600177811,
+          "f1_pos": 0.9125395152792413,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              9,
+              866
+            ]
+          ],
+          "roc_auc": 0.9014103474903475,
+          "pr_auc": 0.773920481765858,
+          "log_loss": 0.29630070145799325,
+          "brier": 0.08352472726775999,
+          "ece": 0.06410290910294628,
+          "mean_predictive_entropy": 0.2942375948436352
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.017848661319168624,
+        "ece_ood_minus_id": 0.01861801204022801,
+        "entropy_ood_minus_id": -0.021728127098282146
+      }
+    }
+  },
+  "dim_8": {
+    "linear__svc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "linear",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.22064282230585325,
+          "poly_gamma": 0.125,
+          "poly_coef0": 1.0,
+          "l1_median": 5.041456915438175,
+          "l2_median": 2.4698157113731423
+        },
+        "fit_seconds": 0.0800023078918457
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8638888888888889,
+          "balanced_accuracy": 0.8653204661910237,
+          "f1_macro": 0.8634062153579114,
+          "f1_pos": 0.8715259570005244,
+          "confusion_matrix": [
+            [
+              724,
+              193
+            ],
+            [
+              52,
+              831
+            ]
+          ],
+          "roc_auc": 0.9273543276551757,
+          "pr_auc": 0.9014571839072807
+        },
+        "ood_test": {
+          "accuracy": 0.7816666666666666,
+          "balanced_accuracy": 0.7826254826254826,
+          "f1_macro": 0.781631013211725,
+          "f1_pos": 0.7844212835984641,
+          "confusion_matrix": [
+            [
+              692,
+              233
+            ],
+            [
+              160,
+              715
+            ]
+          ],
+          "roc_auc": 0.8583091891891893,
+          "pr_auc": 0.7866917636102168
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.08269498356554106
+      }
+    },
+    "linear__gpc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "linear",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.22064282230585325,
+          "poly_gamma": 0.125,
+          "poly_coef0": 1.0,
+          "l1_median": 5.041456915438175,
+          "l2_median": 2.4698157113731423
+        },
+        "fit_seconds": 12.760181903839111
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8655555555555555,
+          "balanced_accuracy": 0.8665993175342808,
+          "f1_macro": 0.8653519211152669,
+          "f1_pos": 0.8705882352941177,
+          "confusion_matrix": [
+            [
+              744,
+              173
+            ],
+            [
+              69,
+              814
+            ]
+          ],
+          "roc_auc": 0.9424683621687243,
+          "pr_auc": 0.9479602974084578,
+          "log_loss": 0.3429978737058726,
+          "brier": 0.10051637213580736,
+          "ece": 0.09272718223197765,
+          "mean_predictive_entropy": 0.4442463561960636
+        },
+        "ood_test": {
+          "accuracy": 0.7111111111111111,
+          "balanced_accuracy": 0.709992277992278,
+          "f1_macro": 0.7100673535840136,
+          "f1_pos": 0.6926713947990544,
+          "confusion_matrix": [
+            [
+              694,
+              231
+            ],
+            [
+              289,
+              586
+            ]
+          ],
+          "roc_auc": 0.8233612355212356,
+          "pr_auc": 0.7146483006557696,
+          "log_loss": 0.522419086724344,
+          "brier": 0.1807090086578824,
+          "ece": 0.17224191789730403,
+          "mean_predictive_entropy": 0.39772051615817
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.15660703954200272,
+        "ece_ood_minus_id": 0.07951473566532638,
+        "entropy_ood_minus_id": -0.04652584003789362
+      }
+    },
+    "rbf_gscale__svc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "rbf_gscale",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.22064282230585325,
+          "poly_gamma": 0.125,
+          "poly_coef0": 1.0,
+          "l1_median": 5.041456915438175,
+          "l2_median": 2.4698157113731423
+        },
+        "fit_seconds": 0.05907917022705078
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8855555555555555,
+          "balanced_accuracy": 0.8875722325619881,
+          "f1_macro": 0.8846209855384167,
+          "f1_pos": 0.8950050968399592,
+          "confusion_matrix": [
+            [
+              716,
+              201
+            ],
+            [
+              5,
+              878
+            ]
+          ],
+          "roc_auc": 0.9744908986045638,
+          "pr_auc": 0.9667150446832479
+        },
+        "ood_test": {
+          "accuracy": 0.9094444444444445,
+          "balanced_accuracy": 0.9117065637065637,
+          "f1_macro": 0.909158433698196,
+          "f1_pos": 0.914255654918464,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              6,
+              869
+            ]
+          ],
+          "roc_auc": 0.9437961389961389,
+          "pr_auc": 0.9225231608600636
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.024134331144575527
+      }
+    },
+    "rbf_gscale__gpc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "rbf_gscale",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.22064282230585325,
+          "poly_gamma": 0.125,
+          "poly_coef0": 1.0,
+          "l1_median": 5.041456915438175,
+          "l2_median": 2.4698157113731423
+        },
+        "fit_seconds": 15.011398792266846
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.895,
+          "balanced_accuracy": 0.8965686522722305,
+          "f1_macro": 0.8945390641008433,
+          "f1_pos": 0.9015112037519541,
+          "confusion_matrix": [
+            [
+              746,
+              171
+            ],
+            [
+              18,
+              865
+            ]
+          ],
+          "roc_auc": 0.9709908844019657,
+          "pr_auc": 0.968415429516558,
+          "log_loss": 0.22859157566782495,
+          "brier": 0.06898513208203637,
+          "ece": 0.052183989301611285,
+          "mean_predictive_entropy": 0.30994707160986035
+        },
+        "ood_test": {
+          "accuracy": 0.9094444444444445,
+          "balanced_accuracy": 0.9115521235521236,
+          "f1_macro": 0.9092124036774237,
+          "f1_pos": 0.9138022210470651,
+          "confusion_matrix": [
+            [
+              773,
+              152
+            ],
+            [
+              11,
+              864
+            ]
+          ],
+          "roc_auc": 0.8847320463320464,
+          "pr_auc": 0.7489205642847573,
+          "log_loss": 0.3262653565221376,
+          "brier": 0.0945508298467121,
+          "ece": 0.10903892854709339,
+          "mean_predictive_entropy": 0.3052587028758344
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.01498347127989308,
+        "ece_ood_minus_id": 0.05685493924548211,
+        "entropy_ood_minus_id": -0.0046883687340259494
+      }
+    },
+    "poly2__svc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "poly2",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.22064282230585325,
+          "poly_gamma": 0.125,
+          "poly_coef0": 1.0,
+          "l1_median": 5.041456915438175,
+          "l2_median": 2.4698157113731423
+        },
+        "fit_seconds": 0.07660436630249023
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8777777777777778,
+          "balanced_accuracy": 0.8800016302112729,
+          "f1_macro": 0.8765153376681856,
+          "f1_pos": 0.8890010090817356,
+          "confusion_matrix": [
+            [
+              699,
+              218
+            ],
+            [
+              2,
+              881
+            ]
+          ],
+          "roc_auc": 0.928798052638534,
+          "pr_auc": 0.8961305275816714
+        },
+        "ood_test": {
+          "accuracy": 0.8705555555555555,
+          "balanced_accuracy": 0.874054054054054,
+          "f1_macro": 0.8692036297396142,
+          "f1_pos": 0.8825012607160867,
+          "confusion_matrix": [
+            [
+              692,
+              233
+            ],
+            [
+              0,
+              875
+            ]
+          ],
+          "roc_auc": 0.8627694208494207,
+          "pr_auc": 0.7238365272319074
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.005947576157218859
+      }
+    },
+    "poly2__gpc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "poly2",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.22064282230585325,
+          "poly_gamma": 0.125,
+          "poly_coef0": 1.0,
+          "l1_median": 5.041456915438175,
+          "l2_median": 2.4698157113731423
+        },
+        "fit_seconds": 13.48493766784668
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8633333333333333,
+          "balanced_accuracy": 0.8647122244850323,
+          "f1_macro": 0.8628930677397421,
+          "f1_pos": 0.8706624605678234,
+          "confusion_matrix": [
+            [
+              726,
+              191
+            ],
+            [
+              55,
+              828
+            ]
+          ],
+          "roc_auc": 0.9541910632312022,
+          "pr_auc": 0.9542088303038724,
+          "log_loss": 0.2975396791235374,
+          "brier": 0.08943685394722464,
+          "ece": 0.1098770306857192,
+          "mean_predictive_entropy": 0.4041857891095147
+        },
+        "ood_test": {
+          "accuracy": 0.7488888888888889,
+          "balanced_accuracy": 0.749127413127413,
+          "f1_macro": 0.7488513716246501,
+          "f1_pos": 0.7457817772778402,
+          "confusion_matrix": [
+            [
+              685,
+              240
+            ],
+            [
+              212,
+              663
+            ]
+          ],
+          "roc_auc": 0.8392376833976833,
+          "pr_auc": 0.7241230028706642,
+          "log_loss": 0.43777450765072906,
+          "brier": 0.14779093531880694,
+          "ece": 0.15106811152632948,
+          "mean_predictive_entropy": 0.4017138956204489
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.11558481135761922,
+        "ece_ood_minus_id": 0.04119108084061028,
+        "entropy_ood_minus_id": -0.0024718934890657907
+      }
+    },
+    "poly3__svc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "poly3",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.22064282230585325,
+          "poly_gamma": 0.125,
+          "poly_coef0": 1.0,
+          "l1_median": 5.041456915438175,
+          "l2_median": 2.4698157113731423
+        },
+        "fit_seconds": 0.08883285522460938
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8777777777777778,
+          "balanced_accuracy": 0.8800016302112729,
+          "f1_macro": 0.8765153376681856,
+          "f1_pos": 0.8890010090817356,
+          "confusion_matrix": [
+            [
+              699,
+              218
+            ],
+            [
+              2,
+              881
+            ]
+          ],
+          "roc_auc": 0.9427450040817031,
+          "pr_auc": 0.9040376376495316
+        },
+        "ood_test": {
+          "accuracy": 0.9111111111111111,
+          "balanced_accuracy": 0.9135135135135135,
+          "f1_macro": 0.9107779051395644,
+          "f1_pos": 0.9162303664921466,
+          "confusion_matrix": [
+            [
+              765,
+              160
+            ],
+            [
+              0,
+              875
+            ]
+          ],
+          "roc_auc": 0.9012299613899615,
+          "pr_auc": 0.8126048453856223
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.03351188330224064
+      }
+    },
+    "poly3__gpc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "poly3",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.22064282230585325,
+          "poly_gamma": 0.125,
+          "poly_coef0": 1.0,
+          "l1_median": 5.041456915438175,
+          "l2_median": 2.4698157113731423
+        },
+        "fit_seconds": 13.232116222381592
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8733333333333333,
+          "balanced_accuracy": 0.875198681998886,
+          "f1_macro": 0.8724711755025332,
+          "f1_pos": 0.8829568788501027,
+          "confusion_matrix": [
+            [
+              712,
+              205
+            ],
+            [
+              23,
+              860
+            ]
+          ],
+          "roc_auc": 0.9612046767303396,
+          "pr_auc": 0.9598969861831452,
+          "log_loss": 0.2712485195848124,
+          "brier": 0.08123747549936572,
+          "ece": 0.09324084078696002,
+          "mean_predictive_entropy": 0.3779130649589192
+        },
+        "ood_test": {
+          "accuracy": 0.83,
+          "balanced_accuracy": 0.8307953667953668,
+          "f1_macro": 0.829994752924473,
+          "f1_pos": 0.830939226519337,
+          "confusion_matrix": [
+            [
+              742,
+              183
+            ],
+            [
+              123,
+              752
+            ]
+          ],
+          "roc_auc": 0.8642199227799228,
+          "pr_auc": 0.7420246242500912,
+          "log_loss": 0.3929662057498762,
+          "brier": 0.12640939991340736,
+          "ece": 0.1159080922297711,
+          "mean_predictive_entropy": 0.37843119272968806
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.044403315203519145,
+        "ece_ood_minus_id": 0.02266725144281108,
+        "entropy_ood_minus_id": 0.0005181277707688725
+      }
+    },
+    "laplacian_med__svc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "laplacian_med",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.22064282230585325,
+          "poly_gamma": 0.125,
+          "poly_coef0": 1.0,
+          "l1_median": 5.041456915438175,
+          "l2_median": 2.4698157113731423
+        },
+        "fit_seconds": 0.06998896598815918
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8988888888888888,
+          "balanced_accuracy": 0.9003434558749974,
+          "f1_macro": 0.8985235737544047,
+          "f1_pos": 0.9046121593291404,
+          "confusion_matrix": [
+            [
+              755,
+              162
+            ],
+            [
+              20,
+              863
+            ]
+          ],
+          "roc_auc": 0.9713144566394677,
+          "pr_auc": 0.9574311288969782
+        },
+        "ood_test": {
+          "accuracy": 0.9055555555555556,
+          "balanced_accuracy": 0.9077065637065637,
+          "f1_macro": 0.9052972860554278,
+          "f1_pos": 0.9102428722280888,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              13,
+              862
+            ]
+          ],
+          "roc_auc": 0.9654560617760618,
+          "pr_auc": 0.948601979018385
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.00736310783156624
+      }
+    },
+    "laplacian_med__gpc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "laplacian_med",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.22064282230585325,
+          "poly_gamma": 0.125,
+          "poly_coef0": 1.0,
+          "l1_median": 5.041456915438175,
+          "l2_median": 2.4698157113731423
+        },
+        "fit_seconds": 15.299444437026978
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8955555555555555,
+          "balanced_accuracy": 0.8967150007842304,
+          "f1_macro": 0.8953488372093024,
+          "f1_pos": 0.9,
+          "confusion_matrix": [
+            [
+              766,
+              151
+            ],
+            [
+              37,
+              846
+            ]
+          ],
+          "roc_auc": 0.974229076794066,
+          "pr_auc": 0.9725867050040746,
+          "log_loss": 0.2229560372800921,
+          "brier": 0.06657655485298274,
+          "ece": 0.04949477484300262,
+          "mean_predictive_entropy": 0.3125397538356733
+        },
+        "ood_test": {
+          "accuracy": 0.9022222222222223,
+          "balanced_accuracy": 0.9044324324324324,
+          "f1_macro": 0.9019315278993659,
+          "f1_pos": 0.9072708113804004,
+          "confusion_matrix": [
+            [
+              763,
+              162
+            ],
+            [
+              14,
+              861
+            ]
+          ],
+          "roc_auc": 0.9174338223938224,
+          "pr_auc": 0.8535738782641626,
+          "log_loss": 0.2886528907991867,
+          "brier": 0.08578138955804811,
+          "ece": 0.07252608103521843,
+          "mean_predictive_entropy": 0.3135572168962819
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.007717431648202044,
+        "ece_ood_minus_id": 0.023031306192215814,
+        "entropy_ood_minus_id": 0.0010174630606086255
+      }
+    },
+    "matern15_med__svc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "matern15_med",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.22064282230585325,
+          "poly_gamma": 0.125,
+          "poly_coef0": 1.0,
+          "l1_median": 5.041456915438175,
+          "l2_median": 2.4698157113731423
+        },
+        "fit_seconds": 0.06308197975158691
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8816666666666667,
+          "balanced_accuracy": 0.8837974289592212,
+          "f1_macro": 0.8805633894078978,
+          "f1_pos": 0.8920425747592499,
+          "confusion_matrix": [
+            [
+              707,
+              210
+            ],
+            [
+              3,
+              880
+            ]
+          ],
+          "roc_auc": 0.9741438612048001,
+          "pr_auc": 0.9663808370059409
+        },
+        "ood_test": {
+          "accuracy": 0.9105555555555556,
+          "balanced_accuracy": 0.9128494208494209,
+          "f1_macro": 0.9102617180762564,
+          "f1_pos": 0.9153967419863374,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              4,
+              871
+            ]
+          ],
+          "roc_auc": 0.9551419305019307,
+          "pr_auc": 0.941943292931509
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.02905199189019969
+      }
+    },
+    "matern15_med__gpc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "matern15_med",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.22064282230585325,
+          "poly_gamma": 0.125,
+          "poly_coef0": 1.0,
+          "l1_median": 5.041456915438175,
+          "l2_median": 2.4698157113731423
+        },
+        "fit_seconds": 14.926236391067505
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.89,
+          "balanced_accuracy": 0.8918293069996579,
+          "f1_macro": 0.8892914653784219,
+          "f1_pos": 0.8981481481481481,
+          "confusion_matrix": [
+            [
+              729,
+              188
+            ],
+            [
+              10,
+              873
+            ]
+          ],
+          "roc_auc": 0.9696385500505735,
+          "pr_auc": 0.9667815417620607,
+          "log_loss": 0.23495600305276215,
+          "brier": 0.07066073615179169,
+          "ece": 0.05587440273469259,
+          "mean_predictive_entropy": 0.323171187563277
+        },
+        "ood_test": {
+          "accuracy": 0.9094444444444445,
+          "balanced_accuracy": 0.9116138996138996,
+          "f1_macro": 0.9091914979224538,
+          "f1_pos": 0.9139841688654353,
+          "confusion_matrix": [
+            [
+              771,
+              154
+            ],
+            [
+              9,
+              866
+            ]
+          ],
+          "roc_auc": 0.8872018532818534,
+          "pr_auc": 0.754610176963348,
+          "log_loss": 0.3327889980563775,
+          "brier": 0.09746486890787796,
+          "ece": 0.12022862391008834,
+          "mean_predictive_entropy": 0.32519823110021673
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.019784592614241703,
+        "ece_ood_minus_id": 0.06435422117539576,
+        "entropy_ood_minus_id": 0.002027043536939721
+      }
+    },
+    "matern25_med__svc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "matern25_med",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.22064282230585325,
+          "poly_gamma": 0.125,
+          "poly_coef0": 1.0,
+          "l1_median": 5.041456915438175,
+          "l2_median": 2.4698157113731423
+        },
+        "fit_seconds": 0.05999898910522461
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8805555555555555,
+          "balanced_accuracy": 0.8827279115635085,
+          "f1_macro": 0.8793893172593887,
+          "f1_pos": 0.8912493677288822,
+          "confusion_matrix": [
+            [
+              704,
+              213
+            ],
+            [
+              2,
+              881
+            ]
+          ],
+          "roc_auc": 0.9701597236544891,
+          "pr_auc": 0.9606314383054685
+        },
+        "ood_test": {
+          "accuracy": 0.9111111111111111,
+          "balanced_accuracy": 0.9134208494208493,
+          "f1_macro": 0.9108133819565563,
+          "f1_pos": 0.9159663865546218,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              3,
+              872
+            ]
+          ],
+          "roc_auc": 0.9432154440154439,
+          "pr_auc": 0.9219713343965437
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.03069293785734084
+      }
+    },
+    "matern25_med__gpc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "matern25_med",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.22064282230585325,
+          "poly_gamma": 0.125,
+          "poly_coef0": 1.0,
+          "l1_median": 5.041456915438175,
+          "l2_median": 2.4698157113731423
+        },
+        "fit_seconds": 15.232439994812012
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8883333333333333,
+          "balanced_accuracy": 0.8902355284786794,
+          "f1_macro": 0.8875419269992313,
+          "f1_pos": 0.8969759097898513,
+          "confusion_matrix": [
+            [
+              724,
+              193
+            ],
+            [
+              8,
+              875
+            ]
+          ],
+          "roc_auc": 0.9693940183596369,
+          "pr_auc": 0.9666122243797245,
+          "log_loss": 0.23845016458223398,
+          "brier": 0.07165900158354489,
+          "ece": 0.05692157433968256,
+          "mean_predictive_entropy": 0.3291215182779474
+        },
+        "ood_test": {
+          "accuracy": 0.9072222222222223,
+          "balanced_accuracy": 0.9094517374517375,
+          "f1_macro": 0.9069407178938511,
+          "f1_pos": 0.9120589784096893,
+          "confusion_matrix": [
+            [
+              767,
+              158
+            ],
+            [
+              9,
+              866
+            ]
+          ],
+          "roc_auc": 0.8831258687258687,
+          "pr_auc": 0.7462744046281742,
+          "log_loss": 0.3378262737683576,
+          "brier": 0.09929542947072346,
+          "ece": 0.11835378513006266,
+          "mean_predictive_entropy": 0.3296074707773137
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.01921620897305809,
+        "ece_ood_minus_id": 0.061432210790380096,
+        "entropy_ood_minus_id": 0.0004859524993663378
+      }
+    },
+    "zz_r1_full__svc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "zz_r1_full",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.10485434532165527
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8816666666666667,
+          "balanced_accuracy": 0.8823697590868841,
+          "f1_macro": 0.8816166460458138,
+          "f1_pos": 0.8840500816548721,
+          "confusion_matrix": [
+            [
+              775,
+              142
+            ],
+            [
+              71,
+              812
+            ]
+          ],
+          "roc_auc": 0.950146410262427,
+          "pr_auc": 0.9262108542385148
+        },
+        "ood_test": {
+          "accuracy": 0.9016666666666666,
+          "balanced_accuracy": 0.9033050193050194,
+          "f1_macro": 0.901553605236137,
+          "f1_pos": 0.9048898441698012,
+          "confusion_matrix": [
+            [
+              781,
+              144
+            ],
+            [
+              33,
+              842
+            ]
+          ],
+          "roc_auc": 0.948652972972973,
+          "pr_auc": 0.9353490522218555
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.0209352602181353
+      }
+    },
+    "zz_r1_full__gpc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "zz_r1_full",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 15.471320152282715
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8738888888888889,
+          "balanced_accuracy": 0.8745682101391731,
+          "f1_macro": 0.8738411899560791,
+          "f1_pos": 0.8762942779291553,
+          "confusion_matrix": [
+            [
+              769,
+              148
+            ],
+            [
+              79,
+              804
+            ]
+          ],
+          "roc_auc": 0.9622630790491915,
+          "pr_auc": 0.9592492455315182,
+          "log_loss": 0.28301189746313493,
+          "brier": 0.08355358138851043,
+          "ece": 0.073902085601525,
+          "mean_predictive_entropy": 0.4010057661195063
+        },
+        "ood_test": {
+          "accuracy": 0.8772222222222222,
+          "balanced_accuracy": 0.8782857142857143,
+          "f1_macro": 0.8771985336677599,
+          "f1_pos": 0.8789041095890411,
+          "confusion_matrix": [
+            [
+              777,
+              148
+            ],
+            [
+              73,
+              802
+            ]
+          ],
+          "roc_auc": 0.9220484942084942,
+          "pr_auc": 0.8879127265129401,
+          "log_loss": 0.34548902172360424,
+          "brier": 0.1058325808723394,
+          "ece": 0.17065735046469818,
+          "mean_predictive_entropy": 0.4320382254239579
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.0037175041465412617,
+        "ece_ood_minus_id": 0.09675526486317318,
+        "entropy_ood_minus_id": 0.031032459304451643
+      }
+    },
+    "zz_r2_full__svc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "zz_r2_full",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.13939833641052246
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8683333333333333,
+          "balanced_accuracy": 0.8685487785148034,
+          "f1_macro": 0.8683300415843729,
+          "f1_pos": 0.8676716917922948,
+          "confusion_matrix": [
+            [
+              786,
+              131
+            ],
+            [
+              106,
+              777
+            ]
+          ],
+          "roc_auc": 0.9505490230464942,
+          "pr_auc": 0.934772874281891
+        },
+        "ood_test": {
+          "accuracy": 0.8716666666666667,
+          "balanced_accuracy": 0.8713667953667954,
+          "f1_macro": 0.871509265516925,
+          "f1_pos": 0.8670120898100173,
+          "confusion_matrix": [
+            [
+              816,
+              109
+            ],
+            [
+              122,
+              753
+            ]
+          ],
+          "roc_auc": 0.9478993050193051,
+          "pr_auc": 0.9283297130769024
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.0028180168519920112
+      }
+    },
+    "zz_r2_full__gpc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "zz_r2_full",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 15.07056450843811
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8683333333333333,
+          "balanced_accuracy": 0.8676039969816391,
+          "f1_macro": 0.8679338331786989,
+          "f1_pos": 0.8606701940035273,
+          "confusion_matrix": [
+            [
+              831,
+              86
+            ],
+            [
+              151,
+              732
+            ]
+          ],
+          "roc_auc": 0.9582542413280787,
+          "pr_auc": 0.9552667559039202,
+          "log_loss": 0.33651640399021715,
+          "brier": 0.10245508427425398,
+          "ece": 0.11198584945192144,
+          "mean_predictive_entropy": 0.45537049574388977
+        },
+        "ood_test": {
+          "accuracy": 0.7566666666666667,
+          "balanced_accuracy": 0.7536679536679536,
+          "f1_macro": 0.7525560421018802,
+          "f1_pos": 0.7206632653061225,
+          "confusion_matrix": [
+            [
+              797,
+              128
+            ],
+            [
+              310,
+              565
+            ]
+          ],
+          "roc_auc": 0.9216766023166022,
+          "pr_auc": 0.8960194724419435,
+          "log_loss": 0.4057492517596829,
+          "brier": 0.1294116978197536,
+          "ece": 0.22513571107896058,
+          "mean_predictive_entropy": 0.49858192954037645
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.11393604331368556,
+        "ece_ood_minus_id": 0.11314986162703913,
+        "entropy_ood_minus_id": 0.043211433796486676
+      }
+    },
+    "pauli_xz_r1_full__svc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "pauli_xz_r1_full",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.06811380386352539
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8972222222222223,
+          "balanced_accuracy": 0.8988126627895632,
+          "f1_macro": 0.8967556789802313,
+          "f1_pos": 0.9036959916710047,
+          "confusion_matrix": [
+            [
+              747,
+              170
+            ],
+            [
+              15,
+              868
+            ]
+          ],
+          "roc_auc": 0.9750219522768,
+          "pr_auc": 0.962996026282755
+        },
+        "ood_test": {
+          "accuracy": 0.9044444444444445,
+          "balanced_accuracy": 0.9065637065637066,
+          "f1_macro": 0.9041941664892484,
+          "f1_pos": 0.9090909090909091,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              15,
+              860
+            ]
+          ],
+          "roc_auc": 0.9576129729729729,
+          "pr_auc": 0.9436485025612101
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.0077510437741433735
+      }
+    },
+    "pauli_xz_r1_full__gpc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "pauli_xz_r1_full",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 15.13884687423706
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8972222222222223,
+          "balanced_accuracy": 0.8984347501762975,
+          "f1_macro": 0.8969925219045557,
+          "f1_pos": 0.9018567639257294,
+          "confusion_matrix": [
+            [
+              765,
+              152
+            ],
+            [
+              33,
+              850
+            ]
+          ],
+          "roc_auc": 0.9718072250469613,
+          "pr_auc": 0.9685106604390396,
+          "log_loss": 0.22636516709315932,
+          "brier": 0.06765403341896076,
+          "ece": 0.04717021793245966,
+          "mean_predictive_entropy": 0.31018889366966196
+        },
+        "ood_test": {
+          "accuracy": 0.9061111111111111,
+          "balanced_accuracy": 0.9081853281853283,
+          "f1_macro": 0.9058810134281989,
+          "f1_pos": 0.9105346744309158,
+          "confusion_matrix": [
+            [
+              771,
+              154
+            ],
+            [
+              15,
+              860
+            ]
+          ],
+          "roc_auc": 0.9106755212355213,
+          "pr_auc": 0.8112195389454075,
+          "log_loss": 0.3037934659490472,
+          "brier": 0.08964410286186626,
+          "ece": 0.08722433047947514,
+          "mean_predictive_entropy": 0.3004404411887338
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.009750578009030786,
+        "ece_ood_minus_id": 0.040054112547015484,
+        "entropy_ood_minus_id": -0.00974845248092815
+      }
+    },
+    "zmap_r2__svc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "zmap_r2",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.07140469551086426
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.9005555555555556,
+          "balanced_accuracy": 0.9018112635248873,
+          "f1_macro": 0.9003118426251339,
+          "f1_pos": 0.9052408681842244,
+          "confusion_matrix": [
+            [
+              766,
+              151
+            ],
+            [
+              28,
+              855
+            ]
+          ],
+          "roc_auc": 0.9657173979358067,
+          "pr_auc": 0.94608706528802
+        },
+        "ood_test": {
+          "accuracy": 0.9066666666666666,
+          "balanced_accuracy": 0.9088185328185328,
+          "f1_macro": 0.9064114356312462,
+          "f1_pos": 0.91129883843717,
+          "confusion_matrix": [
+            [
+              769,
+              156
+            ],
+            [
+              12,
+              863
+            ]
+          ],
+          "roc_auc": 0.948098223938224,
+          "pr_auc": 0.925348949305837
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.0070072692936454795
+      }
+    },
+    "zmap_r2__gpc__d8": {
+      "config": {
+        "dim": 8,
+        "kernel": "zmap_r2",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 15.243045806884766
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8977777777777778,
+          "balanced_accuracy": 0.8988120452852931,
+          "f1_macro": 0.8976316817581635,
+          "f1_pos": 0.9014989293361885,
+          "confusion_matrix": [
+            [
+              774,
+              143
+            ],
+            [
+              41,
+              842
+            ]
+          ],
+          "roc_auc": 0.9710958601278729,
+          "pr_auc": 0.9680786539147316,
+          "log_loss": 0.23231066917212667,
+          "brier": 0.06923132982996658,
+          "ece": 0.048744689156156935,
+          "mean_predictive_entropy": 0.3181164225109363
+        },
+        "ood_test": {
+          "accuracy": 0.9066666666666666,
+          "balanced_accuracy": 0.9086023166023166,
+          "f1_macro": 0.9064819396338446,
+          "f1_pos": 0.9106382978723404,
+          "confusion_matrix": [
+            [
+              776,
+              149
+            ],
+            [
+              19,
+              856
+            ]
+          ],
+          "roc_auc": 0.9044225482625483,
+          "pr_auc": 0.78409701267228,
+          "log_loss": 0.30468566274568326,
+          "brier": 0.08774158483902314,
+          "ece": 0.07698433876319158,
+          "mean_predictive_entropy": 0.3152901530407296
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.00979027131702348,
+        "ece_ood_minus_id": 0.028239649607034643,
+        "entropy_ood_minus_id": -0.0028262694702066993
+      }
+    }
+  },
+  "dim_10": {
+    "linear__svc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "linear",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.20400220236698713,
+          "poly_gamma": 0.1,
+          "poly_coef0": 1.0,
+          "l1_median": 5.778947532176971,
+          "l2_median": 2.578163727473365
+        },
+        "fit_seconds": 0.0943751335144043
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8638888888888889,
+          "balanced_accuracy": 0.8652994710458424,
+          "f1_macro": 0.8634241516270643,
+          "f1_pos": 0.8713910761154856,
+          "confusion_matrix": [
+            [
+              725,
+              192
+            ],
+            [
+              53,
+              830
+            ]
+          ],
+          "roc_auc": 0.9243581969369318,
+          "pr_auc": 0.894970462545614
+        },
+        "ood_test": {
+          "accuracy": 0.7738888888888888,
+          "balanced_accuracy": 0.7746254826254826,
+          "f1_macro": 0.7738832359697881,
+          "f1_pos": 0.7750138197899392,
+          "confusion_matrix": [
+            [
+              692,
+              233
+            ],
+            [
+              174,
+              701
+            ]
+          ],
+          "roc_auc": 0.8497606177606177,
+          "pr_auc": 0.7637405565427338
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.09067398842035979
+      }
+    },
+    "linear__gpc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "linear",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.20400220236698713,
+          "poly_gamma": 0.1,
+          "poly_coef0": 1.0,
+          "l1_median": 5.778947532176971,
+          "l2_median": 2.578163727473365
+        },
+        "fit_seconds": 12.916185140609741
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8666666666666667,
+          "balanced_accuracy": 0.8675428640589049,
+          "f1_macro": 0.8665465585693791,
+          "f1_pos": 0.8705501618122977,
+          "confusion_matrix": [
+            [
+              753,
+              164
+            ],
+            [
+              76,
+              807
+            ]
+          ],
+          "roc_auc": 0.9412382936628008,
+          "pr_auc": 0.9470175298711554,
+          "log_loss": 0.34393510439590796,
+          "brier": 0.10237646781365962,
+          "ece": 0.10089565772656027,
+          "mean_predictive_entropy": 0.45304547112797905
+        },
+        "ood_test": {
+          "accuracy": 0.7138888888888889,
+          "balanced_accuracy": 0.7126640926640927,
+          "f1_macro": 0.7127162569438525,
+          "f1_pos": 0.6943620178041543,
+          "confusion_matrix": [
+            [
+              700,
+              225
+            ],
+            [
+              290,
+              585
+            ]
+          ],
+          "roc_auc": 0.8456179150579152,
+          "pr_auc": 0.763140316435232,
+          "log_loss": 0.513589757711711,
+          "brier": 0.17901255298134758,
+          "ece": 0.15765120090811482,
+          "mean_predictive_entropy": 0.3867705880307118
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.1548787713948122,
+        "ece_ood_minus_id": 0.056755543181554555,
+        "entropy_ood_minus_id": -0.06627488309726726
+      }
+    },
+    "rbf_gscale__svc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "rbf_gscale",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.20400220236698713,
+          "poly_gamma": 0.1,
+          "poly_coef0": 1.0,
+          "l1_median": 5.778947532176971,
+          "l2_median": 2.578163727473365
+        },
+        "fit_seconds": 0.05598950386047363
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.89,
+          "balanced_accuracy": 0.8919342827255651,
+          "f1_macro": 0.8891888900358302,
+          "f1_pos": 0.8986693961105425,
+          "confusion_matrix": [
+            [
+              724,
+              193
+            ],
+            [
+              5,
+              878
+            ]
+          ],
+          "roc_auc": 0.9754159200010868,
+          "pr_auc": 0.96742485481038
+        },
+        "ood_test": {
+          "accuracy": 0.9088888888888889,
+          "balanced_accuracy": 0.9111351351351351,
+          "f1_macro": 0.9086068111455108,
+          "f1_pos": 0.9136842105263158,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              7,
+              868
+            ]
+          ],
+          "roc_auc": 0.9561810038610039,
+          "pr_auc": 0.936963586653904
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.019200852409570035
+      }
+    },
+    "rbf_gscale__gpc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "rbf_gscale",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.20400220236698713,
+          "poly_gamma": 0.1,
+          "poly_coef0": 1.0,
+          "l1_median": 5.778947532176971,
+          "l2_median": 2.578163727473365
+        },
+        "fit_seconds": 15.322275638580322
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8961111111111111,
+          "balanced_accuracy": 0.897428218216129,
+          "f1_macro": 0.8958209209294408,
+          "f1_pos": 0.9013192612137203,
+          "confusion_matrix": [
+            [
+              759,
+              158
+            ],
+            [
+              29,
+              854
+            ]
+          ],
+          "roc_auc": 0.971834395234843,
+          "pr_auc": 0.9696378825623636,
+          "log_loss": 0.22532014396642028,
+          "brier": 0.06784915809481805,
+          "ece": 0.046975172122337885,
+          "mean_predictive_entropy": 0.3074225103700705
+        },
+        "ood_test": {
+          "accuracy": 0.8938888888888888,
+          "balanced_accuracy": 0.8955212355212355,
+          "f1_macro": 0.8937668847463398,
+          "f1_pos": 0.8973670069854917,
+          "confusion_matrix": [
+            [
+              774,
+              151
+            ],
+            [
+              40,
+              835
+            ]
+          ],
+          "roc_auc": 0.923233359073359,
+          "pr_auc": 0.8537747503314304,
+          "log_loss": 0.2922618576293136,
+          "brier": 0.08891048628994752,
+          "ece": 0.07100369018101405,
+          "mean_predictive_entropy": 0.3058139927597162
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.001906982694893422,
+        "ece_ood_minus_id": 0.02402851805867616,
+        "entropy_ood_minus_id": -0.0016085176103542986
+      }
+    },
+    "poly2__svc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "poly2",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.20400220236698713,
+          "poly_gamma": 0.1,
+          "poly_coef0": 1.0,
+          "l1_median": 5.778947532176971,
+          "l2_median": 2.578163727473365
+        },
+        "fit_seconds": 0.0738074779510498
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8777777777777778,
+          "balanced_accuracy": 0.8800016302112729,
+          "f1_macro": 0.8765153376681856,
+          "f1_pos": 0.8890010090817356,
+          "confusion_matrix": [
+            [
+              699,
+              218
+            ],
+            [
+              2,
+              881
+            ]
+          ],
+          "roc_auc": 0.9394018359636958,
+          "pr_auc": 0.9111943052737117
+        },
+        "ood_test": {
+          "accuracy": 0.8716666666666667,
+          "balanced_accuracy": 0.8751042471042472,
+          "f1_macro": 0.8703848771134544,
+          "f1_pos": 0.8832743810005053,
+          "confusion_matrix": [
+            [
+              695,
+              230
+            ],
+            [
+              1,
+              874
+            ]
+          ],
+          "roc_auc": 0.9246282625482625,
+          "pr_auc": 0.8685940470867105
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.004897383107025699
+      }
+    },
+    "poly2__gpc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "poly2",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.20400220236698713,
+          "poly_gamma": 0.1,
+          "poly_coef0": 1.0,
+          "l1_median": 5.778947532176971,
+          "l2_median": 2.578163727473365
+        },
+        "fit_seconds": 13.334283828735352
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8733333333333333,
+          "balanced_accuracy": 0.874757783950076,
+          "f1_macro": 0.872892537206188,
+          "f1_pos": 0.8803777544596013,
+          "confusion_matrix": [
+            [
+              733,
+              184
+            ],
+            [
+              44,
+              839
+            ]
+          ],
+          "roc_auc": 0.960401921179285,
+          "pr_auc": 0.9597509415289607,
+          "log_loss": 0.2870395654053516,
+          "brier": 0.08505117659342815,
+          "ece": 0.08972872433713575,
+          "mean_predictive_entropy": 0.40249156362918154
+        },
+        "ood_test": {
+          "accuracy": 0.7844444444444445,
+          "balanced_accuracy": 0.7853590733590734,
+          "f1_macro": 0.7844178293616495,
+          "f1_pos": 0.7868131868131868,
+          "confusion_matrix": [
+            [
+              696,
+              229
+            ],
+            [
+              159,
+              716
+            ]
+          ],
+          "roc_auc": 0.8699366795366795,
+          "pr_auc": 0.7970976338105189,
+          "log_loss": 0.4195274681461376,
+          "brier": 0.1429080425885762,
+          "ece": 0.11270120414805578,
+          "mean_predictive_entropy": 0.37461719022118195
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.08939871059100257,
+        "ece_ood_minus_id": 0.02297247981092003,
+        "entropy_ood_minus_id": -0.027874373407999586
+      }
+    },
+    "poly3__svc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "poly3",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.20400220236698713,
+          "poly_gamma": 0.1,
+          "poly_coef0": 1.0,
+          "l1_median": 5.778947532176971,
+          "l2_median": 2.578163727473365
+        },
+        "fit_seconds": 0.06075906753540039
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8777777777777778,
+          "balanced_accuracy": 0.8800016302112729,
+          "f1_macro": 0.8765153376681856,
+          "f1_pos": 0.8890010090817356,
+          "confusion_matrix": [
+            [
+              699,
+              218
+            ],
+            [
+              2,
+              881
+            ]
+          ],
+          "roc_auc": 0.944740777882479,
+          "pr_auc": 0.9098681369631455
+        },
+        "ood_test": {
+          "accuracy": 0.9111111111111111,
+          "balanced_accuracy": 0.9135135135135135,
+          "f1_macro": 0.9107779051395644,
+          "f1_pos": 0.9162303664921466,
+          "confusion_matrix": [
+            [
+              765,
+              160
+            ],
+            [
+              0,
+              875
+            ]
+          ],
+          "roc_auc": 0.9332262548262548,
+          "pr_auc": 0.8839000806864536
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.03351188330224064
+      }
+    },
+    "poly3__gpc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "poly3",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.20400220236698713,
+          "poly_gamma": 0.1,
+          "poly_coef0": 1.0,
+          "l1_median": 5.778947532176971,
+          "l2_median": 2.578163727473365
+        },
+        "fit_seconds": 13.204263925552368
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8783333333333333,
+          "balanced_accuracy": 0.8796860855292814,
+          "f1_macro": 0.8779641749625952,
+          "f1_pos": 0.8846761453396524,
+          "confusion_matrix": [
+            [
+              741,
+              176
+            ],
+            [
+              43,
+              840
+            ]
+          ],
+          "roc_auc": 0.9646750507279758,
+          "pr_auc": 0.9634218428233924,
+          "log_loss": 0.265966122391806,
+          "brier": 0.07868653757634349,
+          "ece": 0.08019958741222655,
+          "mean_predictive_entropy": 0.37769112931498866
+        },
+        "ood_test": {
+          "accuracy": 0.81,
+          "balanced_accuracy": 0.8105328185328186,
+          "f1_macro": 0.8099978888654318,
+          "f1_pos": 0.8093645484949833,
+          "confusion_matrix": [
+            [
+              732,
+              193
+            ],
+            [
+              149,
+              726
+            ]
+          ],
+          "roc_auc": 0.886283861003861,
+          "pr_auc": 0.8152180505694772,
+          "log_loss": 0.3817922536534398,
+          "brier": 0.12722366423000755,
+          "ece": 0.11845659366751309,
+          "mean_predictive_entropy": 0.3553957159591049
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.06915326699646285,
+        "ece_ood_minus_id": 0.03825700625528654,
+        "entropy_ood_minus_id": -0.022295413355883753
+      }
+    },
+    "laplacian_med__svc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "laplacian_med",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.20400220236698713,
+          "poly_gamma": 0.1,
+          "poly_coef0": 1.0,
+          "l1_median": 5.778947532176971,
+          "l2_median": 2.578163727473365
+        },
+        "fit_seconds": 0.05318498611450195
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.9055555555555556,
+          "balanced_accuracy": 0.9064666282167342,
+          "f1_macro": 0.9054640540968049,
+          "f1_pos": 0.9084051724137931,
+          "confusion_matrix": [
+            [
+              787,
+              130
+            ],
+            [
+              40,
+              843
+            ]
+          ],
+          "roc_auc": 0.9745402989461672,
+          "pr_auc": 0.9674122036963272
+        },
+        "ood_test": {
+          "accuracy": 0.9233333333333333,
+          "balanced_accuracy": 0.9250965250965251,
+          "f1_macro": 0.9232237613186226,
+          "f1_pos": 0.9261241970021413,
+          "confusion_matrix": [
+            [
+              797,
+              128
+            ],
+            [
+              10,
+              865
+            ]
+          ],
+          "roc_auc": 0.9728938996138997,
+          "pr_auc": 0.9554611216522372
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.018629896879790886
+      }
+    },
+    "laplacian_med__gpc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "laplacian_med",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.20400220236698713,
+          "poly_gamma": 0.1,
+          "poly_coef0": 1.0,
+          "l1_median": 5.778947532176971,
+          "l2_median": 2.578163727473365
+        },
+        "fit_seconds": 15.186670064926147
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.905,
+          "balanced_accuracy": 0.9057114204944727,
+          "f1_macro": 0.9049598426001604,
+          "f1_pos": 0.9069134458356015,
+          "confusion_matrix": [
+            [
+              796,
+              121
+            ],
+            [
+              50,
+              833
+            ]
+          ],
+          "roc_auc": 0.9741142209998382,
+          "pr_auc": 0.9727899735207466,
+          "log_loss": 0.2213360481695355,
+          "brier": 0.06647694814465442,
+          "ece": 0.05143911955970658,
+          "mean_predictive_entropy": 0.3098101093851687
+        },
+        "ood_test": {
+          "accuracy": 0.905,
+          "balanced_accuracy": 0.9071660231660231,
+          "f1_macro": 0.9047346389247828,
+          "f1_pos": 0.9097625329815303,
+          "confusion_matrix": [
+            [
+              767,
+              158
+            ],
+            [
+              13,
+              862
+            ]
+          ],
+          "roc_auc": 0.9556274903474903,
+          "pr_auc": 0.9394865096642492,
+          "log_loss": 0.24541179867349744,
+          "brier": 0.07281492024247327,
+          "ece": 0.0458404295530762,
+          "mean_predictive_entropy": 0.31465437121569373
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.001454602671550398,
+        "ece_ood_minus_id": -0.00559869000663038,
+        "entropy_ood_minus_id": 0.004844261830525054
+      }
+    },
+    "matern15_med__svc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "matern15_med",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.20400220236698713,
+          "poly_gamma": 0.1,
+          "poly_coef0": 1.0,
+          "l1_median": 5.778947532176971,
+          "l2_median": 2.578163727473365
+        },
+        "fit_seconds": 0.04676413536071777
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8855555555555555,
+          "balanced_accuracy": 0.8876352179975324,
+          "f1_macro": 0.884549856527977,
+          "f1_pos": 0.8953252032520326,
+          "confusion_matrix": [
+            [
+              713,
+              204
+            ],
+            [
+              2,
+              881
+            ]
+          ],
+          "roc_auc": 0.9744377932373401,
+          "pr_auc": 0.9655388383134078
+        },
+        "ood_test": {
+          "accuracy": 0.9111111111111111,
+          "balanced_accuracy": 0.9134208494208493,
+          "f1_macro": 0.9108133819565563,
+          "f1_pos": 0.9159663865546218,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              3,
+              872
+            ]
+          ],
+          "roc_auc": 0.9670610038610039,
+          "pr_auc": 0.9524354713563012
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.025785631423316913
+      }
+    },
+    "matern15_med__gpc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "matern15_med",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.20400220236698713,
+          "poly_gamma": 0.1,
+          "poly_coef0": 1.0,
+          "l1_median": 5.778947532176971,
+          "l2_median": 2.578163727473365
+        },
+        "fit_seconds": 15.223549842834473
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8955555555555555,
+          "balanced_accuracy": 0.8969459473812262,
+          "f1_macro": 0.8952190924189898,
+          "f1_pos": 0.9011566771819137,
+          "confusion_matrix": [
+            [
+              755,
+              162
+            ],
+            [
+              26,
+              857
+            ]
+          ],
+          "roc_auc": 0.9706759572242442,
+          "pr_auc": 0.9683346174688467,
+          "log_loss": 0.2310428970671606,
+          "brier": 0.0693351285171799,
+          "ece": 0.04813369336134954,
+          "mean_predictive_entropy": 0.31949300135803754
+        },
+        "ood_test": {
+          "accuracy": 0.8788888888888889,
+          "balanced_accuracy": 0.8799382239382239,
+          "f1_macro": 0.8788673541963016,
+          "f1_pos": 0.8804824561403509,
+          "confusion_matrix": [
+            [
+              779,
+              146
+            ],
+            [
+              72,
+              803
+            ]
+          ],
+          "roc_auc": 0.9226328957528956,
+          "pr_auc": 0.8701041492313623,
+          "log_loss": 0.29904489541451706,
+          "brier": 0.09213109381481271,
+          "ece": 0.0800843195298525,
+          "mean_predictive_entropy": 0.3219332817840363
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.017007723443002387,
+        "ece_ood_minus_id": 0.03195062616850296,
+        "entropy_ood_minus_id": 0.002440280425998753
+      }
+    },
+    "matern25_med__svc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "matern25_med",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.20400220236698713,
+          "poly_gamma": 0.1,
+          "poly_coef0": 1.0,
+          "l1_median": 5.778947532176971,
+          "l2_median": 2.578163727473365
+        },
+        "fit_seconds": 0.053842782974243164
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8805555555555555,
+          "balanced_accuracy": 0.8827279115635085,
+          "f1_macro": 0.8793893172593887,
+          "f1_pos": 0.8912493677288822,
+          "confusion_matrix": [
+            [
+              704,
+              213
+            ],
+            [
+              2,
+              881
+            ]
+          ],
+          "roc_auc": 0.9725716953332731,
+          "pr_auc": 0.96396635361481
+        },
+        "ood_test": {
+          "accuracy": 0.9111111111111111,
+          "balanced_accuracy": 0.9134208494208493,
+          "f1_macro": 0.9108133819565563,
+          "f1_pos": 0.9159663865546218,
+          "confusion_matrix": [
+            [
+              768,
+              157
+            ],
+            [
+              3,
+              872
+            ]
+          ],
+          "roc_auc": 0.954704555984556,
+          "pr_auc": 0.9294536084099044
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.03069293785734084
+      }
+    },
+    "matern25_med__gpc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "matern25_med",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.20400220236698713,
+          "poly_gamma": 0.1,
+          "poly_coef0": 1.0,
+          "l1_median": 5.778947532176971,
+          "l2_median": 2.578163727473365
+        },
+        "fit_seconds": 15.41452407836914
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8988888888888888,
+          "balanced_accuracy": 0.9003644510201787,
+          "f1_macro": 0.8985098670962546,
+          "f1_pos": 0.9047120418848168,
+          "confusion_matrix": [
+            [
+              754,
+              163
+            ],
+            [
+              19,
+              864
+            ]
+          ],
+          "roc_auc": 0.9700041125784384,
+          "pr_auc": 0.9679083641004459,
+          "log_loss": 0.23453465592800773,
+          "brier": 0.0702122537652513,
+          "ece": 0.04756818189397033,
+          "mean_predictive_entropy": 0.32577659061328673
+        },
+        "ood_test": {
+          "accuracy": 0.8666666666666667,
+          "balanced_accuracy": 0.8672741312741312,
+          "f1_macro": 0.8666660082272011,
+          "f1_pos": 0.8663697104677061,
+          "confusion_matrix": [
+            [
+              782,
+              143
+            ],
+            [
+              97,
+              778
+            ]
+          ],
+          "roc_auc": 0.9157399227799229,
+          "pr_auc": 0.8448219262598357,
+          "log_loss": 0.3123107799507378,
+          "brier": 0.09678924870049425,
+          "ece": 0.08707868607374901,
+          "mean_predictive_entropy": 0.32295313242630275
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.03309031974604748,
+        "ece_ood_minus_id": 0.03951050417977868,
+        "entropy_ood_minus_id": -0.0028234581869839848
+      }
+    },
+    "zz_r1_full__svc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "zz_r1_full",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.09801840782165527
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.885,
+          "balanced_accuracy": 0.885452340402934,
+          "f1_macro": 0.884994001230311,
+          "f1_pos": 0.8858246001103144,
+          "confusion_matrix": [
+            [
+              790,
+              127
+            ],
+            [
+              80,
+              803
+            ]
+          ],
+          "roc_auc": 0.9596226307904919,
+          "pr_auc": 0.9603255424828714
+        },
+        "ood_test": {
+          "accuracy": 0.9305555555555556,
+          "balanced_accuracy": 0.931011583011583,
+          "f1_macro": 0.9305493607300157,
+          "f1_pos": 0.9298934380257993,
+          "confusion_matrix": [
+            [
+              846,
+              79
+            ],
+            [
+              46,
+              829
+            ]
+          ],
+          "roc_auc": 0.9712074131274132,
+          "pr_auc": 0.9624512742973077
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.045559242608649075
+      }
+    },
+    "zz_r1_full__gpc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "zz_r1_full",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 15.321380853652954
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8838888888888888,
+          "balanced_accuracy": 0.8841728715554068,
+          "f1_macro": 0.8838885663571288,
+          "f1_pos": 0.8836950473010573,
+          "confusion_matrix": [
+            [
+              797,
+              120
+            ],
+            [
+              89,
+              794
+            ]
+          ],
+          "roc_auc": 0.9672698036706923,
+          "pr_auc": 0.9659979427037362,
+          "log_loss": 0.2964018901399318,
+          "brier": 0.08838781626420841,
+          "ece": 0.10201358116647566,
+          "mean_predictive_entropy": 0.42260235726752393
+        },
+        "ood_test": {
+          "accuracy": 0.8805555555555555,
+          "balanced_accuracy": 0.880138996138996,
+          "f1_macro": 0.8803694266295183,
+          "f1_pos": 0.8756506651243493,
+          "confusion_matrix": [
+            [
+              828,
+              97
+            ],
+            [
+              118,
+              757
+            ]
+          ],
+          "roc_auc": 0.9534999227799227,
+          "pr_auc": 0.9340468621832503,
+          "log_loss": 0.3302958550245535,
+          "brier": 0.09898240046618546,
+          "ece": 0.1690761008749183,
+          "mean_predictive_entropy": 0.46123338673157543
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.004033875416410759,
+        "ece_ood_minus_id": 0.06706251970844265,
+        "entropy_ood_minus_id": 0.0386310294640515
+      }
+    },
+    "zz_r2_full__svc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "zz_r2_full",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.13112545013427734
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8716666666666667,
+          "balanced_accuracy": 0.8707705588784147,
+          "f1_macro": 0.8711406900078251,
+          "f1_pos": 0.8629080118694362,
+          "confusion_matrix": [
+            [
+              842,
+              75
+            ],
+            [
+              156,
+              727
+            ]
+          ],
+          "roc_auc": 0.9523052051904938,
+          "pr_auc": 0.953372943263258
+        },
+        "ood_test": {
+          "accuracy": 0.7922222222222223,
+          "balanced_accuracy": 0.787984555984556,
+          "f1_macro": 0.7857009158962044,
+          "f1_pos": 0.7483176312247645,
+          "confusion_matrix": [
+            [
+              870,
+              55
+            ],
+            [
+              319,
+              556
+            ]
+          ],
+          "roc_auc": 0.9589572200772201,
+          "pr_auc": 0.9464307216285083
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.08278600289385873
+      }
+    },
+    "zz_r2_full__gpc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "zz_r2_full",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 15.226773738861084
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8605555555555555,
+          "balanced_accuracy": 0.8591515985333038,
+          "f1_macro": 0.8594026135927612,
+          "f1_pos": 0.8466707391569945,
+          "confusion_matrix": [
+            [
+              856,
+              61
+            ],
+            [
+              190,
+              693
+            ]
+          ],
+          "roc_auc": 0.9561090314939528,
+          "pr_auc": 0.956824252994152,
+          "log_loss": 0.3737110687621275,
+          "brier": 0.11890211599439353,
+          "ece": 0.1500289164464947,
+          "mean_predictive_entropy": 0.484712920651693
+        },
+        "ood_test": {
+          "accuracy": 0.7716666666666666,
+          "balanced_accuracy": 0.7668725868725869,
+          "f1_macro": 0.7627476629939269,
+          "f1_pos": 0.7167470709855273,
+          "confusion_matrix": [
+            [
+              869,
+              56
+            ],
+            [
+              355,
+              520
+            ]
+          ],
+          "roc_auc": 0.9518282625482627,
+          "pr_auc": 0.9399567932584488,
+          "log_loss": 0.41731877404808765,
+          "brier": 0.1337015690615826,
+          "ece": 0.19693001853200556,
+          "mean_predictive_entropy": 0.527688417515479
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.09227901166071695,
+        "ece_ood_minus_id": 0.046901102085510876,
+        "entropy_ood_minus_id": 0.04297549686378599
+      }
+    },
+    "pauli_xz_r1_full__svc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "pauli_xz_r1_full",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.0575258731842041
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8961111111111111,
+          "balanced_accuracy": 0.8967983638606861,
+          "f1_macro": 0.8960718172765938,
+          "f1_pos": 0.8980926430517712,
+          "confusion_matrix": [
+            [
+              789,
+              128
+            ],
+            [
+              59,
+              824
+            ]
+          ],
+          "roc_auc": 0.9706043267289193,
+          "pr_auc": 0.9582856543496026
+        },
+        "ood_test": {
+          "accuracy": 0.9388888888888889,
+          "balanced_accuracy": 0.9402934362934363,
+          "f1_macro": 0.9388523512815065,
+          "f1_pos": 0.940347071583514,
+          "confusion_matrix": [
+            [
+              823,
+              102
+            ],
+            [
+              8,
+              867
+            ]
+          ],
+          "roc_auc": 0.9718832432432433,
+          "pr_auc": 0.9525929048236623
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.04349507243275019
+      }
+    },
+    "pauli_xz_r1_full__gpc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "pauli_xz_r1_full",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 15.369754314422607
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8977777777777778,
+          "balanced_accuracy": 0.898560103543116,
+          "f1_macro": 0.897716660325429,
+          "f1_pos": 0.9002169197396963,
+          "confusion_matrix": [
+            [
+              786,
+              131
+            ],
+            [
+              53,
+              830
+            ]
+          ],
+          "roc_auc": 0.9721270922588429,
+          "pr_auc": 0.9694689955810516,
+          "log_loss": 0.22555307229136387,
+          "brier": 0.06729469390684677,
+          "ece": 0.04735109855697655,
+          "mean_predictive_entropy": 0.31295352004914345
+        },
+        "ood_test": {
+          "accuracy": 0.9138888888888889,
+          "balanced_accuracy": 0.915907335907336,
+          "f1_macro": 0.9136964372713845,
+          "f1_pos": 0.9177718832891246,
+          "confusion_matrix": [
+            [
+              780,
+              145
+            ],
+            [
+              10,
+              865
+            ]
+          ],
+          "roc_auc": 0.9504345945945947,
+          "pr_auc": 0.924086898769143,
+          "log_loss": 0.24938636093552305,
+          "brier": 0.07335277167053553,
+          "ece": 0.04469977062138474,
+          "mean_predictive_entropy": 0.3187220991510844
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.017347232364219978,
+        "ece_ood_minus_id": -0.0026513279355918073,
+        "entropy_ood_minus_id": 0.005768579101940952
+      }
+    },
+    "zmap_r2__svc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "zmap_r2",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.05607795715332031
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8983333333333333,
+          "balanced_accuracy": 0.8990423743780188,
+          "f1_macro": 0.8982903578703471,
+          "f1_pos": 0.9003810560696788,
+          "confusion_matrix": [
+            [
+              790,
+              127
+            ],
+            [
+              56,
+              827
+            ]
+          ],
+          "roc_auc": 0.9698867867671305,
+          "pr_auc": 0.9620053327899284
+        },
+        "ood_test": {
+          "accuracy": 0.9377777777777778,
+          "balanced_accuracy": 0.938965250965251,
+          "f1_macro": 0.9377604890247291,
+          "f1_pos": 0.9387978142076503,
+          "confusion_matrix": [
+            [
+              829,
+              96
+            ],
+            [
+              16,
+              859
+            ]
+          ],
+          "roc_auc": 0.9732089575289576,
+          "pr_auc": 0.9586803646811795
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.03992287658723215
+      }
+    },
+    "zmap_r2__gpc__d10": {
+      "config": {
+        "dim": 10,
+        "kernel": "zmap_r2",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 15.132205724716187
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.905,
+          "balanced_accuracy": 0.9055644544782027,
+          "f1_macro": 0.9049844866646437,
+          "f1_pos": 0.9061985737794843,
+          "confusion_matrix": [
+            [
+              803,
+              114
+            ],
+            [
+              57,
+              826
+            ]
+          ],
+          "roc_auc": 0.973054583672446,
+          "pr_auc": 0.9708323141900493,
+          "log_loss": 0.22517820001373656,
+          "brier": 0.06756486316399077,
+          "ece": 0.04372280323928847,
+          "mean_predictive_entropy": 0.30973259309785584
+        },
+        "ood_test": {
+          "accuracy": 0.9133333333333333,
+          "balanced_accuracy": 0.9152123552123552,
+          "f1_macro": 0.9131785553505261,
+          "f1_pos": 0.9168443496801706,
+          "confusion_matrix": [
+            [
+              784,
+              141
+            ],
+            [
+              15,
+              860
+            ]
+          ],
+          "roc_auc": 0.9585569111969112,
+          "pr_auc": 0.9309008933923738,
+          "log_loss": 0.23569567045232864,
+          "brier": 0.06693367121124677,
+          "ece": 0.049211603788914524,
+          "mean_predictive_entropy": 0.32464836396990815
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.009647900734152559,
+        "ece_ood_minus_id": 0.005488800549626055,
+        "entropy_ood_minus_id": 0.014915770872052314
+      }
+    }
+  },
+  "dim_12": {
+    "linear__svc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "linear",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.19263363724890295,
+          "poly_gamma": 0.08333333333333333,
+          "poly_coef0": 1.0,
+          "l1_median": 6.2471794337034225,
+          "l2_median": 2.62219769743405
+        },
+        "fit_seconds": 0.08997249603271484
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8633333333333333,
+          "balanced_accuracy": 0.8647122244850323,
+          "f1_macro": 0.8628930677397421,
+          "f1_pos": 0.8706624605678234,
+          "confusion_matrix": [
+            [
+              726,
+              191
+            ],
+            [
+              55,
+              828
+            ]
+          ],
+          "roc_auc": 0.9241037851776746,
+          "pr_auc": 0.8880391998189163
+        },
+        "ood_test": {
+          "accuracy": 0.7661111111111111,
+          "balanced_accuracy": 0.7666254826254826,
+          "f1_macro": 0.7661093063989691,
+          "f1_pos": 0.7654596100278551,
+          "confusion_matrix": [
+            [
+              692,
+              233
+            ],
+            [
+              188,
+              687
+            ]
+          ],
+          "roc_auc": 0.8761488803088803,
+          "pr_auc": 0.8349023990736626
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.09808674185954969
+      }
+    },
+    "linear__gpc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "linear",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.19263363724890295,
+          "poly_gamma": 0.08333333333333333,
+          "poly_coef0": 1.0,
+          "l1_median": 6.2471794337034225,
+          "l2_median": 2.62219769743405
+        },
+        "fit_seconds": 11.361370086669922
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8661111111111112,
+          "balanced_accuracy": 0.8669766126432764,
+          "f1_macro": 0.8659949320259447,
+          "f1_pos": 0.8699406368051807,
+          "confusion_matrix": [
+            [
+              753,
+              164
+            ],
+            [
+              77,
+              806
+            ]
+          ],
+          "roc_auc": 0.9397896286452821,
+          "pr_auc": 0.9436541768621892,
+          "log_loss": 0.3446282455692382,
+          "brier": 0.10307033817734687,
+          "ece": 0.0945334803266004,
+          "mean_predictive_entropy": 0.45291815957740106
+        },
+        "ood_test": {
+          "accuracy": 0.7144444444444444,
+          "balanced_accuracy": 0.7131428571428571,
+          "f1_macro": 0.7131696428571428,
+          "f1_pos": 0.694047619047619,
+          "confusion_matrix": [
+            [
+              703,
+              222
+            ],
+            [
+              292,
+              583
+            ]
+          ],
+          "roc_auc": 0.8685738996138995,
+          "pr_auc": 0.8291099688183938,
+          "log_loss": 0.5135045175855809,
+          "brier": 0.17803378810123102,
+          "ece": 0.1927612210012816,
+          "mean_predictive_entropy": 0.3908607103659371
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.15383375550041933,
+        "ece_ood_minus_id": 0.0982277406746812,
+        "entropy_ood_minus_id": -0.062057449211463944
+      }
+    },
+    "rbf_gscale__svc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "rbf_gscale",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.19263363724890295,
+          "poly_gamma": 0.08333333333333333,
+          "poly_coef0": 1.0,
+          "l1_median": 6.2471794337034225,
+          "l2_median": 2.62219769743405
+        },
+        "fit_seconds": 0.054732561111450195
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8933333333333333,
+          "balanced_accuracy": 0.8951848252030663,
+          "f1_macro": 0.8926269245443168,
+          "f1_pos": 0.9013360739979445,
+          "confusion_matrix": [
+            [
+              731,
+              186
+            ],
+            [
+              6,
+              877
+            ]
+          ],
+          "roc_auc": 0.973831404044159,
+          "pr_auc": 0.9626700690920544
+        },
+        "ood_test": {
+          "accuracy": 0.925,
+          "balanced_accuracy": 0.9268416988416988,
+          "f1_macro": 0.9248764402933096,
+          "f1_pos": 0.9279231179925254,
+          "confusion_matrix": [
+            [
+              796,
+              129
+            ],
+            [
+              6,
+              869
+            ]
+          ],
+          "roc_auc": 0.9721649420849421,
+          "pr_auc": 0.9540823798767656
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.031656873638632455
+      }
+    },
+    "rbf_gscale__gpc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "rbf_gscale",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.19263363724890295,
+          "poly_gamma": 0.08333333333333333,
+          "poly_coef0": 1.0,
+          "l1_median": 6.2471794337034225,
+          "l2_median": 2.62219769743405
+        },
+        "fit_seconds": 15.065742254257202
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8966666666666666,
+          "balanced_accuracy": 0.8979314841962132,
+          "f1_macro": 0.8964076858813701,
+          "f1_pos": 0.9015873015873016,
+          "confusion_matrix": [
+            [
+              762,
+              155
+            ],
+            [
+              31,
+              852
+            ]
+          ],
+          "roc_auc": 0.970704362420666,
+          "pr_auc": 0.9679325887885446,
+          "log_loss": 0.2245231365532079,
+          "brier": 0.06788136780072206,
+          "ece": 0.048497716643201974,
+          "mean_predictive_entropy": 0.3039343451668492
+        },
+        "ood_test": {
+          "accuracy": 0.9122222222222223,
+          "balanced_accuracy": 0.9141312741312742,
+          "f1_macro": 0.9120570849706671,
+          "f1_pos": 0.9158679446219382,
+          "confusion_matrix": [
+            [
+              782,
+              143
+            ],
+            [
+              15,
+              860
+            ]
+          ],
+          "roc_auc": 0.9603706563706564,
+          "pr_auc": 0.9450526327798008,
+          "log_loss": 0.23927636465874746,
+          "brier": 0.07185962069728823,
+          "ece": 0.06556618912297894,
+          "mean_predictive_entropy": 0.30108141793617216
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.016199789935060993,
+        "ece_ood_minus_id": 0.01706847247977697,
+        "entropy_ood_minus_id": -0.002852927230677038
+      }
+    },
+    "poly2__svc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "poly2",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.19263363724890295,
+          "poly_gamma": 0.08333333333333333,
+          "poly_coef0": 1.0,
+          "l1_median": 6.2471794337034225,
+          "l2_median": 2.62219769743405
+        },
+        "fit_seconds": 0.06126880645751953
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8777777777777778,
+          "balanced_accuracy": 0.8800016302112729,
+          "f1_macro": 0.8765153376681856,
+          "f1_pos": 0.8890010090817356,
+          "confusion_matrix": [
+            [
+              699,
+              218
+            ],
+            [
+              2,
+              881
+            ]
+          ],
+          "roc_auc": 0.9408183907591721,
+          "pr_auc": 0.894933692868837
+        },
+        "ood_test": {
+          "accuracy": 0.9094444444444445,
+          "balanced_accuracy": 0.9118918918918919,
+          "f1_macro": 0.909086148465976,
+          "f1_pos": 0.9147935180345008,
+          "confusion_matrix": [
+            [
+              762,
+              163
+            ],
+            [
+              0,
+              875
+            ]
+          ],
+          "roc_auc": 0.9295728185328185,
+          "pr_auc": 0.8936527858274926
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.031890261680619036
+      }
+    },
+    "poly2__gpc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "poly2",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.19263363724890295,
+          "poly_gamma": 0.08333333333333333,
+          "poly_coef0": 1.0,
+          "l1_median": 6.2471794337034225,
+          "l2_median": 2.62219769743405
+        },
+        "fit_seconds": 13.145305871963501
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8705555555555555,
+          "balanced_accuracy": 0.872052497743022,
+          "f1_macro": 0.870043390138481,
+          "f1_pos": 0.8782017773131208,
+          "confusion_matrix": [
+            [
+              727,
+              190
+            ],
+            [
+              43,
+              840
+            ]
+          ],
+          "roc_auc": 0.9615628292069639,
+          "pr_auc": 0.9604187815590431,
+          "log_loss": 0.2897963990085331,
+          "brier": 0.08569567266385682,
+          "ece": 0.09666866885382748,
+          "mean_predictive_entropy": 0.4093544204991209
+        },
+        "ood_test": {
+          "accuracy": 0.7872222222222223,
+          "balanced_accuracy": 0.7885868725868725,
+          "f1_macro": 0.7870644264468825,
+          "f1_pos": 0.7928610059491618,
+          "confusion_matrix": [
+            [
+              684,
+              241
+            ],
+            [
+              142,
+              733
+            ]
+          ],
+          "roc_auc": 0.8739706563706565,
+          "pr_auc": 0.8207839519076477,
+          "log_loss": 0.40497991838590214,
+          "brier": 0.13843743374371453,
+          "ece": 0.1048351893110033,
+          "mean_predictive_entropy": 0.3783478906518167
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.08346562515614941,
+        "ece_ood_minus_id": 0.008166520457175822,
+        "entropy_ood_minus_id": -0.03100652984730423
+      }
+    },
+    "poly3__svc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "poly3",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.19263363724890295,
+          "poly_gamma": 0.08333333333333333,
+          "poly_coef0": 1.0,
+          "l1_median": 6.2471794337034225,
+          "l2_median": 2.62219769743405
+        },
+        "fit_seconds": 0.055994510650634766
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8777777777777778,
+          "balanced_accuracy": 0.8800016302112729,
+          "f1_macro": 0.8765153376681856,
+          "f1_pos": 0.8890010090817356,
+          "confusion_matrix": [
+            [
+              699,
+              218
+            ],
+            [
+              2,
+              881
+            ]
+          ],
+          "roc_auc": 0.9470959391684193,
+          "pr_auc": 0.8970868718348275
+        },
+        "ood_test": {
+          "accuracy": 0.9111111111111111,
+          "balanced_accuracy": 0.9135135135135135,
+          "f1_macro": 0.9107779051395644,
+          "f1_pos": 0.9162303664921466,
+          "confusion_matrix": [
+            [
+              765,
+              160
+            ],
+            [
+              0,
+              875
+            ]
+          ],
+          "roc_auc": 0.9465229343629343,
+          "pr_auc": 0.92132351686229
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.03351188330224064
+      }
+    },
+    "poly3__gpc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "poly3",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.19263363724890295,
+          "poly_gamma": 0.08333333333333333,
+          "poly_coef0": 1.0,
+          "l1_median": 6.2471794337034225,
+          "l2_median": 2.62219769743405
+        },
+        "fit_seconds": 12.895708560943604
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8716666666666667,
+          "balanced_accuracy": 0.8732059957194604,
+          "f1_macro": 0.8711221577833012,
+          "f1_pos": 0.8794992175273866,
+          "confusion_matrix": [
+            [
+              726,
+              191
+            ],
+            [
+              40,
+              843
+            ]
+          ],
+          "roc_auc": 0.9642353876877058,
+          "pr_auc": 0.9626547632204359,
+          "log_loss": 0.2689358095292305,
+          "brier": 0.07941574627721548,
+          "ece": 0.08874857943958063,
+          "mean_predictive_entropy": 0.38382319481895655
+        },
+        "ood_test": {
+          "accuracy": 0.8116666666666666,
+          "balanced_accuracy": 0.8128030888030888,
+          "f1_macro": 0.8116033444574426,
+          "f1_pos": 0.8150572831423896,
+          "confusion_matrix": [
+            [
+              714,
+              211
+            ],
+            [
+              128,
+              747
+            ]
+          ],
+          "roc_auc": 0.9075928957528957,
+          "pr_auc": 0.8816516159045183,
+          "log_loss": 0.35737710496891845,
+          "brier": 0.11962452617664389,
+          "ece": 0.10854343138323579,
+          "mean_predictive_entropy": 0.3573597509607325
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.060402906916371624,
+        "ece_ood_minus_id": 0.019794851943655156,
+        "entropy_ood_minus_id": -0.026463443858224023
+      }
+    },
+    "laplacian_med__svc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "laplacian_med",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.19263363724890295,
+          "poly_gamma": 0.08333333333333333,
+          "poly_coef0": 1.0,
+          "l1_median": 6.2471794337034225,
+          "l2_median": 2.62219769743405
+        },
+        "fit_seconds": 0.0564579963684082
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.915,
+          "balanced_accuracy": 0.9157989702498792,
+          "f1_macro": 0.9149468417761101,
+          "f1_pos": 0.9170731707317074,
+          "confusion_matrix": [
+            [
+              801,
+              116
+            ],
+            [
+              37,
+              846
+            ]
+          ],
+          "roc_auc": 0.9774709742117867,
+          "pr_auc": 0.973808046287529
+        },
+        "ood_test": {
+          "accuracy": 0.9366666666666666,
+          "balanced_accuracy": 0.9380694980694981,
+          "f1_macro": 0.9366288004190158,
+          "f1_pos": 0.938177874186551,
+          "confusion_matrix": [
+            [
+              821,
+              104
+            ],
+            [
+              10,
+              865
+            ]
+          ],
+          "roc_auc": 0.9793223166023165,
+          "pr_auc": 0.9593584404719854
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.022270527819618913
+      }
+    },
+    "laplacian_med__gpc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "laplacian_med",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.19263363724890295,
+          "poly_gamma": 0.08333333333333333,
+          "poly_coef0": 1.0,
+          "l1_median": 6.2471794337034225,
+          "l2_median": 2.62219769743405
+        },
+        "fit_seconds": 15.182302474975586
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.9133333333333333,
+          "balanced_accuracy": 0.9139322548415423,
+          "f1_macro": 0.9133152472552916,
+          "f1_pos": 0.9145673603504929,
+          "confusion_matrix": [
+            [
+              809,
+              108
+            ],
+            [
+              48,
+              835
+            ]
+          ],
+          "roc_auc": 0.9768065396172215,
+          "pr_auc": 0.975676070524953,
+          "log_loss": 0.2144232675547227,
+          "brier": 0.06453373325934336,
+          "ece": 0.054008863398346714,
+          "mean_predictive_entropy": 0.30463495292763254
+        },
+        "ood_test": {
+          "accuracy": 0.9116666666666666,
+          "balanced_accuracy": 0.9138687258687259,
+          "f1_macro": 0.9114093984661011,
+          "f1_pos": 0.9161834475487612,
+          "confusion_matrix": [
+            [
+              772,
+              153
+            ],
+            [
+              6,
+              869
+            ]
+          ],
+          "roc_auc": 0.9711728185328186,
+          "pr_auc": 0.9580765903175745,
+          "log_loss": 0.21836764303687933,
+          "brier": 0.06283085123670386,
+          "ece": 0.06554407778482453,
+          "mean_predictive_entropy": 0.3123274760770471
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 6.352897281636238e-05,
+        "ece_ood_minus_id": 0.011535214386477817,
+        "entropy_ood_minus_id": 0.007692523149414543
+      }
+    },
+    "matern15_med__svc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "matern15_med",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.19263363724890295,
+          "poly_gamma": 0.08333333333333333,
+          "poly_coef0": 1.0,
+          "l1_median": 6.2471794337034225,
+          "l2_median": 2.62219769743405
+        },
+        "fit_seconds": 0.05226492881774902
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8866666666666667,
+          "balanced_accuracy": 0.8885997596673381,
+          "f1_macro": 0.8858309776126736,
+          "f1_pos": 0.8955987717502559,
+          "confusion_matrix": [
+            [
+              721,
+              196
+            ],
+            [
+              8,
+              875
+            ]
+          ],
+          "roc_auc": 0.9735584671568003,
+          "pr_auc": 0.9641830911821356
+        },
+        "ood_test": {
+          "accuracy": 0.9327777777777778,
+          "balanced_accuracy": 0.9345637065637066,
+          "f1_macro": 0.9326788530924608,
+          "f1_pos": 0.9352594970572499,
+          "confusion_matrix": [
+            [
+              805,
+              120
+            ],
+            [
+              1,
+              874
+            ]
+          ],
+          "roc_auc": 0.972129111969112,
+          "pr_auc": 0.9541278458309526
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.04596394689636851
+      }
+    },
+    "matern15_med__gpc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "matern15_med",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.19263363724890295,
+          "poly_gamma": 0.08333333333333333,
+          "poly_coef0": 1.0,
+          "l1_median": 6.2471794337034225,
+          "l2_median": 2.62219769743405
+        },
+        "fit_seconds": 14.800790786743164
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8938888888888888,
+          "balanced_accuracy": 0.8952681882795219,
+          "f1_macro": 0.8935537474623034,
+          "f1_pos": 0.8995265649658075,
+          "confusion_matrix": [
+            [
+              754,
+              163
+            ],
+            [
+              28,
+              855
+            ]
+          ],
+          "roc_auc": 0.9698744366817296,
+          "pr_auc": 0.9667484093346851,
+          "log_loss": 0.23086821329414975,
+          "brier": 0.06948969096291988,
+          "ece": 0.05168513759398126,
+          "mean_predictive_entropy": 0.31750442886220126
+        },
+        "ood_test": {
+          "accuracy": 0.9033333333333333,
+          "balanced_accuracy": 0.9052355212355212,
+          "f1_macro": 0.9031514733221271,
+          "f1_pos": 0.9073482428115016,
+          "confusion_matrix": [
+            [
+              774,
+              151
+            ],
+            [
+              23,
+              852
+            ]
+          ],
+          "roc_auc": 0.9547391505791506,
+          "pr_auc": 0.9399633542234418,
+          "log_loss": 0.24976216724946892,
+          "brier": 0.07539872070934173,
+          "ece": 0.0640812680836297,
+          "mean_predictive_entropy": 0.3179876164653538
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.009967332955999275,
+        "ece_ood_minus_id": 0.012396130489648438,
+        "entropy_ood_minus_id": 0.00048318760315252396
+      }
+    },
+    "matern25_med__svc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "matern25_med",
+        "family": "classical_ext",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.19263363724890295,
+          "poly_gamma": 0.08333333333333333,
+          "poly_coef0": 1.0,
+          "l1_median": 6.2471794337034225,
+          "l2_median": 2.62219769743405
+        },
+        "fit_seconds": 0.04953575134277344
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.885,
+          "balanced_accuracy": 0.8870899617270853,
+          "f1_macro": 0.8839772450916863,
+          "f1_pos": 0.8948704926358557,
+          "confusion_matrix": [
+            [
+              712,
+              205
+            ],
+            [
+              2,
+              881
+            ]
+          ],
+          "roc_auc": 0.9709316039920416,
+          "pr_auc": 0.9594003190224722
+        },
+        "ood_test": {
+          "accuracy": 0.9133333333333333,
+          "balanced_accuracy": 0.9156447876447877,
+          "f1_macro": 0.9130430474076423,
+          "f1_pos": 0.9180672268907563,
+          "confusion_matrix": [
+            [
+              770,
+              155
+            ],
+            [
+              1,
+              874
+            ]
+          ],
+          "roc_auc": 0.9707873359073359,
+          "pr_auc": 0.9544346831585337
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.02855482591770242
+      }
+    },
+    "matern25_med__gpc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "matern25_med",
+        "family": "classical_ext",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": {
+          "rbf_gamma": 0.19263363724890295,
+          "poly_gamma": 0.08333333333333333,
+          "poly_coef0": 1.0,
+          "l1_median": 6.2471794337034225,
+          "l2_median": 2.62219769743405
+        },
+        "fit_seconds": 14.87875247001648
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8911111111111111,
+          "balanced_accuracy": 0.8925629020724679,
+          "f1_macro": 0.8907176948124359,
+          "f1_pos": 0.8972746331236897,
+          "confusion_matrix": [
+            [
+              748,
+              169
+            ],
+            [
+              27,
+              856
+            ]
+          ],
+          "roc_auc": 0.9685702676634009,
+          "pr_auc": 0.9657586583963235,
+          "log_loss": 0.23449511930373584,
+          "brier": 0.07040733699815621,
+          "ece": 0.051484116172929854,
+          "mean_predictive_entropy": 0.32379967427502226
+        },
+        "ood_test": {
+          "accuracy": 0.9005555555555556,
+          "balanced_accuracy": 0.9023474903474904,
+          "f1_macro": 0.9004005924031804,
+          "f1_pos": 0.9043292357028327,
+          "confusion_matrix": [
+            [
+              775,
+              150
+            ],
+            [
+              29,
+              846
+            ]
+          ],
+          "roc_auc": 0.9494918918918919,
+          "pr_auc": 0.9319477614566674,
+          "log_loss": 0.2624277276958303,
+          "brier": 0.08034488653063478,
+          "ece": 0.08183685378464943,
+          "mean_predictive_entropy": 0.31882826857973756
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.009784588275022488,
+        "ece_ood_minus_id": 0.030352737611719575,
+        "entropy_ood_minus_id": -0.004971405695284703
+      }
+    },
+    "zz_r1_full__svc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "zz_r1_full",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.12523937225341797
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8883333333333333,
+          "balanced_accuracy": 0.8888288537515237,
+          "f1_macro": 0.8883233720538652,
+          "f1_pos": 0.8893780957622455,
+          "confusion_matrix": [
+            [
+              791,
+              126
+            ],
+            [
+              75,
+              808
+            ]
+          ],
+          "roc_auc": 0.963647523622626,
+          "pr_auc": 0.9619761952061613
+        },
+        "ood_test": {
+          "accuracy": 0.9266666666666666,
+          "balanced_accuracy": 0.9272586872586872,
+          "f1_macro": 0.9266652180783819,
+          "f1_pos": 0.9263392857142857,
+          "confusion_matrix": [
+            [
+              838,
+              87
+            ],
+            [
+              45,
+              830
+            ]
+          ],
+          "roc_auc": 0.9704673359073359,
+          "pr_auc": 0.9605423073152158
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.03842983350716356
+      }
+    },
+    "zz_r1_full__gpc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "zz_r1_full",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 14.810230016708374
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8911111111111111,
+          "balanced_accuracy": 0.8912192127808565,
+          "f1_macro": 0.8910976663785652,
+          "f1_pos": 0.8898876404494382,
+          "confusion_matrix": [
+            [
+              812,
+              105
+            ],
+            [
+              91,
+              792
+            ]
+          ],
+          "roc_auc": 0.9678626077699326,
+          "pr_auc": 0.9662383539008466,
+          "log_loss": 0.3183255351163447,
+          "brier": 0.09517911153171836,
+          "ece": 0.12014989860773853,
+          "mean_predictive_entropy": 0.45644426490822676
+        },
+        "ood_test": {
+          "accuracy": 0.88,
+          "balanced_accuracy": 0.8794749034749034,
+          "f1_macro": 0.8797742427447095,
+          "f1_pos": 0.8745644599303136,
+          "confusion_matrix": [
+            [
+              831,
+              94
+            ],
+            [
+              122,
+              753
+            ]
+          ],
+          "roc_auc": 0.9565318918918919,
+          "pr_auc": 0.9462305252756803,
+          "log_loss": 0.3456598546849052,
+          "brier": 0.10420328991121774,
+          "ece": 0.1728015509986768,
+          "mean_predictive_entropy": 0.4860187024096766
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.011744309305953049,
+        "ece_ood_minus_id": 0.052651652390938275,
+        "entropy_ood_minus_id": 0.029574437501449835
+      }
+    },
+    "zz_r2_full__svc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "zz_r2_full",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.14290499687194824
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8505555555555555,
+          "balanced_accuracy": 0.8486651410194501,
+          "f1_macro": 0.8485132428897115,
+          "f1_pos": 0.830923947203017,
+          "confusion_matrix": [
+            [
+              870,
+              47
+            ],
+            [
+              222,
+              661
+            ]
+          ],
+          "roc_auc": 0.9526275424194558,
+          "pr_auc": 0.9538060224205936
+        },
+        "ood_test": {
+          "accuracy": 0.7811111111111111,
+          "balanced_accuracy": 0.7758764478764479,
+          "f1_macro": 0.7710127744650184,
+          "f1_pos": 0.7229254571026723,
+          "confusion_matrix": [
+            [
+              892,
+              33
+            ],
+            [
+              361,
+              514
+            ]
+          ],
+          "roc_auc": 0.9655944401544402,
+          "pr_auc": 0.9561849793325826
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.07278869314300218
+      }
+    },
+    "zz_r2_full__gpc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "zz_r2_full",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 12.928293466567993
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8611111111111112,
+          "balanced_accuracy": 0.8598018305296582,
+          "f1_macro": 0.8600869823684725,
+          "f1_pos": 0.8481166464155528,
+          "confusion_matrix": [
+            [
+              852,
+              65
+            ],
+            [
+              185,
+              698
+            ]
+          ],
+          "roc_auc": 0.9549789986797759,
+          "pr_auc": 0.9559698123965583,
+          "log_loss": 0.4156920342888529,
+          "brier": 0.1343150545642194,
+          "ece": 0.1427381578892144,
+          "mean_predictive_entropy": 0.5282868809716181
+        },
+        "ood_test": {
+          "accuracy": 0.7916666666666666,
+          "balanced_accuracy": 0.7872586872586873,
+          "f1_macro": 0.7846460618145563,
+          "f1_pos": 0.7457627118644068,
+          "confusion_matrix": [
+            [
+              875,
+              50
+            ],
+            [
+              325,
+              550
+            ]
+          ],
+          "roc_auc": 0.9614220849420848,
+          "pr_auc": 0.9520505434172898,
+          "log_loss": 0.44451906044313194,
+          "brier": 0.1439511076687994,
+          "ece": 0.2427407008310641,
+          "mean_predictive_entropy": 0.5606309268581195
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": 0.07254314327097089,
+        "ece_ood_minus_id": 0.10000254294184971,
+        "entropy_ood_minus_id": 0.032344045886501416
+      }
+    },
+    "pauli_xz_r1_full__svc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "pauli_xz_r1_full",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.06515169143676758
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.8983333333333333,
+          "balanced_accuracy": 0.8988744132165674,
+          "f1_macro": 0.8983194934866134,
+          "f1_pos": 0.899505766062603,
+          "confusion_matrix": [
+            [
+              798,
+              119
+            ],
+            [
+              64,
+              819
+            ]
+          ],
+          "roc_auc": 0.9709106088468602,
+          "pr_auc": 0.9628342164100693
+        },
+        "ood_test": {
+          "accuracy": 0.9344444444444444,
+          "balanced_accuracy": 0.9357528957528958,
+          "f1_macro": 0.9344152146820991,
+          "f1_pos": 0.9357997823721437,
+          "confusion_matrix": [
+            [
+              822,
+              103
+            ],
+            [
+              15,
+              860
+            ]
+          ],
+          "roc_auc": 0.9731694208494208,
+          "pr_auc": 0.9528150027313884
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.036878482536328416
+      }
+    },
+    "pauli_xz_r1_full__gpc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "pauli_xz_r1_full",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 14.894556760787964
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.9016666666666666,
+          "balanced_accuracy": 0.9020619702585243,
+          "f1_macro": 0.901665179504258,
+          "f1_pos": 0.9020475926950747,
+          "confusion_matrix": [
+            [
+              808,
+              109
+            ],
+            [
+              68,
+              815
+            ]
+          ],
+          "roc_auc": 0.97222959796767,
+          "pr_auc": 0.969785993062443,
+          "log_loss": 0.22734555439134724,
+          "brier": 0.06817179652330725,
+          "ece": 0.04746223014217926,
+          "mean_predictive_entropy": 0.31201088179159975
+        },
+        "ood_test": {
+          "accuracy": 0.9405555555555556,
+          "balanced_accuracy": 0.9416679536679537,
+          "f1_macro": 0.9405440864364267,
+          "f1_pos": 0.9413698630136986,
+          "confusion_matrix": [
+            [
+              834,
+              91
+            ],
+            [
+              16,
+              859
+            ]
+          ],
+          "roc_auc": 0.9717868725868725,
+          "pr_auc": 0.9576479851691527,
+          "log_loss": 0.21765196757762686,
+          "brier": 0.06113997823172246,
+          "ece": 0.08066865908649737,
+          "mean_predictive_entropy": 0.3200673564311259
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.039605983409429446,
+        "ece_ood_minus_id": 0.033206428944318106,
+        "entropy_ood_minus_id": 0.008056474639526134
+      }
+    },
+    "zmap_r2__svc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "zmap_r2",
+        "family": "quantum",
+        "model": "svc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 0.05182456970214844
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.9094444444444445,
+          "balanced_accuracy": 0.9101574512387753,
+          "f1_macro": 0.9094061657533692,
+          "f1_pos": 0.9112683723462166,
+          "confusion_matrix": [
+            [
+              800,
+              117
+            ],
+            [
+              46,
+              837
+            ]
+          ],
+          "roc_auc": 0.9725754003588937,
+          "pr_auc": 0.9656320521209317
+        },
+        "ood_test": {
+          "accuracy": 0.9377777777777778,
+          "balanced_accuracy": 0.9389343629343629,
+          "f1_macro": 0.9377627178922308,
+          "f1_pos": 0.9387308533916849,
+          "confusion_matrix": [
+            [
+              830,
+              95
+            ],
+            [
+              17,
+              858
+            ]
+          ],
+          "roc_auc": 0.9749831660231659,
+          "pr_auc": 0.9498555056240994
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.028776911695587604
+      }
+    },
+    "zmap_r2__gpc__d12": {
+      "config": {
+        "dim": 12,
+        "kernel": "zmap_r2",
+        "family": "quantum",
+        "model": "gpc",
+        "seed": 999,
+        "hyperparams": null,
+        "fit_seconds": 14.483254671096802
+      },
+      "splits": {
+        "id_test": {
+          "accuracy": 0.91,
+          "balanced_accuracy": 0.9104717609122267,
+          "f1_macro": 0.9099945552261803,
+          "f1_pos": 0.9106945975744212,
+          "confusion_matrix": [
+            [
+              812,
+              105
+            ],
+            [
+              57,
+              826
+            ]
+          ],
+          "roc_auc": 0.974655154740395,
+          "pr_auc": 0.9727197887432723,
+          "log_loss": 0.2219014970398526,
+          "brier": 0.06663559826760466,
+          "ece": 0.04636444778325605,
+          "mean_predictive_entropy": 0.30749626263166546
+        },
+        "ood_test": {
+          "accuracy": 0.935,
+          "balanced_accuracy": 0.9362625482625483,
+          "f1_macro": 0.9349754150874945,
+          "f1_pos": 0.9362397820163487,
+          "confusion_matrix": [
+            [
+              824,
+              101
+            ],
+            [
+              16,
+              859
+            ]
+          ],
+          "roc_auc": 0.9756293436293436,
+          "pr_auc": 0.9643545921476814,
+          "log_loss": 0.2148710632322624,
+          "brier": 0.05869719324062487,
+          "ece": 0.07445433628269905,
+          "mean_predictive_entropy": 0.3367525007934312
+        }
+      },
+      "degradation": {
+        "bal_acc_id_minus_ood": -0.025790787350321587,
+        "ece_ood_minus_id": 0.028089888499443,
+        "entropy_ood_minus_id": 0.029256238161765757
+      }
+    }
+  }
+}
