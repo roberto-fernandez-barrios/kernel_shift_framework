@@ -120,7 +120,12 @@ Netflow sweep (405) en ejecución — 18 workers paralelos, monitor armado.
 - [x] A3 parcial (`mechanism_controls.py` → `results/mechanism_controls/`);
       pendiente: null por permutación de etiquetas + cross-fitting (necesita
       recomputar Grams en subset q1000 — unir al batch de Fase B)
-- [ ] A2 estadística jerárquica
+- [x] A2 (`hierarchical_stats.py` → `results/honest_selection/hier_stats.csv`).
+      TITULAR REVISADO: netflow GPC vs classical_ext sobrevive P1 (+0.017,
+      perm p=1e-4, LODO +0.015..+0.022) y P2 (+0.020, p=1e-4). SVC: P1 nulo
+      (p=0.29), P2 pequeño (+0.006, p=7e-4) → claim dependiente de clasificador.
+      EMBER vs ext: agregado nulo en P1/P2 (m2 positivo y m1 negativo se
+      cancelan) → contar la historia POR MECANISMO de shift, no pooled.
 - [ ] A4 prosa (tras B), A5 pipeline de pools
 - [ ] B1, B2, B3 (esperan CPU libre), C
 - [ ] Cierre
