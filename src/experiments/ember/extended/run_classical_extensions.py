@@ -52,7 +52,9 @@ C_GRID = [0.01, 0.1, 10.0, 100.0]
 
 OUT_FILES = {"lsweep": "summary_classical_lsweep.csv",
              "ablation": "summary_classical_plainrep.csv",
-             "csens": "summary_csens.csv"}
+             "csens": "summary_csens.csv",
+             "ktanull": "mechanism_crossfit.csv"}
+N_PERM = 100
 
 
 def make_plain_pipeline(dim: int, seed: int) -> Pipeline:
@@ -83,6 +85,63 @@ def eff_rank(K: np.ndarray) -> float:
     p = ev / s
     p = p[p > 1e-15]
     return float(np.exp(-(p * np.log(p)).sum()))
+
+
+def kta_terms(K: np.ndarray) -> tuple[np.ndarray, float]:
+    """Doubly centered kernel and its Frobenius norm (label-independent)."""
+    n = K.shape[0]
+    H = np.eye(n) - np.ones((n, n)) / n
+    Kc = H @ K @ H
+    return Kc, float(np.linalg.norm(Kc, "fro"))
+
+
+def kta_with(Kc: np.ndarray, fro: float, y: np.ndarray) -> float:
+    yy = np.where(np.asarray(y) > 0, 1.0, -1.0)
+    return float(yy @ Kc @ yy) / max(len(yy) * fro, 1e-12)
+
+
+def ktanull_rows(kname: str, family: str, dim: int, K_oo: np.ndarray,
+                 blocks: Dict[str, np.ndarray], y_by_split: Dict[str, np.ndarray],
+                 K_tr: np.ndarray, seed: int) -> Dict[str, Any]:
+    """Permutation null for OOD KTA + cross-fitted mechanism cell.
+
+    KTA is measured on one half of the OOD split (A); balanced accuracy of
+    models trained on the training split is measured on the other half (B),
+    so the mechanism correlation never reuses the same labels.
+    """
+    rng = np.random.default_rng(seed + dim)
+    y_ood = y_by_split["ood_test"]
+    n = len(y_ood)
+    # full-OOD KTA + permutation null (Kc fixed; only labels permute)
+    Kc, fro = kta_terms(K_oo)
+    kta_full = kta_with(Kc, fro, y_ood)
+    null = np.array([kta_with(Kc, fro, rng.permutation(y_ood)) for _ in range(N_PERM)])
+    # cross-fit halves
+    perm = rng.permutation(n)
+    a_idx, b_idx = perm[: n // 2], perm[n // 2:]
+    Kc_a, fro_a = kta_terms(K_oo[np.ix_(a_idx, a_idx)])
+    kta_a = kta_with(Kc_a, fro_a, y_ood[a_idx])
+    row: Dict[str, Any] = {
+        "family": family, "kernel": kname, "dim": dim,
+        "kta_ood_full": kta_full,
+        "kta_null_mean": float(null.mean()), "kta_null_std": float(null.std()),
+        "kta_null_exceed_frac": float((np.abs(null) >= abs(kta_full)).mean()),
+        "kta_ood_halfA": kta_a,
+        "eff_rank_train": eff_rank(K_tr),
+    }
+    from sklearn.metrics import balanced_accuracy_score
+    for model_name in ("svc", "gpc"):
+        if model_name == "svc":
+            model = SVC(kernel="precomputed", C=1.0, class_weight="balanced")
+            model.fit(K_tr, y_by_split["train"])
+            y_pred = model.predict(blocks["ood_test"][b_idx]).astype(np.int64)
+        else:
+            model = LaplaceGPC().fit(K_tr, y_by_split["train"])
+            p = model.predict_proba(blocks["ood_test"][b_idx], np.ones(len(b_idx)))
+            y_pred = (p >= 0.5).astype(np.int64)
+        row[f"bacc_{model_name}_halfB"] = float(
+            balanced_accuracy_score(y_ood[b_idx], y_pred))
+    return row
 
 
 def eval_model_rows(kname: str, family: str, model_name: str, dim: int,
@@ -167,6 +226,11 @@ def main() -> None:
             blocks = {"train": factory.block(kname, X_emb["train"], X_emb["train"])}
             for split in ("id_test", "ood_test"):
                 blocks[split] = factory.block(kname, X_emb[split], X_emb["train"])
+            if args.mode == "ktanull":
+                K_oo = factory.block(kname, X_emb["ood_test"], X_emb["ood_test"])
+                summary_rows.append(ktanull_rows(kname, family, dim, K_oo, blocks,
+                                                 y_by_split, blocks["train"], args.seed))
+                continue
             if args.mode == "csens":
                 for c in C_GRID:
                     summary_rows += eval_model_rows(kname, family, "svc", dim, blocks, y_by_split, c)
@@ -182,7 +246,7 @@ def main() -> None:
                     "kta_train": centered_kta(blocks["train"], y_by_split["train"]),
                 })
 
-        if args.mode == "csens" and args.include_quantum:
+        if args.mode in ("csens", "ktanull") and args.include_quantum:
             for qcfg in DEFAULT_QUANTUM_CONFIGS:
                 fmap = build_feature_map(qcfg, feature_dim=dim)
                 sv = {k: compute_statevectors_batch(X_emb[k], fmap, dtype=np.complex64)
@@ -190,6 +254,12 @@ def main() -> None:
                 blocks = {"train": kernel_block_abs2(sv["train"], sv["train"], out_dtype=np.float64)}
                 for split in ("id_test", "ood_test"):
                     blocks[split] = kernel_block_abs2(sv[split], sv["train"], out_dtype=np.float64)
+                if args.mode == "ktanull":
+                    K_oo = kernel_block_abs2(sv["ood_test"], sv["ood_test"], out_dtype=np.float64)
+                    summary_rows.append(ktanull_rows(qcfg["id"], "quantum", dim, K_oo,
+                                                     blocks, y_by_split, blocks["train"],
+                                                     args.seed))
+                    continue
                 for c in C_GRID:
                     summary_rows += eval_model_rows(qcfg["id"], "quantum", "svc", dim,
                                                     blocks, y_by_split, c)

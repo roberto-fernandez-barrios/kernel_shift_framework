@@ -59,6 +59,8 @@ def main() -> None:
     ap.add_argument("--include-quantum", action="store_true")
     ap.add_argument("--shard", type=str, default="0/1", help="i/N")
     ap.add_argument("--dims", type=int, nargs="+", default=[4, 6, 8, 10, 12])
+    ap.add_argument("--filter", type=str, default="",
+                    help="only run dirs whose name contains this substring (e.g. q1000)")
     args = ap.parse_args()
     shard_i, shard_n = (int(x) for x in args.shard.split("/"))
 
@@ -66,6 +68,7 @@ def main() -> None:
     for root in args.roots:
         run_dirs += sorted(d for d in root.iterdir()
                            if d.is_dir() and LABEL_RE.match(d.name)
+                           and args.filter in d.name
                            and (d / "extended_kernels_qsplits__summary.csv").exists())
     todo = [d for k, d in enumerate(run_dirs)
             if k % shard_n == shard_i and not (d / OUT_FILES[args.mode]).exists()]
