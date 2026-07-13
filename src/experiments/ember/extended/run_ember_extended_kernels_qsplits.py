@@ -128,6 +128,16 @@ class ClassicalKernelFactory:
             da = (hp["poly_gamma"] * np.einsum("ij,ij->i", A, A) + hp["poly_coef0"]) ** deg
             db = (hp["poly_gamma"] * np.einsum("ij,ij->i", B, B) + hp["poly_coef0"]) ** deg
             return _cosine_normalize(K, da, db)
+        if name.startswith("laplacian_med_x"):
+            # Length-scale sweep variant: l1 = median * factor.
+            factor = float(name.rsplit("x", 1)[-1])
+            return np.exp(-cdist(A, B, "cityblock") / (hp["l1_median"] * factor))
+        if name.startswith("matern15_med_x"):
+            factor = float(name.rsplit("x", 1)[-1])
+            return _matern(cdist(A, B, "euclidean"), hp["l2_median"] * factor, "1.5")
+        if name.startswith("matern25_med_x"):
+            factor = float(name.rsplit("x", 1)[-1])
+            return _matern(cdist(A, B, "euclidean"), hp["l2_median"] * factor, "2.5")
         if name == "laplacian_med":
             return np.exp(-cdist(A, B, "cityblock") / hp["l1_median"])
         if name == "matern15_med":
