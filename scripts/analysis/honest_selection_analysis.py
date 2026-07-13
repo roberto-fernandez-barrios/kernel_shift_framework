@@ -33,14 +33,20 @@ ORIG_PREFIXES = ("linear", "rbf_gscale")
 RUN_RE = re.compile(r"(?P<setting>.+)__qs(?P<qs>\d+)__s(?P<seed>\d+)$")
 
 
-def load_runs(root: Path) -> pd.DataFrame:
+def load_runs(root: Path, extra_files: list[str] | None = None) -> pd.DataFrame:
+    cols = ["family", "model", "cfg", "kernel", "split", "balanced_accuracy"]
     frames = []
     for d in sorted(root.iterdir()):
         f = d / "extended_kernels_qsplits__summary.csv"
         m = RUN_RE.match(d.name)
         if not m or not f.exists():
             continue
-        df = pd.read_csv(f, usecols=["family", "model", "cfg", "kernel", "split", "balanced_accuracy"])
+        parts = [pd.read_csv(f, usecols=cols)]
+        for name in extra_files or []:
+            fx = d / name
+            if fx.exists():
+                parts.append(pd.read_csv(fx, usecols=lambda c: c in cols)[cols])
+        df = pd.concat(parts, ignore_index=True)
         df["setting"] = m.group("setting")
         df["qs"] = int(m.group("qs"))
         df["seed"] = int(m.group("seed"))
@@ -48,6 +54,7 @@ def load_runs(root: Path) -> pd.DataFrame:
     if not frames:
         raise SystemExit(f"No run summaries under {root}")
     out = pd.concat(frames, ignore_index=True)
+    out = out.drop_duplicates(["setting", "qs", "seed", "model", "cfg", "split"], keep="first")
     return out
 
 
@@ -112,8 +119,9 @@ def p3_oracle(w: pd.DataFrame) -> pd.DataFrame:
     return sel[["setting", "model", "p3_ood_mean", "p3_cfg"]]
 
 
-def analyze_root(root: Path, out_dir: Path, tag: str) -> pd.DataFrame:
-    df = load_runs(root)
+def analyze_root(root: Path, out_dir: Path, tag: str,
+                 extra_files: list[str] | None = None) -> pd.DataFrame:
+    df = load_runs(root, extra_files)
     per_family = []
     for fam in ("quantum", "classical_ext", "classical_orig"):
         sub = family_view(df, fam)
@@ -162,10 +170,13 @@ def main() -> None:
     ap.add_argument("--roots", nargs="+", required=True,
                     help="pairs tag=path, e.g. ember_main=results/ember_shift/extended_kernels")
     ap.add_argument("--out-dir", type=Path, default=Path("results/honest_selection"))
+    ap.add_argument("--extra-files", nargs="*", default=[],
+                    help="additional per-run summary CSVs to merge into the candidate "
+                         "sets (e.g. summary_classical_lsweep.csv)")
     args = ap.parse_args()
     for spec in args.roots:
         tag, path = spec.split("=", 1)
-        st = analyze_root(Path(path), args.out_dir, tag)
+        st = analyze_root(Path(path), args.out_dir, tag, args.extra_files)
         view = st[st.scope != "ALL"] if st.scope.nunique() > 2 else st
         print(f"\n=== {tag} ===")
         print(view.to_string(index=False,
