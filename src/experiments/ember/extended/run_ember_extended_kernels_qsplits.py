@@ -374,8 +374,8 @@ def main() -> None:
     df = pd.DataFrame(summary_rows)
     out_csv = out_dir / "extended_kernels_qsplits__summary.csv"
     df.to_csv(out_csv, index=False)
-    print(f"[✓] Wrote {out_json}")
-    print(f"[✓] Wrote {out_csv}")
+    print(f"[OK] Wrote {out_json}")
+    print(f"[OK] Wrote {out_csv}")
 
 
 if __name__ == "__main__":

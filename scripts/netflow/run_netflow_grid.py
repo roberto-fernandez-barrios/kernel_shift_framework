@@ -161,7 +161,7 @@ def main() -> None:
                         print(f"[SETTING DONE] {scenario}/{variant}/ms{ms}/{n_train} "
                               f"({n_done} settings, {(time.time() - t_start) / 60:.1f} min total)")
 
-    print(f"[✓] Netflow grid complete: {n_done} settings in {(time.time() - t_start) / 60:.1f} min")
+    print(f"[OK] Netflow grid complete: {n_done} settings in {(time.time() - t_start) / 60:.1f} min")
 
 
 if __name__ == "__main__":
