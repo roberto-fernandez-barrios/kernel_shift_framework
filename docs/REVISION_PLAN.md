@@ -126,9 +126,54 @@ Netflow sweep (405) en ejecución — 18 workers paralelos, monitor armado.
       (p=0.29), P2 pequeño (+0.006, p=7e-4) → claim dependiente de clasificador.
       EMBER vs ext: agregado nulo en P1/P2 (m2 positivo y m1 negativo se
       cancelan) → contar la historia POR MECANISMO de shift, no pooled.
-- [ ] A4 prosa (tras B), A5 pipeline de pools
-- [ ] B1, B2, B3 (esperan CPU libre), C
+- [x] A5 pipeline de pools portado (`scripts/data/`, `docs/NETFLOW_POOLS.md`):
+      natural drift = attack-campaign regime shift (+ cambio de partición de
+      captura en UNSW). Renombrar así en el manuscrito.
+- [x] B infra lista y probada (`run_classical_extensions.py` + driver shardeable).
+      Hallazgo del smoke: en representación NO angular el eff rank del lineal es
+      ~4.6 (dim 6), no ~1.2 → el ancla rank-1 era artefacto del [0,pi]; el ORDEN
+      (Laplaciano arriba) se preserva. Reportar en ablación.
+- [ ] A4 prosa (tras B)
+- [ ] LANZAR al acabar el sweep (18 shards, PYTHONPATH=., PYTHONUTF8=1):
+      B1 lsweep  → roots: ember_shift/bandwidth_sweep + netflow_bandwidth_sweep/extended_kernels
+      B2 ablation→ roots: ember_shift/extended_kernels + netflow/extended_kernels (solo unsw_dos*)
+      B3 csens   → roots: ember_shift/extended_kernels + netflow/extended_kernels
+      C  csens --include-quantum → subset q1000 (driver con root filtrado o dims/sizes)
+      (comando: python scripts/experiments/run_phase_b_driver.py --roots ... --mode ... --shard i/18)
+- [ ] Extender honest_selection_analysis para fusionar summary_classical_lsweep.csv
+      y summary_csens.csv en las comparaciones (opción --extra-summaries)
 - [ ] Cierre
+
+## HALLAZGO PRINCIPAL (15-jul): la simetría real de bandwidth disuelve la ventaja en EMBER
+
+Con el sweep de longitud de escala para Laplaciano/Matérn (B1) COMPLETO en EMBER
+(270/270 runs), la comparación por fin es simétrica de verdad: cada kernel, clásico
+o cuántico, puede mover su escala. Resultado:
+
+- **La ventaja cuántica en EMBER contra la familia clásica extendida desaparece**
+  en los tres protocolos (P1, P2 y hasta el oracle P3): deltas -0.013..+0.004,
+  ningún p significativo a favor del cuántico; en m2/SVC el clásico gana (p=0.02).
+  El "restablecimiento de la ventaja por simetría de bandwidth" del manuscrito v2
+  era un artefacto de dar gamma solo al RBF. **El reviewer tenía razón.**
+- **El kernel que cierra la brecha es `laplacian_med_x0.1` / `_x0.3`** (21 de 33
+  selecciones clásicas): Laplaciano con longitud de escala ACORTADA.
+- **Esto CONFIRMA el mecanismo en lugar de refutarlo**: acortar l sube el rango
+  efectivo → mejor supervivencia del alineamiento → mejor OOD. El mecanismo
+  PREDICE cuál kernel clásico cerraría la brecha, y acierta. Verificación
+  cuantitativa en curso (modo `lsweep_geo`).
+- Presupuesto de búsqueda ahora 115 clásicos vs 60 cuánticos (favorece al clásico);
+  reportarlo explícitamente.
+- PENDIENTE: ¿sobrevive en netflow (drift natural)? lsweep netflow al 339/405.
+  Ahí está el desenlace del paper.
+
+**Reencuadre del paper que esto impone** (y que lo hace MEJOR y más publicable):
+la tesis deja de ser "los kernels cuánticos ganan bajo shift" y pasa a ser
+"la geometría del kernel — no su cuanticidad — gobierna la robustez OOD; los mapas
+de fidelidad son un modo (caro) de obtener alto rango efectivo, y un Laplaciano con
+la escala bien elegida obtiene la misma geometría y el mismo rendimiento". Es
+exactamente la conclusión escéptico-rigurosa que ambos revisores señalaron como la
+más valiosa, y ahora con el mecanismo como contribución central y poder predictivo
+demostrado. Título sin "Governs" y sin promesa cuántica.
 
 ## Hallazgos clave hasta ahora (13-jul noche)
 **A1 — la ventaja cuántica bajo selección honesta se vuelve REGIME-DEPENDENT pero real:**

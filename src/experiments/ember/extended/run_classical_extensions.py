@@ -53,7 +53,8 @@ C_GRID = [0.01, 0.1, 10.0, 100.0]
 OUT_FILES = {"lsweep": "summary_classical_lsweep.csv",
              "ablation": "summary_classical_plainrep.csv",
              "csens": "summary_csens.csv",
-             "ktanull": "mechanism_crossfit.csv"}
+             "ktanull": "mechanism_crossfit.csv",
+             "lsweep_geo": "geometry_lsweep.csv"}
 N_PERM = 100
 
 
@@ -98,6 +99,22 @@ def kta_terms(K: np.ndarray) -> tuple[np.ndarray, float]:
 def kta_with(Kc: np.ndarray, fro: float, y: np.ndarray) -> float:
     yy = np.where(np.asarray(y) > 0, 1.0, -1.0)
     return float(yy @ Kc @ yy) / max(len(yy) * fro, 1e-12)
+
+
+def geometry_row(kname: str, family: str, dim: int, K_tr: np.ndarray,
+                 K_id: np.ndarray, K_ood: np.ndarray,
+                 y_by_split: Dict[str, np.ndarray]) -> Dict[str, Any]:
+    """Mechanism descriptors on the true square Gram of each split."""
+    kta_id = centered_kta(K_id, y_by_split["id_test"])
+    kta_ood = centered_kta(K_ood, y_by_split["ood_test"])
+    return {
+        "family": family, "kernel": kname, "dim": dim,
+        "spec_train_eff_rank": eff_rank(K_tr),
+        "kta_train": centered_kta(K_tr, y_by_split["train"]),
+        "kta_id": kta_id,
+        "kta_ood": kta_ood,
+        "kta_survival": kta_ood - kta_id,
+    }
 
 
 def ktanull_rows(kname: str, family: str, dim: int, K_oo: np.ndarray,
@@ -218,6 +235,10 @@ def main() -> None:
         if args.mode == "lsweep":
             kernels = [f"{base}_x{f:g}" for base in
                        ("laplacian_med", "matern15_med", "matern25_med") for f in LS_FACTORS]
+        elif args.mode == "lsweep_geo":
+            kernels = list(CLASSICAL_KERNELS) + [
+                f"{base}_x{f:g}" for base in
+                ("laplacian_med", "matern15_med", "matern25_med") for f in LS_FACTORS]
         else:
             kernels = list(CLASSICAL_KERNELS)
 
@@ -226,6 +247,13 @@ def main() -> None:
             blocks = {"train": factory.block(kname, X_emb["train"], X_emb["train"])}
             for split in ("id_test", "ood_test"):
                 blocks[split] = factory.block(kname, X_emb[split], X_emb["train"])
+            if args.mode == "lsweep_geo":
+                summary_rows.append(geometry_row(
+                    kname, family, dim, blocks["train"],
+                    factory.block(kname, X_emb["id_test"], X_emb["id_test"]),
+                    factory.block(kname, X_emb["ood_test"], X_emb["ood_test"]),
+                    y_by_split))
+                continue
             if args.mode == "ktanull":
                 K_oo = factory.block(kname, X_emb["ood_test"], X_emb["ood_test"])
                 summary_rows.append(ktanull_rows(kname, family, dim, K_oo, blocks,
@@ -246,7 +274,7 @@ def main() -> None:
                     "kta_train": centered_kta(blocks["train"], y_by_split["train"]),
                 })
 
-        if args.mode in ("csens", "ktanull") and args.include_quantum:
+        if args.mode in ("csens", "ktanull", "lsweep_geo") and args.include_quantum:
             for qcfg in DEFAULT_QUANTUM_CONFIGS:
                 fmap = build_feature_map(qcfg, feature_dim=dim)
                 sv = {k: compute_statevectors_batch(X_emb[k], fmap, dtype=np.complex64)
@@ -254,6 +282,13 @@ def main() -> None:
                 blocks = {"train": kernel_block_abs2(sv["train"], sv["train"], out_dtype=np.float64)}
                 for split in ("id_test", "ood_test"):
                     blocks[split] = kernel_block_abs2(sv[split], sv["train"], out_dtype=np.float64)
+                if args.mode == "lsweep_geo":
+                    summary_rows.append(geometry_row(
+                        qcfg["id"], "quantum", dim, blocks["train"],
+                        kernel_block_abs2(sv["id_test"], sv["id_test"], out_dtype=np.float64),
+                        kernel_block_abs2(sv["ood_test"], sv["ood_test"], out_dtype=np.float64),
+                        y_by_split))
+                    continue
                 if args.mode == "ktanull":
                     K_oo = kernel_block_abs2(sv["ood_test"], sv["ood_test"], out_dtype=np.float64)
                     summary_rows.append(ktanull_rows(qcfg["id"], "quantum", dim, K_oo,
