@@ -163,8 +163,26 @@ o cuántico, puede mover su escala. Resultado:
   cuantitativa en curso (modo `lsweep_geo`).
 - Presupuesto de búsqueda ahora 115 clásicos vs 60 cuánticos (favorece al clásico);
   reportarlo explícitamente.
-- PENDIENTE: ¿sobrevive en netflow (drift natural)? lsweep netflow al 339/405.
-  Ahí está el desenlace del paper.
+- PENDIENTE: ¿sobrevive en netflow (drift natural)? lsweep netflow ~378/405.
+  Ahí está el desenlace del paper. (geometry_lsweep de netflow aún no procesado
+  por los shards; los 85 runs de geo actuales son todos EMBER.)
+
+## Ley dosis-respuesta CONFIRMADA en EMBER (15-jul, 85 runs, modo lsweep_geo)
+rho(eff_rank, kta_ood) mediana 0.94, positiva en 98% de 425 unidades run×dim.
+DENTRO de la familia clásica sola: rho 0.96, 99% — NO es artefacto del split
+cuántico/clásico. Los 4 mapas de fidelidad caen en medio del continuo clásico
+(3-9 de 19 kernels clásicos tienen más rango y mejor alineamiento OOD que cada
+mapa cuántico). Esta es la figura central del paper reformulado.
+
+## Ablación de preprocesado (B2, parcial 135/540): jerarquía robusta
+En representación NO angular (MaxAbs+SVD+Std, sin [0,pi]): los kernels DÉBILES
+mejoran su OOD (linear +0.03/+0.04, poly +0.03/+0.06) pero el LAPLACIANO —el que
+neutraliza— no cambia (±0.001). El eff rank del lineal sube de ~1.2 a ~8 (el
+ancla rank-1 era del angle mapping, como sospechaba el reviewer), pero el
+Laplaciano sigue siendo el de más rango (25.6) y la conclusión del mecanismo se
+mantiene. Estabilidad de rankings rho~0.64 (moderada): reportar con matiz — el
+mapeo angular comprime más a unos kernels que a otros, pero no cambia qué kernel
+gana ni la ley geométrica.
 
 **Reencuadre del paper que esto impone** (y que lo hace MEJOR y más publicable):
 la tesis deja de ser "los kernels cuánticos ganan bajo shift" y pasa a ser
