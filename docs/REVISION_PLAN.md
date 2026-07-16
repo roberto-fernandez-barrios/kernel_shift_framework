@@ -177,7 +177,11 @@ Netflow sweep (405) en ejecución — 18 workers paralelos, monitor armado.
       PENDIENTE csens: al fundir summary_csens los C=1 duplican el cfg base
       (linear__svc__d4 vs linear__svc_C1__d4) — inofensivo para la selección
       (idxmax) pero infla n_candidates; dedup por (kernel,dim,C) si se reporta el conteo.
-- [ ] Cierre
+- [x] Cierre COMPLETADO (16-jul): análisis finales, tablas/figuras v3, manuscrito
+      reescrito y recompilado (65 págs, limpio), README + CITATION 0.3.0, commit +
+      push a origin/main, release v0.3.0 publicada en GitHub (con PDF) y archivada en
+      Zenodo. Fase experimental y de revisión CERRADAS. Quedan solo pasos en portales
+      externos a cargo de Roberto: verificar DOI Zenodo, arXiv v2, submit a EPJ QT.
 
 ## HALLAZGO PRINCIPAL (15-jul): la simetría real de bandwidth disuelve la ventaja en EMBER
 
