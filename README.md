@@ -7,31 +7,31 @@
 
 Reproducible framework for the **controlled comparison of quantum and classical kernels under distribution shift** — the artifact behind the manuscript:
 
-> **Quantum and Classical Kernels under Distribution Shift: Kernel Geometry Governs Out-of-Distribution Robustness**
+> **Quantum and Classical Kernels under Distribution Shift: A Controlled Study of Kernel Geometry and Out-of-Distribution Robustness**
 
-Within each experimental setting, the classifier, preprocessing, splits, model-selection logic, and bandwidth-tuning freedom are held fixed; **only the kernel changes**.
+Within each experimental setting, the classifier, preprocessing, splits, model-selection logic, and length-scale tuning freedom are held fixed; **only the kernel changes**.
 
-![Protocol](docs/assets/fig_v2_protocol.png)
+![Protocol](docs/assets/fig_v3_protocol.png)
 
 ## The study at a glance
 
 - **4 benchmark scenarios, 2 modalities**: EMBER (static PE malware), UNSW-NB15 (DoS, Reconnaissance) and ToN-IoT (Scanning) network flows.
 - **3 drift mechanisms**: within-class sparsity extremes ($m1$), train-geometry extremes ($m2$), and **natural regime drift** on network traffic.
 - **2 classifier families** consuming the same precomputed Gram matrices: SVC and a Laplace-approximation **Gaussian process classifier** (calibrated uncertainty under shift).
-- **11+ kernels**: linear, RBF, polynomial, Laplacian, Matérn (median heuristic) + 4 fidelity feature maps — with a **symmetric bandwidth sweep** (RBF $\gamma$ factors vs. quantum angle scales).
-- **72 principal settings × 15 repeated runs**, paired Wilcoxon tests with Holm correction.
-- **Kernel-geometry analysis**: effective rank, centered kernel-target alignment (ID/OOD), concentration, and the geometric difference of Huang et al.
+- **11+ kernels** plus a **length-scale sweep** applied symmetrically: linear, RBF, polynomial, Laplacian, Matérn (median heuristic) with $\ell$ factors, + 4 fidelity feature maps with angle scales (115 classical vs. 60 quantum configurations).
+- **72 principal settings × 15 repeated runs**, evaluated under **honest, no-OOD-label selection** (P1 deployment, P2 cross-seed) alongside the oracle (P3), with per-scenario Wilcoxon tests and a **hierarchy-aware permutation test**.
+- **Kernel-geometry analysis**: effective rank, centered kernel-target alignment (ID/OOD), with **label-permutation and cross-fitting controls** against circularity.
 
 ## Key findings
 
-![Results arc](docs/assets/fig_v2_arc.png)
+![Honest-selection reversal](docs/assets/fig_v3_reversal.png)
 
-1. Against the customary **linear+RBF baselines**, fidelity-based quantum kernels improve OOD balanced accuracy nearly uniformly (69–71 of 72 settings; $p<10^{-9}$ on network data).
-2. A median-heuristic **Laplacian kernel neutralizes the advantage on EMBER** at fixed bandwidth — the operative property is geometric, not quantum per se.
-3. With **symmetric bandwidth tuning** the advantage re-emerges on EMBER, and under **natural network drift** the quantum family wins **54/54 settings** under the GP classifier ($p=1.6\times10^{-10}$).
-4. One mechanism explains the pattern: **OOD accuracy tracks the survival of kernel-target alignment under shift** (positive within-setting correlation in 89–99% of 360 setting-seed units, all four datasets), with high effective rank of the training kernel as its structural precondition.
+1. Against the customary **linear+RBF baselines**, fidelity-based quantum kernels improve OOD balanced accuracy nearly uniformly — the result the optimistic literature reports.
+2. **That advantage does not survive a fair test.** Once the classical family is enlarged with heavy-tailed kernels given the **same length-scale freedom**, and configurations are selected **without consulting the shifted labels**, the OOD advantage **dissolves on EMBER and reverses on network flows** (the extended classical family wins the deployment comparison; hierarchical permutation $p=2\times10^{-4}$ under SVC). The quantum maps survive only against the restricted linear+RBF baseline.
+3. **The operative property is geometry, not quantumness.** OOD kernel-target alignment is ordered by the **effective rank of the training kernel**, identically across both families (median within-setting Spearman $\rho\approx0.93$ on EMBER, and $\approx0.96$ within the classical family alone); the fidelity maps sit in the *middle* of this classical continuum. The kernel that closes the gap is a **short-length-scale Laplacian** — exactly what the mechanism predicts. The mechanism survives label-permutation and cross-fitting controls.
+4. **What remains** as a distinct quantum contribution is **in-distribution separability**, which no classical kernel we tried reproduces.
 
-![Mechanism](docs/assets/fig_v2_dose_response.png)
+![Dose-response continuum](docs/assets/fig_v3_continuum.png)
 
 ## Repository layout
 

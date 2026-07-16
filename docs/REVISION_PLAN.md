@@ -116,10 +116,18 @@ Netflow sweep (405) en ejecución — 18 workers paralelos, monitor armado.
 - [x] Plan aprobado (13-jul)
 - [x] A1 script (`honest_selection_analysis.py`) + resultados en
       `results/honest_selection/` para ember_main, ember_sweep, netflow_main
-- [ ] A1 netflow sweep (espera fin del sweep)
-- [x] A3 parcial (`mechanism_controls.py` → `results/mechanism_controls/`);
-      pendiente: null por permutación de etiquetas + cross-fitting (necesita
-      recomputar Grams en subset q1000 — unir al batch de Fase B)
+- [x] A1 netflow sweep → `netflow_sweep_full` (lsweep fundido, 15-jul). DESENLACE:
+      vs classical_ext la ventaja OOD cuántica se INVIERTE (hier perm test:
+      P1 svc T=-0.0165 p=2e-4, P1 gpc -0.004 p=0.036, P2 ambos<0); solo persiste
+      vs classical_orig (linear+RBF). Mismo patrón que EMBER → tesis unificada.
+- [x] A3 COMPLETO: null permutación + cross-fitting vía modo `ktanull`
+      (`mechanism_crossfit.csv` por run) + consumer nuevo
+      `scripts/analysis/mechanism_crossfit_analysis.py` → `results/mechanism_crossfit/`.
+      El mecanismo SOBREVIVE los controles: (1) null — KTA OOD observado (0.08-0.45)
+      >> null de etiquetas permutadas (~0.005), ~100% celdas signif. al 5%;
+      (2) cross-fit ρ(kta_halfA, bacc_halfB) en mitades DISJUNTAS: mediana 0.31-0.85,
+      frac_pos 0.78-1.0 → no circular; (3) label-free ρ(eff_rank_train, bacc):
+      mediana 0.26-0.91. Punto débil persistente: unsw_recon.
 - [x] A2 (`hierarchical_stats.py` → `results/honest_selection/hier_stats.csv`).
       TITULAR REVISADO: netflow GPC vs classical_ext sobrevive P1 (+0.017,
       perm p=1e-4, LODO +0.015..+0.022) y P2 (+0.020, p=1e-4). SVC: P1 nulo
@@ -133,15 +141,42 @@ Netflow sweep (405) en ejecución — 18 workers paralelos, monitor armado.
       Hallazgo del smoke: en representación NO angular el eff rank del lineal es
       ~4.6 (dim 6), no ~1.2 → el ancla rank-1 era artefacto del [0,pi]; el ORDEN
       (Laplaciano arriba) se preserva. Reportar en ablación.
-- [ ] A4 prosa (tras B)
-- [ ] LANZAR al acabar el sweep (18 shards, PYTHONPATH=., PYTHONUTF8=1):
-      B1 lsweep  → roots: ember_shift/bandwidth_sweep + netflow_bandwidth_sweep/extended_kernels
-      B2 ablation→ roots: ember_shift/extended_kernels + netflow/extended_kernels (solo unsw_dos*)
-      B3 csens   → roots: ember_shift/extended_kernels + netflow/extended_kernels
-      C  csens --include-quantum → subset q1000 (driver con root filtrado o dims/sizes)
-      (comando: python scripts/experiments/run_phase_b_driver.py --roots ... --mode ... --shard i/18)
-- [ ] Extender honest_selection_analysis para fusionar summary_classical_lsweep.csv
-      y summary_csens.csv en las comparaciones (opción --extra-summaries)
+- [x] Fase B/C COMPLETA (15-jul, 24 workers; PC reinició a media noche y se relanzó
+      — resume-safe). Todo 100%: ablación 270+270, csens 270+810, ktanull 90+270,
+      geo q1000 90+135. Sin fallos (18 shards `complete`).
+- [x] Análisis de cierre ejecutados sobre datos completos (15-jul):
+      · dose_response_law → `results/dose_response/`: ρ(eff_rank,kta_ood) mediana
+        0.93 EMBER / 0.44-0.88 netflow (0.96/0.81-0.88 solo-clásico), frac_pos 0.98-1.0;
+        mapas de fidelidad a mitad del continuo (2250 units, 4 datasets).
+      · csens_analysis → `results/csens/`: P1C (C-tuneado) cuántico-classical_ext
+        -0.008, gana cuántico 19/72; estabilidad de orden ρ 0.63-0.78 (moderada).
+        OJO asimetría: en el root completo el cuántico solo tiene C=1 (csens
+        --include-quantum fue subset q1000) → la comparación C-simétrica limpia es
+        ese subset; reportar con matiz.
+      · preprocessing_ablation → `results/preproc_ablation/`: laplaciano invariante
+        (Δ0.0014), lineal rango 1.2→8.5 (artefacto angular) pero laplaciano sigue
+        el más alto (26.3); jerarquía preservada.
+      · hier_stats refrescado con netflow_sweep_full.
+- [x] A4 prosa + rediseño completo (16-jul): manuscrito reescrito a la tesis
+      "geometría, no cuanticidad". Título sin "Governs" ("...A Controlled Study of
+      Kernel Geometry and Out-of-Distribution Robustness"). Abstract, intro
+      (preview+contribuciones), Overview (3 movimientos, no 4), §res_honest NUEVA
+      (P1/P2/P3, dos tablas jerárquicas), §res_mechanism (continuo + controles
+      crossfit), discusión, conclusiones, métodos-selección, apéndice: todo alineado.
+      Tablas/figuras nuevas: `make_v3_tables.py` + `make_v3_figures.py`
+      (fig continuum, reversal, crossfit, protocol; se conserva mechanism_law).
+      Tabla oracle EMBER retenida como upper bound. COMPILA LIMPIO: 65 págs,
+      sin refs/citas indefinidas, sin labels duplicados, 0 overfull. Números
+      verificados contra CSVs. make_v2_* quedan como legado (apéndice per-setting
+      oracle aún los usa). PENDIENTE: lectura humana de Roberto; luego commit/tag/
+      push + release v0.3.0/Zenodo (NO ejecutado, espera su OK).
+- [x] Extender honest_selection_analysis para fusionar summary_classical_lsweep.csv
+      y summary_csens.csv (opción --extra-summaries, alias de --extra-files ya
+      existente; ficheros ausentes se saltan por run → una lista sirve para todos
+      los roots). netflow_sweep_full generado (15-jul): ver desenlace abajo.
+      PENDIENTE csens: al fundir summary_csens los C=1 duplican el cfg base
+      (linear__svc__d4 vs linear__svc_C1__d4) — inofensivo para la selección
+      (idxmax) pero infla n_candidates; dedup por (kernel,dim,C) si se reporta el conteo.
 - [ ] Cierre
 
 ## HALLAZGO PRINCIPAL (15-jul): la simetría real de bandwidth disuelve la ventaja en EMBER
@@ -163,9 +198,16 @@ o cuántico, puede mover su escala. Resultado:
   cuantitativa en curso (modo `lsweep_geo`).
 - Presupuesto de búsqueda ahora 115 clásicos vs 60 cuánticos (favorece al clásico);
   reportarlo explícitamente.
-- PENDIENTE: ¿sobrevive en netflow (drift natural)? lsweep netflow ~378/405.
-  Ahí está el desenlace del paper. (geometry_lsweep de netflow aún no procesado
-  por los shards; los 85 runs de geo actuales son todos EMBER.)
+- DESENLACE (15-jul, netflow lsweep 405/405, netflow_sweep_full): **TAMPOCO
+  sobrevive.** Al dar a Laplaciano/Matérn su sweep de escala, la ventaja OOD
+  cuántica vs classical_ext se disuelve o se invierte también en netflow bajo P1:
+  unsw_dos svc +0.010 (p=8e-3, cuántico) → -0.010 (p=8e-3, CLÁSICO gana);
+  unsw_dos gpc +0.005 (p=0.04) → -0.008 (n.s.); unsw_recon gpc +0.013 (p=8e-3)
+  → +0.003 (n.s.); toniot ya era clásico-favorable. La ventaja cuántica solo
+  persiste vs classical_orig (linear+RBF restringido). Historia unificada y más
+  fuerte: geometría (alto rango efectivo vía escala corta), no cuanticidad, en
+  AMBOS datasets. (geometry_lsweep de netflow lo cuantificará; los shards geo van
+  109/135 q1000.)
 
 ## Ley dosis-respuesta CONFIRMADA en EMBER (15-jul, 85 runs, modo lsweep_geo)
 rho(eff_rank, kta_ood) mediana 0.94, positiva en 98% de 425 unidades run×dim.

@@ -10,7 +10,7 @@ sys.path.insert(0, os.getcwd())
 
 import matplotlib.pyplot as plt
 
-import scripts.reporting.make_v2_figures as figs
+import scripts.reporting.make_v3_figures as figs
 
 OUT = Path("docs/assets")
 OUT.mkdir(parents=True, exist_ok=True)
@@ -26,6 +26,6 @@ def _png(self, path, **kw):
 
 plt.Figure.savefig = _png
 figs.fig_protocol()
-figs.fig_arc()
-figs.fig_mechanism_scatter()
-print("[✓] README assets in docs/assets/")
+figs.fig_reversal()
+figs.fig_continuum()
+print("[ok] README assets in docs/assets/")

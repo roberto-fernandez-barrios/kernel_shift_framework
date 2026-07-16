@@ -170,9 +170,12 @@ def main() -> None:
     ap.add_argument("--roots", nargs="+", required=True,
                     help="pairs tag=path, e.g. ember_main=results/ember_shift/extended_kernels")
     ap.add_argument("--out-dir", type=Path, default=Path("results/honest_selection"))
-    ap.add_argument("--extra-files", nargs="*", default=[],
+    ap.add_argument("--extra-files", "--extra-summaries", dest="extra_files",
+                    nargs="*", default=[],
                     help="additional per-run summary CSVs to merge into the candidate "
-                         "sets (e.g. summary_classical_lsweep.csv)")
+                         "sets (e.g. summary_classical_lsweep.csv summary_csens.csv). "
+                         "Missing files are skipped per run, so one list is safe across "
+                         "roots that carry different extension summaries.")
     args = ap.parse_args()
     for spec in args.roots:
         tag, path = spec.split("=", 1)
