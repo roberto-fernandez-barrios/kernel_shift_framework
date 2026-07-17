@@ -1,5 +1,19 @@
 # scripts/analysis/hierarchical_stats.py
 """
+LEGACY (superseded by the v4 revision -- see docs/ANALYSIS_SPEC_V4.md).
+
+The sign-flip permutation implemented here flips signs independently per
+SETTING, but settings within a dataset are correlated (shared pools, shift
+mechanisms, and -- on EMBER m1 -- literally identical OOD samples across
+master seeds; see results/v4/audit/). The permutation therefore does not
+preserve the experimental dependence structure, and its p-values (including
+the previously reported p=2e-4) are withdrawn. No v4 artifact may cite this
+script's output. Replacement: scripts/analysis/hierarchical_effect_estimation.py
+(fixed case studies, conditional pipeline-realization intervals, no global
+population p-value).
+
+Original description follows for the record.
+
 Hierarchy-aware inference for the family comparisons, replacing pooled
 Wilcoxon over correlated settings.
 
