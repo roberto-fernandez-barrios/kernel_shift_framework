@@ -15,7 +15,7 @@ ROOTS = ["results/ember_shift/extended_kernels", "results/netflow/extended_kerne
 
 BATCHES = [
     ["--roots", *ROOTS, "--mode", "v4", "--filter", "q1000", "__s42",
-     "--runner-args", "--shots"],
+     "--runner-args=--shots"],
     ["--roots", *ROOTS, "--mode", "v4"],
 ]
 
