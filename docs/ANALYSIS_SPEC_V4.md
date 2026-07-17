@@ -126,7 +126,7 @@ confirmatory results exist** (Section 8).
 | Resamples (headline schemes) | B = 5000 |
 | Resamples (budget curves) | B = 2000 per point |
 | ID-val/ID-test split | 50/50, class-stratified, ordered by SHA-256 of `"ksf-v4-idsplit::" + str(global_row_index)`; within each class stratum, sorted by hash digest, alternating assignment starting with `id_val` |
-| Internal C CV | k = 5 stratified folds on train only; fold seed `20260717`; grid C ∈ {0.01, 0.1, 1, 10, 100}; select by mean fold balanced accuracy; ties → smaller C |
+| Internal C CV | k = 5 stratified folds on train only; fold seed `20260717`; grid C ∈ {0.01, 0.1, 1, 10, 100}; select by mean fold balanced accuracy; ties → smaller C. Cost amendment (2026-07-17, added BEFORE any v4 result existed): when n_train > 2000, the CV folds are computed on a seeded stratified subsample of 2000 train points; this affects only which C is selected — the final fit at the selected C always uses the full training split |
 | GPC (secondary) | Laplace approximation, fixed hyperparameters as in v0.3 (declared in methods); no C analogue |
 | Finite-shot subset | all scenario-groups, q1000 size only, model seed 42, all 5 q-split seeds; shots ∈ {128, 512, 2048, 8192}; perturbation seed `20260718`, one draw per (run, config, shots) |
 | BCa bootstrap | B = 9999, seed `20260719` |

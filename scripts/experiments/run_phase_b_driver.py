@@ -59,8 +59,12 @@ def main() -> None:
     ap.add_argument("--include-quantum", action="store_true")
     ap.add_argument("--shard", type=str, default="0/1", help="i/N")
     ap.add_argument("--dims", type=int, nargs="+", default=[4, 6, 8, 10, 12])
-    ap.add_argument("--filter", type=str, default="",
-                    help="only run dirs whose name contains this substring (e.g. q1000)")
+    ap.add_argument("--filter", type=str, nargs="*", default=[],
+                    help="only run dirs whose name contains ALL these substrings "
+                         "(e.g. --filter q1000 __s42)")
+    ap.add_argument("--runner-args", type=str, nargs="*", default=[],
+                    help="extra flags passed through to the extension runner "
+                         "(e.g. --runner-args --shots)")
     args = ap.parse_args()
     shard_i, shard_n = (int(x) for x in args.shard.split("/"))
 
@@ -68,7 +72,7 @@ def main() -> None:
     for root in args.roots:
         run_dirs += sorted(d for d in root.iterdir()
                            if d.is_dir() and LABEL_RE.match(d.name)
-                           and args.filter in d.name
+                           and all(f in d.name for f in args.filter)
                            and (d / "extended_kernels_qsplits__summary.csv").exists())
     todo = [d for k, d in enumerate(run_dirs)
             if k % shard_n == shard_i and not (d / OUT_FILES[args.mode]).exists()]
@@ -89,6 +93,7 @@ def main() -> None:
                "--seed", str(seed), "--dims", *map(str, args.dims), "--mode", args.mode]
         if args.include_quantum:
             cmd.append("--include-quantum")
+        cmd += args.runner_args
         p = subprocess.run(cmd, capture_output=True, text=True)
         if p.returncode != 0:
             print(f"[FAIL] {d.name}\n{p.stdout[-1500:]}\n{p.stderr[-1500:]}")

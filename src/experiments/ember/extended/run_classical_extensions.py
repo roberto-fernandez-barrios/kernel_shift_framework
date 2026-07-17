@@ -47,6 +47,12 @@ from src.experiments.ember.quantum.run_ember_quantum_kernel_sparsity_shift_qspli
     make_embedding_pipeline,
 )
 
+from src.experiments.ember.extended.v4_protocol import (
+    perturb_kernel_finite_shots,
+    select_c_by_train_cv,
+    split_id_val_test,
+)
+
 LS_FACTORS = [0.1, 0.3, 3.0, 10.0]
 C_GRID = [0.01, 0.1, 10.0, 100.0]
 
@@ -54,8 +60,65 @@ OUT_FILES = {"lsweep": "summary_classical_lsweep.csv",
              "ablation": "summary_classical_plainrep.csv",
              "csens": "summary_csens.csv",
              "ktanull": "mechanism_crossfit.csv",
-             "lsweep_geo": "geometry_lsweep.csv"}
+             "lsweep_geo": "geometry_lsweep.csv",
+             "v4": "summary_v4.csv"}
 N_PERM = 100
+
+V4_ANGLE_SCALES = [0.5, 1.0, 2.0]
+V4_SHOTS = [128, 512, 2048, 8192]
+V4_SHOTS_SEED = 20260718
+
+
+def v4_classical_kernels() -> list[str]:
+    """The 23 deduplicated classical geometries of the frozen sweep pools."""
+    return (list(CLASSICAL_KERNELS)
+            + [f"rbf_gscale_x{f:g}" for f in LS_FACTORS]
+            + [f"{base}_x{f:g}" for base in
+               ("laplacian_med", "matern15_med", "matern25_med") for f in LS_FACTORS])
+
+
+def v4_eval_rows(kname: str, family: str, dim: int, blocks: Dict[str, np.ndarray],
+                 y_eval: Dict[str, np.ndarray], y_train: np.ndarray,
+                 shots_blocks: Dict[str, np.ndarray] | None = None
+                 ) -> List[Dict[str, Any]]:
+    """Evaluate one kernel configuration under the v4 protocol: SVC at its
+    internally CV-selected C (train-only; constraint 4) and GPC with fixed
+    hyperparameters, on id_val / id_test / ood_test."""
+    from sklearn.metrics import balanced_accuracy_score  # noqa: F401 (parity)
+    rows: List[Dict[str, Any]] = []
+    c_star, c_scores = select_c_by_train_cv(blocks["train"], y_train)
+    for model_name in ("svc", "gpc"):
+        t0 = time.time()
+        if model_name == "svc":
+            model = SVC(kernel="precomputed", C=c_star, class_weight="balanced")
+            model.fit(blocks["train"], y_train)
+        else:
+            model = LaplaceGPC().fit(blocks["train"], y_train)
+        fit_seconds = time.time() - t0
+        cfg_key = f"{kname}__{model_name}__d{dim}"
+        for split in ("id_val", "id_test", "ood_test"):
+            K_s, y_s = blocks[split], y_eval[split]
+            if model_name == "svc":
+                y_pred = model.predict(K_s).astype(np.int64)
+                scores = np.asarray(model.decision_function(K_s)).ravel()
+                m = eval_split(y_s, y_pred, scores)
+            else:
+                p_pos = model.predict_proba(K_s, np.ones(K_s.shape[0]))
+                y_pred = (p_pos >= 0.5).astype(np.int64)
+                m = eval_split(y_s, y_pred, p_pos)
+                m.update(probabilistic_metrics(y_s, p_pos))
+            row = {"family": family, "model": model_name, "dim": dim, "cfg": cfg_key,
+                   "kernel": kname, "split": split,
+                   "c_selected": c_star if model_name == "svc" else np.nan,
+                   "c_cv_score": c_scores[c_star] if model_name == "svc" else np.nan,
+                   "fit_seconds": float(fit_seconds),
+                   "accuracy": m["accuracy"], "balanced_accuracy": m["balanced_accuracy"],
+                   "f1_macro": m["f1_macro"], "f1_pos": m["f1_pos"],
+                   "roc_auc": m["roc_auc"], "pr_auc": m["pr_auc"]}
+            for pm in ("log_loss", "brier", "ece", "mean_predictive_entropy"):
+                row[pm] = m.get(pm)
+            rows.append(row)
+    return rows
 
 
 def make_plain_pipeline(dim: int, seed: int) -> Pipeline:
@@ -198,6 +261,98 @@ def eval_model_rows(kname: str, family: str, model_name: str, dim: int,
     return rows
 
 
+def run_v4(args, X, y, idx, y_by_split) -> None:
+    """v4 protocol pass (docs/ANALYSIS_SPEC_V4.md): hash-based ID-val/ID-test
+    split, internal C CV per configuration, full 23-classical + 12-quantum
+    geometry pools, geometry descriptors, and (--shots) the finite-shot
+    fidelity-estimation perturbation model on the quantum configs."""
+    y_id = y_by_split["id_test"]
+    val_pos, test_pos, audit = split_id_val_test(idx["id_test"], y_id)
+    y_eval = {"id_val": y_id[val_pos], "id_test": y_id[test_pos],
+              "ood_test": y_by_split["ood_test"]}
+    summary_rows: List[Dict[str, Any]] = []
+    geo_rows: List[Dict[str, Any]] = []
+    shots_rows: List[Dict[str, Any]] = []
+
+    def eval_config(kname: str, family: str, dim: int, K_tr, K_id_full, K_oo_rect,
+                    K_id_sq, K_oo_sq) -> None:
+        blocks = {"train": K_tr, "id_val": K_id_full[val_pos],
+                  "id_test": K_id_full[test_pos], "ood_test": K_oo_rect}
+        summary_rows.extend(v4_eval_rows(kname, family, dim, blocks, y_eval,
+                                         y_by_split["train"]))
+        geo_rows.append(geometry_row(kname, family, dim, K_tr, K_id_sq, K_oo_sq,
+                                     y_by_split))
+
+    for dim in args.dims:
+        t_dim = time.time()
+        embed = make_embedding_pipeline(dim=dim, select_k=None, use_scaling=True,
+                                        angle_min=0.0, angle_max=float(np.pi),
+                                        seed=args.seed)
+        embed.fit(np.asarray(X[idx["train"]]), y_by_split["train"])
+        X_emb = {k: np.asarray(embed.transform(np.asarray(X[v])), dtype=np.float64)
+                 for k, v in idx.items()}
+        factory = ClassicalKernelFactory(X_emb["train"], seed=args.seed)
+
+        for kname in v4_classical_kernels():
+            eval_config(kname, "classical_ext", dim,
+                        factory.block(kname, X_emb["train"], X_emb["train"]),
+                        factory.block(kname, X_emb["id_test"], X_emb["train"]),
+                        factory.block(kname, X_emb["ood_test"], X_emb["train"]),
+                        factory.block(kname, X_emb["id_test"], X_emb["id_test"]),
+                        factory.block(kname, X_emb["ood_test"], X_emb["ood_test"]))
+
+        for scale in V4_ANGLE_SCALES:
+            X_q = X_emb if scale == 1.0 else {k: v * scale for k, v in X_emb.items()}
+            suffix = "" if scale == 1.0 else f"__as{scale:g}"
+            for qcfg in DEFAULT_QUANTUM_CONFIGS:
+                fmap = build_feature_map(qcfg, feature_dim=dim)
+                sv = {k: compute_statevectors_batch(X_q[k], fmap, dtype=np.complex64)
+                      for k in X_q}
+                K_tr = kernel_block_abs2(sv["train"], sv["train"], out_dtype=np.float64)
+                K_id = kernel_block_abs2(sv["id_test"], sv["train"], out_dtype=np.float64)
+                K_oo = kernel_block_abs2(sv["ood_test"], sv["train"], out_dtype=np.float64)
+                K_id_sq = kernel_block_abs2(sv["id_test"], sv["id_test"], out_dtype=np.float64)
+                K_oo_sq = kernel_block_abs2(sv["ood_test"], sv["ood_test"], out_dtype=np.float64)
+                kname = qcfg["id"] + suffix
+                eval_config(kname, "quantum", dim, K_tr, K_id, K_oo, K_id_sq, K_oo_sq)
+
+                if args.shots:
+                    rng = np.random.default_rng(V4_SHOTS_SEED + dim * 1000 + hash(kname) % 997)
+                    for shots in V4_SHOTS:
+                        Kp_tr, a_tr = perturb_kernel_finite_shots(K_tr, shots, rng, square=True)
+                        Kp_id, _ = perturb_kernel_finite_shots(K_id, shots, rng, square=False)
+                        Kp_oo, _ = perturb_kernel_finite_shots(K_oo, shots, rng, square=False)
+                        Kp_oo_sq, a_oo = perturb_kernel_finite_shots(K_oo_sq, shots, rng, square=True)
+                        blocks_p = {"train": Kp_tr, "id_val": Kp_id[val_pos],
+                                    "id_test": Kp_id[test_pos], "ood_test": Kp_oo}
+                        for r in v4_eval_rows(kname, "quantum", dim, blocks_p, y_eval,
+                                              y_by_split["train"]):
+                            r.update({"shots": shots,
+                                      "min_eig_before_psd": a_tr["min_eig_before_psd"],
+                                      "fro_change_sampling": a_tr["fro_change_sampling"],
+                                      "fro_change_projection": a_tr["fro_change_projection"]})
+                            shots_rows.append(r)
+                        shots_rows.append({
+                            "family": "quantum", "kernel": kname, "dim": dim,
+                            "cfg": f"{kname}__geom__d{dim}", "model": "geometry",
+                            "split": "ood_test", "shots": shots,
+                            "balanced_accuracy": np.nan,
+                            "spec_train_eff_rank": eff_rank(Kp_tr),
+                            "kta_ood": centered_kta(Kp_oo_sq, y_by_split["ood_test"]),
+                            "min_eig_before_psd": a_oo["min_eig_before_psd"],
+                            "fro_change_sampling": a_oo["fro_change_sampling"],
+                            "fro_change_projection": a_oo["fro_change_projection"]})
+        print(f"[OK] dim={dim} done in {time.time() - t_dim:.1f}s (v4)", flush=True)
+
+    args.out_dir.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(summary_rows).to_csv(args.out_dir / OUT_FILES["v4"], index=False)
+    pd.DataFrame(geo_rows).to_csv(args.out_dir / "geometry_v4.csv", index=False)
+    pd.DataFrame([audit]).to_csv(args.out_dir / "idsplit_audit_v4.csv", index=False)
+    if shots_rows:
+        pd.DataFrame(shots_rows).to_csv(args.out_dir / "shots_v4.csv", index=False)
+    print(f"[OK] Wrote {args.out_dir / OUT_FILES['v4']}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--in-dir", type=Path, required=True)
@@ -208,6 +363,9 @@ def main() -> None:
     ap.add_argument("--mode", choices=list(OUT_FILES), required=True)
     ap.add_argument("--include-quantum", action="store_true",
                     help="csens only: also sweep C for the quantum feature maps.")
+    ap.add_argument("--shots", action="store_true",
+                    help="v4 only: run the finite-shot fidelity-estimation "
+                         "perturbation model on the quantum configs (spec subset).")
     args = ap.parse_args()
 
     X = np.load(args.in_dir / "X.npy", mmap_mode="r")
@@ -215,6 +373,10 @@ def main() -> None:
     idx = {k: load_indices(args.splits_dir / f"{k}_idx.npy")
            for k in ("train", "id_test", "ood_test")}
     y_by_split = {k: y[v] for k, v in idx.items()}
+
+    if args.mode == "v4":
+        run_v4(args, X, y, idx, y_by_split)
+        return
 
     summary_rows: List[Dict[str, Any]] = []
     geo_rows: List[Dict[str, Any]] = []
