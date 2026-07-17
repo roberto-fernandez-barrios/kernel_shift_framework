@@ -16,7 +16,11 @@ ROOTS = ["results/ember_shift/extended_kernels", "results/netflow/extended_kerne
 BATCHES = [
     ["--roots", *ROOTS, "--mode", "v4", "--filter", "q1000", "__s42",
      "--runner-args=--shots"],
-    ["--roots", *ROOTS, "--mode", "v4"],
+    # size-ordered so the q1000+q2000 confirmatory stratum (spec section 7
+    # fallback) completes first; q4000 (the slow stratum) runs last
+    ["--roots", *ROOTS, "--mode", "v4", "--filter", "q1000"],
+    ["--roots", *ROOTS, "--mode", "v4", "--filter", "q2000"],
+    ["--roots", *ROOTS, "--mode", "v4", "--filter", "q4000"],
 ]
 
 
