@@ -33,11 +33,12 @@ ORIG_PREFIXES = ("linear", "rbf_gscale")
 RUN_RE = re.compile(r"(?P<setting>.+)__qs(?P<qs>\d+)__s(?P<seed>\d+)$")
 
 
-def load_runs(root: Path, extra_files: list[str] | None = None) -> pd.DataFrame:
+def load_runs(root: Path, extra_files: list[str] | None = None,
+              base_file: str = "extended_kernels_qsplits__summary.csv") -> pd.DataFrame:
     cols = ["family", "model", "cfg", "kernel", "split", "balanced_accuracy"]
     frames = []
     for d in sorted(root.iterdir()):
-        f = d / "extended_kernels_qsplits__summary.csv"
+        f = d / base_file
         m = RUN_RE.match(d.name)
         if not m or not f.exists():
             continue

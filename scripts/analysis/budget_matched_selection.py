@@ -72,10 +72,11 @@ def annotate(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def load_combined(roots: list[tuple[str, Path]], extra_files: list[str]) -> pd.DataFrame:
+def load_combined(roots: list[tuple[str, Path]], extra_files: list[str],
+                  base_file: str = "extended_kernels_qsplits__summary.csv") -> pd.DataFrame:
     frames = []
     for tag, root in roots:
-        d = load_runs(root, extra_files)
+        d = load_runs(root, extra_files, base_file=base_file)
         d["root"] = tag
         frames.append(d)
     df = pd.concat(frames, ignore_index=True)
@@ -231,6 +232,9 @@ def main() -> None:
         "netflow=results/netflow/extended_kernels",
         "netflow_bw=results/netflow_bandwidth_sweep/extended_kernels"])
     ap.add_argument("--extra-files", nargs="*", default=["summary_classical_lsweep.csv"])
+    ap.add_argument("--base-file", default="extended_kernels_qsplits__summary.csv",
+                    help="per-run base summary; the confirmatory v4 pass uses "
+                         "summary_v4.csv (with --extra-files '' --select-col id_val)")
     ap.add_argument("--select-col", choices=["id_test", "id_val"], default="id_test",
                     help="id_test = legacy software-validation pass (spec constraint 7); "
                          "id_val = confirmatory v4 protocol")
@@ -242,7 +246,8 @@ def main() -> None:
     args = ap.parse_args()
 
     roots = [(s.split("=", 1)[0], Path(s.split("=", 1)[1])) for s in args.roots]
-    df = load_combined(roots, args.extra_files)
+    extra = [f for f in args.extra_files if f]
+    df = load_combined(roots, extra, base_file=args.base_file)
     cfg_meta = df[["cfg", "kernel", "shape", "scale", "dim"]].drop_duplicates("cfg")
     w = wide_metrics(df, args.select_col)
 
