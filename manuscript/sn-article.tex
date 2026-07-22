@@ -310,26 +310,22 @@ In the experiments, we evaluate multiple commonly used fidelity-based feature-ma
 
 \subsection{Model selection and repeated-run protocol}
 
-A major source of ambiguity in robustness studies is the selection criterion. Strong ID performance does not necessarily imply strong OOD performance, and a criterion that consults the shifted test labels is not deployable. We therefore apply family-internal selection at three levels of stringency, identically to both families.
+A major source of ambiguity in robustness studies is the selection criterion, and a fair comparison must fix four things that optimistic evaluations leave loose: the regularization of each configuration, the data used to select the deployed configuration, the candidate budget of each family, and the way significance is assessed over correlated settings.
 
-\paragraph{P3, Best-by-OOD (oracle).}
-Within each family we select the configuration with the highest mean OOD balanced accuracy and compare the selected representatives. Because it peeks at the target split, this is an oracle upper bound rather than a deployable rule; it is the comparison that dominates the optimistic literature, and we report it as such.
+\paragraph{Regularization tuned on training data alone.}
+For every one of the 23 classical and 12 quantum kernel geometries, the SVC regularization $C\in\{0.01,0.1,1,10,100\}$ is chosen by five-fold stratified cross-validation on the training Gram matrix only, selecting the value with the best mean validation balanced accuracy (ties broken toward smaller $C$). Regularization is thus tuned per configuration without touching any test split, and $C$ is \emph{not} a candidate in the family comparison---so it introduces no additional selection optimism. The GP classifier has no analogous free constant and is run at fixed hyperparameters, and therefore serves as a secondary robustness check rather than carrying the family-level claim.
 
-\paragraph{P1, deployment (honest).}
-Within each run and family we select the configuration with the highest \emph{in-distribution} balanced accuracy and report its OOD accuracy. No OOD labels enter the selection, so P1 is a rule a practitioner could actually deploy; it is our primary comparison.
+\paragraph{P1$'$, ID-validation deployment (primary).}
+We split each in-distribution test set, class-stratified and deterministically by a stable hash of the sample index, into an ID-validation half and a disjoint ID-test half. Within each run and family, the deployed configuration (at its cross-validated $C$) is the one with the best ID-\emph{validation} balanced accuracy; we then report its ID-test and OOD-test accuracy. No out-of-distribution label ever enters selection, and---unlike a rule that selects and reports on the same ID split---the reported ID-test number is out-of-sample. Two auxiliary protocols are reported for context only: P2, a cross-realization protocol that selects using OOD labels from other split seeds (hence \emph{not} label-free, and named accordingly), and P3, the Best-by-OOD oracle that selects and evaluates on the same OOD split, an upper bound.
 
-\paragraph{P2, cross-seed (honest).}
-For each setting we perform leave-one-seed-out selection over the five q-split seeds: pick the configuration with the best mean OOD accuracy on four seeds and evaluate it on the held-out seed. Shift labels inform the choice only from splits disjoint from the evaluation split, answering whether a robust kernel can be chosen from prior examples of the same shift.
+\paragraph{Matched candidate budgets.}
+The classical family offers 23 kernel geometries per dimension against the quantum family's 12; because best-of-family selection favours the larger pool, we compare the 12 quantum geometries both against the full classical pool and against random equal-size subsamples of it (5000 resamples, three sampling schemes), and report performance as a function of candidate budget.
 
-\paragraph{Best-by-ID.}
-Within each family we also select by ID balanced accuracy and compare, as a separability-oriented view reported separately to avoid conflating ID accuracy with OOD robustness.
+\paragraph{Inference by fixed case studies.}
+The eight scenario-groups share underlying data pools and are not exchangeable---on the EMBER sparsity construction the OOD split is identical across master seeds---so a pooled significance test over settings would understate dependence. We therefore treat each scenario-group as a fixed case study and summarize its quantum-minus-classical delta by the mean over its five split-seed clusters, with a conditional interval (a $t$-interval on the five cluster means, with a BCa bootstrap and leave-one-split-out jackknife as secondary) that quantifies pipeline-realization uncertainty conditional on the benchmark pools. Across case studies we report the dataset-equal-weighted mean, its leave-one-dataset-out range, and the heterogeneity of effects; we deliberately report \emph{no} population $p$-value, because the case studies are fixed and few.
 
-This separation is methodological, not cosmetic. It acts as a guardrail against overinterpreting ID gains as robustness gains, and against reading an oracle comparison as a deployable one; it disentangles which kernel family yields the strongest in-distribution class separation from which yields the strongest, honestly selectable out-of-distribution generalization.
-
-Selection is only one source of ambiguity in robustness studies; a second is result stability. Each configuration is therefore realized as fifteen pipeline realizations, generated by combining five q-split seeds with three model seeds under fixed setting definitions (shift variant, master seed, and size regime). Within a setting, both classical and quantum candidates are evaluated on identical split definitions and summarized by mean $\pm$ standard deviation over the repeated runs, so that every reported comparison is variability-aware while preserving strict comparability between kernel families.
-
-\paragraph{Statistical testing.}
-Family-level comparisons are tested with paired two-sided Wilcoxon signed-rank tests over the per-setting deltas (the settings are the paired units), separately for each classifier, scenario, and selection view, with Holm correction. Because settings within a dataset are correlated, cross-dataset claims are based instead on a hierarchy-aware sign-flip permutation test whose statistic weights each dataset equally, reported with leave-one-dataset-out ranges and bootstrap confidence intervals rather than by pooling correlated settings as independent replicates. We retain the per-setting effect-size proxy defined below as a descriptor of magnitude relative to run-to-run noise, not as an inferential criterion.
+\paragraph{Finite-shot perturbation model.}
+To test how far the statevector-exact geometry transfers to finite measurement, each fidelity entry is optionally replaced by a binomial estimate from $s\in\{128,512,2048,8192\}$ shots; square (train) blocks are symmetrized, set unit-diagonal, clipped to $[0,1]$, and projected to the positive-semidefinite cone (reporting the deviation before and after projection), while rectangular test blocks receive sampling and clipping only. This is a statistical estimation model, not a device-noise or hardware simulation.
 
 \subsection{Evaluation metrics}
 
@@ -423,10 +419,11 @@ Shared preprocessing & MaxAbsScaler + TruncatedSVD + angle mapping \\
 Classical-original family & Linear, RBF(scale) \\
 Classical-extended family & + poly(2,3), Laplacian, Mat\'ern(3/2, 5/2), median heuristic \\
 Quantum family & ZZ (1 rep), ZZ (2 reps), PauliXZ (1 rep), Z-map \\
-Bandwidth sweep & RBF $\gamma$ factors $\{0.1,0.3,1,3,10\}$; angle scales $\{0.5,1,2\}$ \\
-Selection & honest P1 (ID), P2 (cross-seed); oracle P3 (OOD); Best-by-ID \\
-Statistical testing & Paired Wilcoxon (per scenario) + Holm; hierarchical permutation test \\
-Principal settings & EMBER $2{\times}3{\times}3 = 18$; network $3{\times}2{\times}3{\times}3 = 54$; total 72 \\
+Length-scale sweep & RBF/Laplacian/Mat\'ern factors; quantum angle scales $\{0.5,1,2\}$ \\
+Regularization & SVC $C\in\{0.01,0.1,1,10,100\}$, 5-fold CV on train \\
+Selection & P1$'$ ID-validation (primary); P2, P3 for context; equal budgets \\
+Inference & Fixed case studies; conditional intervals; no population $p$-value \\
+Scenario-groups & EMBER 2; network 6; total 8 (each $\times$ master seed $\times$ size) \\
 \bottomrule
 \end{tabular}
 \end{table}
