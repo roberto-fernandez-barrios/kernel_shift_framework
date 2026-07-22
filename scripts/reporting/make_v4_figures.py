@@ -156,8 +156,98 @@ def fig_shots() -> None:
     print("[ok] fig_v4_shots.pdf")
 
 
+def fig_uncertainty() -> None:
+    """GPC predictive-uncertainty change ID->OOD, for the P1'-selected config
+    of each family (from summary_v4). Computed under honest selection."""
+    import glob
+    import os
+    rows = []
+    for f in glob.glob("results/*/extended_kernels/*/summary_v4.csv"):
+        run = os.path.basename(os.path.dirname(f))
+        grp = ("ember_" + run.split("__")[0].split("_")[0]
+               if run.startswith(("m1_", "m2_"))
+               else run.split("__")[0] + "_" + run.split("__")[1])
+        ds = "ember" if grp.startswith("ember") else grp.rsplit("_m", 1)[0].rsplit("_natural", 1)[0]
+        s = pd.read_csv(f)
+        g = s[s.model == "gpc"]
+        for fam, mask in [("classical", g.family == "classical_ext"),
+                          ("quantum", g.family == "quantum")]:
+            sub = g[mask]
+            w = sub.pivot_table(index="cfg", columns="split",
+                                values=["balanced_accuracy", "ece", "mean_predictive_entropy"])
+            sel = w["balanced_accuracy"]["id_val"].idxmax()   # P1' selection
+            for metric in ("ece", "mean_predictive_entropy"):
+                rows.append({"dataset": ds, "family": fam, "metric": metric,
+                             "delta": w[metric].loc[sel, "ood_test"] - w[metric].loc[sel, "id_test"]})
+    df = pd.DataFrame(rows)
+    fig, axes = plt.subplots(1, 2, figsize=(7.0, 2.6))
+    datasets = ["ember", "unsw_dos", "unsw_recon", "toniot_scanning"]
+    dlab = {"ember": "EMBER", "unsw_dos": "UNSW-DoS", "unsw_recon": "UNSW-Recon",
+            "toniot_scanning": "ToN-IoT"}
+    for ax, metric, title in [
+        ("mean_predictive_entropy", "mean_predictive_entropy", "Predictive entropy rises under shift"),
+        ("ece", "ece", "Calibration error changes moderately")]:
+        a = axes[0] if metric == "mean_predictive_entropy" else axes[1]
+        a.axhline(0, color=C_NEUTRAL, lw=0.8, ls="--")
+        for j, fam in enumerate(("classical", "quantum")):
+            vals = [df[(df.dataset == d) & (df.family == fam) & (df.metric == metric)].delta.mean()
+                    for d in datasets]
+            x = np.arange(len(datasets)) + (j - 0.5) * 0.32
+            a.bar(x, vals, width=0.3, color=C_CLASSICAL if fam == "classical" else C_QUANTUM,
+                  label=fam if metric == "mean_predictive_entropy" else None)
+        a.set_xticks(range(len(datasets)))
+        a.set_xticklabels([dlab[d] for d in datasets], fontsize=7, rotation=20, ha="right")
+        a.set_title(title, fontsize=8)
+    axes[0].set_ylabel("OOD $-$ ID (mean over settings)")
+    axes[0].legend(frameon=False, fontsize=7, loc="upper left")
+    fig.tight_layout()
+    fig.savefig(OUT / "fig_v4_uncertainty.pdf", bbox_inches="tight")
+    plt.close(fig)
+    print("[ok] fig_v4_uncertainty.pdf")
+
+
+def fig_protocol() -> None:
+    from matplotlib.patches import FancyBboxPatch
+    fig, ax = plt.subplots(figsize=(7.0, 2.9))
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 42)
+    ax.axis("off")
+
+    def box(x, y, w, h, text, edge="#555555", face="#f7f7f7", fs=7):
+        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.6,rounding_size=1.2",
+                                    fc=face, ec=edge, lw=1.0))
+        ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs, color="#222222")
+    P = 0.7
+
+    def arrow(x0, y0, x1, y1):
+        ax.annotate("", (x1, y1), (x0, y0),
+                    arrowprops=dict(arrowstyle="-|>", lw=0.9, color="#555555",
+                                    shrinkA=0.5, shrinkB=0.5, mutation_scale=9))
+    box(1, 26, 16, 13, "Benchmarks\nEMBER (malware)\nUNSW / ToN-IoT\n(network flows)", fs=6.5)
+    box(21, 26, 17, 13, "Shift construction\nsparsity $\\cdot$ centroid $\\cdot$\nheld-out campaign\n$T, S_{\\mathrm{ID}}, S_{\\mathrm{OOD}}$", fs=6.3)
+    box(42, 26, 16, 13, "Shared embedding\nMaxAbs, SVD($d$),\nangles $[0,\\pi]$", fs=6.5)
+    box(62, 34, 18, 7, "Classical kernels\n23 geometries", edge=C_CLASSICAL, fs=6.5)
+    box(62, 24, 18, 7, "Quantum kernels\n12 fidelity maps", edge=C_QUANTUM, fs=6.5)
+    box(84, 26, 15, 13, "Same classifier\nSVC / GPC\n$C$ tuned on train", fs=6.3)
+    box(6, 3, 40, 12, "Gram-matrix geometry\neffective rank $\\cdot$ KTA (ID/OOD)\n$\\Rightarrow$ association analysis + shots model", face="#fdf3ec", edge=C_QUANTUM, fs=6.2)
+    box(53, 3, 46, 12, "Honest selection at equal budget\nP1$'$: select on ID-validation\nfixed case studies $\\cdot$ conditional intervals", fs=6.3)
+    arrow(17 + P, 32.5, 21 - P, 32.5)
+    arrow(38 + P, 32.5, 42 - P, 32.5)
+    arrow(58 + P, 34.5, 62 - P, 37.5)
+    arrow(58 + P, 30.5, 62 - P, 27.5)
+    arrow(80 + P, 37.5, 84 - P, 35.5)
+    arrow(80 + P, 27.5, 84 - P, 29.5)
+    arrow(68, 24 - P, 30, 15 + P)
+    arrow(91.5, 26 - P, 80, 15 + P)
+    fig.savefig(OUT / "fig_v4_protocol.pdf", bbox_inches="tight")
+    plt.close(fig)
+    print("[ok] fig_v4_protocol.pdf")
+
+
 if __name__ == "__main__":
     fig_honest()
     fig_rankmatched()
     fig_mechanism()
     fig_shots()
+    fig_uncertainty()
+    fig_protocol()
