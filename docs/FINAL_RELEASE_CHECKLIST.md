@@ -1,89 +1,111 @@
-# Final release checklist
+# Paper 1 submission and artifact-release checklist
 
-This checklist is intended for the **post-validation public release phase** of the repository. The core scientific pipeline, reduced end-to-end validation path, and public packaging baseline are already in place.
+Last local validation: 28 July 2026.
 
-## 1. Licensing / ownership
-Confirm that the shipped `BSD-3-Clause` license is acceptable for the actual rights holder.
+Target: *npj Quantum Information*, Collection "Quantum machine learning:
+understanding capabilities, limitations, and perspectives for quantum
+advantage". Fallback: *EPJ Quantum Technology*.
 
-If institutional ownership applies, update the copyright line in `LICENSE` and, if needed, align:
+## Completed locally
 
-- `CITATION.cff`
-- `pyproject.toml`
-- repository hosting namespace / organization
+- [x] Main title, abstract, introduction, results, discussion, and conclusion
+  use the protocol-dependent negative result.
+- [x] The headline table and figure read the frozen equal-budget `budget60`
+  estimand, not the full-pool sensitivity.
+- [x] No same-test oracle result is presented as confirmatory evidence.
+- [x] No pooled population significance test is attached to the eight fixed
+  scenario-groups.
+- [x] Main manuscript reduced below 8,000 counted words.
+- [x] Detailed constructions and secondary analyses moved to separate
+  Supplementary Information.
+- [x] Main and Supplementary PDFs compile without undefined citations,
+  undefined references, or overfull boxes.
+- [x] Both PDFs rendered page by page and visually checked.
+- [x] Reporting regression test added for the equal-budget source and table
+  schema.
+- [x] README describes the current result and the canonical v4 reproduction
+  command.
+- [x] npj Quantum Information and EPJ Quantum Technology cover letters updated
+  to match the current claims.
 
-See also `docs/LEGAL_RELEASE_NOTE.md`.
+## Validate before freezing a release
 
-## 2. Dependency and environment hygiene
-Confirm that the dependency files accurately reflect their intended roles:
-
-- `environment.yml` — recommended Conda setup
-- `requirements.txt` — pinned top-level pip environment
-- `requirements-compat.txt` — looser compatibility envelope
-- `environment.lock.yml` — more explicit Conda snapshot, if retained
-- `requirements.lock.txt` — more explicit pip snapshot, if retained
-
-If lockfiles are kept in the repository, they should be defensible as real archival or near-archival environment snapshots rather than placeholders.
-
-## 3. Package and CI hygiene
-Confirm that public CI remains green and that it validates:
-
-- `pip install .`
-- CLI smoke test
-- reporting stage
-- Python **3.11** and **3.12** support
-
-If CI is green at release time, no further action is required here.
-
-## 4. Public metadata
-Confirm that the public-facing repository metadata is aligned:
-
-- repository URL
-- release tag
-- archival DOI / Zenodo record
-- `CITATION.cff`
-- README citation block
-
-If a newer public release supersedes the current archival DOI, update the citation metadata accordingly.
-
-## 5. Sanity checks before publishing a new release
-Run from repository root:
+Run from the repository root in the declared environment:
 
 ```bash
+python scripts/reproduce_v4.py --stage all
+pytest -q
 python scripts/smoke/smoke_test_cli.py
 ```
 
-Inspect:
-
-- `docs/smoke_test_report.json`
-
-Optional but useful:
+Then regenerate the submission PDFs:
 
 ```bash
-python scripts/reporting/make_summary_tables.py \
-  --metrics results/aggregated/AGG_ROOT_mean_std_metrics__by_variant_seed_and_size.csv \
-  --drops results/aggregated/AGG_ROOT_mean_std_drop__by_variant_seed_and_size.csv \
-  --outdir results/tables_check \
-  --topn 10 \
-  --round 4
+cd manuscript
+latexmk -pdf -interaction=nonstopmode -halt-on-error sn-article.tex
+latexmk -pdf -interaction=nonstopmode -halt-on-error supplementary.tex
 ```
 
-## 6. Release publication step
-For a GitHub + Zenodo archival workflow:
+Check the logs:
 
-1. commit final metadata / documentation changes,
-2. push to the public repository,
-3. create the GitHub release,
-4. wait for Zenodo ingestion,
-5. verify the DOI record,
-6. update the default branch citation metadata if needed.
+- no undefined citations or references;
+- no overfull boxes;
+- headline values remain SVC `-0.0050` and GPC `-0.0019` against the
+  equal-budget extended family;
+- main and Supplementary Information refer to the same protocol and version.
 
-## 7. What is optional rather than blocking
-The following are useful improvements, but they are **not** blockers for a valid public research release:
+## Metadata to align in the release commit
 
-- stricter future lockfile regeneration,
-- additional GitHub templates (`CONTRIBUTING.md`, issue templates, etc.),
-- cosmetic README improvements,
-- future deprecation-warning cleanup.
+- [ ] Use a new release version for this post-v0.4.0 revision (`v0.4.1` is the
+  recommended patch version), and set it consistently in `pyproject.toml`,
+  `CITATION.cff`, the Git tag, and the GitHub release. Do not reuse the
+  existing `v0.4.0` tag.
+- [ ] Ensure the README title, manuscript title, release notes, and Zenodo
+  description state the same protocol-dependent conclusion.
+- [ ] Confirm author names, accents, ORCIDs, affiliation, and corresponding
+  email.
+- [ ] Confirm the code and artifact rights holder and approval of the
+  BSD-3-Clause licence; see `docs/LEGAL_RELEASE_NOTE.md`.
+- [ ] Confirm third-party dataset redistribution boundaries.
 
-## Practical release conclusion
-If licensing is confirmed, CI is green, citation metadata is aligned, and the release archive is publicly resolvable, the repository should be considered **ready for public release and citation**.
+## Archive and public repository
+
+- [ ] Commit the exact tested source and generated manuscript files.
+- [ ] Tag the exact release commit; do not move or overwrite the historical
+  v0.3.0 or v0.4.0 tags.
+- [ ] Create a GitHub release from that tag.
+- [ ] Wait for Zenodo ingestion and inspect the deposited file list.
+- [ ] Confirm that the manuscript DOI resolves to the exact submitted release,
+  not an earlier artifact state.
+- [ ] If Zenodo assigns a new version DOI, update `CITATION.cff`, README, and
+  both manuscript files, rebuild, and recheck before submission.
+
+Remote publication, pushing, tagging, and Zenodo release creation require the
+corresponding author's explicit approval.
+
+## Journal submission
+
+- [x] Main manuscript source and PDF.
+- [x] Supplementary Information source and PDF.
+- [x] Target-specific cover letter.
+- [ ] Confirm the Collection selection in the submission portal.
+- [ ] Confirm article type and APC route or institutional agreement.
+- [ ] Supply the final artifact DOI and repository URL.
+- [ ] Declare the earlier preprint and update it to the submitted version when
+  appropriate.
+- [ ] Prepare suggested reviewers and have all authors check conflicts,
+  current affiliations, and institutional email addresses.
+- [ ] Obtain explicit co-author approval of the final claims and files.
+- [ ] Complete the journal reporting and editorial-policy forms.
+
+## Scientific stop/go
+
+Submit only if all of the following remain true:
+
+1. the abstract, headline table, figures, discussion, and cover letter trace to
+   the frozen equal-budget analysis;
+2. no text implies hardware advantage, speedup, universal dominance, or a
+   population effect;
+3. the tested commit is the archived commit;
+4. GitHub, Zenodo, citation metadata, and manuscript identify the same release;
+5. every co-author has approved the final package.

@@ -4,8 +4,9 @@ Print figures for the v4 (honest-selection) manuscript. Okabe-Ito palette,
 classical = blue #0072B2, quantum = vermillion #D55E00, neutral gray. Vector
 PDF. Every figure traces to a results/v4/ CSV. Framing F1.
 
-  fig_v4_honest      per-group honest P1' OOD delta vs both references, with
-                     conditional intervals -- deltas sit at/below zero.
+  fig_v4_honest      per-group P1' OOD delta vs the customary reference and
+                     the equal-budget extended family, with conditional
+                     intervals -- deltas sit at/below zero.
   fig_v4_rankmatched at matched effective rank, quantum minus classical delta
                      is negative in every group (geometry, not quantumness).
   fig_v4_mechanism   the geometry-OOD association is regime-dependent.
@@ -39,15 +40,17 @@ ORDER = ["ember_m1", "ember_m2", "unsw_dos_natural_cur", "unsw_dos_m2_centroid",
          "unsw_recon_natural_cur", "unsw_recon_m2_centroid",
          "toniot_scanning_natural_cur", "toniot_scanning_m2_centroid"]
 SHORT = {"ember_m1": "EMBER m1", "ember_m2": "EMBER m2",
-         "unsw_dos_natural_cur": "UNSW-DoS drift", "unsw_dos_m2_centroid": "UNSW-DoS m2",
-         "unsw_recon_natural_cur": "UNSW-Recon drift", "unsw_recon_m2_centroid": "UNSW-Recon m2",
-         "toniot_scanning_natural_cur": "ToN-IoT drift", "toniot_scanning_m2_centroid": "ToN-IoT m2"}
+         "unsw_dos_natural_cur": "UNSW-DoS campaign", "unsw_dos_m2_centroid": "UNSW-DoS constructed",
+         "unsw_recon_natural_cur": "UNSW-Recon campaign", "unsw_recon_m2_centroid": "UNSW-Recon constructed",
+         "toniot_scanning_natural_cur": "ToN-IoT campaign", "toniot_scanning_m2_centroid": "ToN-IoT constructed"}
 
 
 def fig_honest() -> None:
     g = pd.read_csv("results/v4/family_comparison/group_summary.csv")
-    hier = pd.read_csv("results/v4/family_comparison/inference/hierarchical_effects.csv")
-    hier = hier[hier.stratum == "all"].set_index(["variant", "model", "scope"])
+    budget = pd.read_csv("results/v4/inference_confirmatory/hierarchical_effects.csv")
+    budget = budget[
+        (budget.variant == "budget60") & (budget.stratum == "all")
+    ].set_index(["model", "scope"])
     fig, axes = plt.subplots(1, 2, figsize=(7.0, 3.4), sharey=True)
     y = np.arange(len(ORDER))
     for ax, model, title in [(axes[0], "svc", "SVC"), (axes[1], "gpc", "GPC")]:
@@ -55,14 +58,15 @@ def fig_honest() -> None:
         gm = g[g.model == model].set_index("group")
         for i, grp in enumerate(ORDER):
             r = gm.loc[grp]
-            # vs extended (primary) with conditional interval
+            # Equal-budget extended family (primary), with conditional interval.
             try:
-                ci = hier.loc[("vs_classical_ext", model, grp)]
+                ci = budget.loc[(model, grp)]
                 ax.plot([ci.ci_lo, ci.ci_hi], [i, i], color=C_CLASSICAL, lw=1.2, zorder=2)
+                primary_delta = ci.effect
             except KeyError:
-                pass
-            ax.scatter(r.p1_ood_delta_vs_classical_ext, i, s=30, color=C_CLASSICAL,
-                       zorder=3, label="vs extended" if i == 0 else None)
+                primary_delta = np.nan
+            ax.scatter(primary_delta, i, s=30, color=C_CLASSICAL,
+                       zorder=3, label="vs extended (equal budget)" if i == 0 else None)
             ax.scatter(r.p1_ood_delta_vs_classical_orig, i, s=24, marker="D",
                        facecolors="none", edgecolors=C_QUANTUM, linewidths=1.0,
                        zorder=3, label="vs linear+RBF" if i == 0 else None)
@@ -72,7 +76,7 @@ def fig_honest() -> None:
     axes[0].set_yticklabels([SHORT[g_] for g_ in ORDER])
     axes[0].set_ylim(len(ORDER) - 0.5, -0.5)   # top-to-bottom = ORDER, once (shared)
     axes[0].legend(frameon=False, loc="lower left", fontsize=7)
-    fig.suptitle("No robust quantum advantage under honest, budget-matched selection",
+    fig.suptitle("No robust quantum advantage under no-OOD-label selection",
                  fontsize=9, y=1.01)
     fig.tight_layout()
     fig.savefig(OUT / "fig_v4_honest.pdf", bbox_inches="tight")
