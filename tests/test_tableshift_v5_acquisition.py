@@ -9,6 +9,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from scripts.data.export_tableshift_v5 import (  # noqa: E402
+    feature_role,
     hashed_order,
     row_digest,
     validate_source_splits,
@@ -56,3 +57,9 @@ def test_split_overlap_gate():
                 "ood_test": np.array([4]),
             }
         )
+
+
+def test_feature_roles_preserve_categorical_codes():
+    assert feature_role(np.dtype("float64")) == "numeric"
+    assert feature_role(np.dtype("bool")) == "categorical"
+    assert feature_role(np.dtype("O")) == "categorical"

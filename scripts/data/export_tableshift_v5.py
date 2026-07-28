@@ -80,6 +80,20 @@ def validate_source_splits(split_positions: dict[str, np.ndarray]) -> None:
                 )
 
 
+def feature_role(dtype) -> str:
+    """Preserve TableShift's semantic dtype across the CSV interchange."""
+    if (
+        isinstance(dtype, pd.CategoricalDtype)
+        or pd.api.types.is_object_dtype(dtype)
+        or pd.api.types.is_string_dtype(dtype)
+        or pd.api.types.is_bool_dtype(dtype)
+    ):
+        return "categorical"
+    if pd.api.types.is_numeric_dtype(dtype):
+        return "numeric"
+    raise TypeError(f"unsupported TableShift feature dtype: {dtype}")
+
+
 def export_task(
     task: str,
     cache_dir: Path,
@@ -90,6 +104,17 @@ def export_task(
     # heavyweight TableShift environment.
     from tableshift import get_dataset
     from tableshift.core.features import PreprocessorConfig
+
+    # TableShift's pinned CollegeScorecardDataSource unconditionally invokes
+    # the Kaggle CLI, even when its public CC0 archive has already been placed
+    # in the exact expected cache path.  In that one case, suppress only the
+    # redundant download call; parsing, schema, target construction, and
+    # published splitting remain the pinned TableShift implementation.
+    if task == "college_scorecard":
+        expected = cache_dir / "kaggle" / "college-scorecard" / "Scorecard.csv"
+        if expected.exists():
+            from tableshift.core.data_source import CollegeScorecardDataSource
+            CollegeScorecardDataSource._download_if_not_cached = lambda self: None
 
     config = PreprocessorConfig(
         categorical_features="passthrough",
@@ -117,9 +142,19 @@ def export_task(
     }
     validate_source_splits(split_positions)
     audit_rows: list[dict] = []
+    schema_rows: list[dict] | None = None
 
     for split, limits in SPLIT_LIMITS.items():
         X, y, _, _ = dataset.get_pandas(split)
+        current_schema = [
+            {"task": task, "column": column, "dtype": str(dtype),
+             "role": feature_role(dtype)}
+            for column, dtype in X.dtypes.items()
+        ]
+        if schema_rows is None:
+            schema_rows = current_schema
+        elif current_schema != schema_rows:
+            raise RuntimeError(f"feature schema changes across splits for {task}")
         X = X.reset_index(drop=True)
         y = pd.Series(np.asarray(y).ravel()).reset_index(drop=True)
         source_positions = split_positions[split]
@@ -184,6 +219,9 @@ def export_task(
     pd.DataFrame(audit_rows).sort_values(
         ["task", "split", "seed", "stratum"]
     ).to_csv(audit_dir / f"tableshift_sampling_{task}.csv", index=False)
+    pd.DataFrame(schema_rows).to_csv(
+        audit_dir / f"tableshift_schema_{task}.csv", index=False
+    )
 
     source_rows = []
     for path in sorted(p for p in cache_dir.rglob("*") if p.is_file()):
