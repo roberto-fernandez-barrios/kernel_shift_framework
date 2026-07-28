@@ -7,6 +7,7 @@ safe: every unit-level runner skips completed configuration/model cells.
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -32,6 +33,14 @@ def main() -> None:
                         choices=(4, 6, 8, 10, 12), default=[4, 6, 8, 10, 12])
     parser.add_argument("--backend", choices=("auto", "cpu", "cuda"), default="auto")
     parser.add_argument("--workers", type=int, default=1)
+    parser.add_argument(
+        "--blas-threads", type=int, default=None,
+        help="threads per worker for MKL/OpenMP/OpenBLAS; useful with --workers > 1",
+    )
+    parser.add_argument(
+        "--retries", type=int, default=2,
+        help="resume and retry a failed unit this many times",
+    )
     parser.add_argument("--preflight-only", action="store_true")
     args = parser.parse_args()
 
@@ -63,16 +72,30 @@ def main() -> None:
         task, stratum, seed, command = job
         label = f"{task}/{stratum}/seed_{seed}"
         print(f"\n[v5] start {label} models={','.join(args.models)}", flush=True)
-        completed = subprocess.run(
-            command, check=False, text=True, capture_output=True
-        )
-        if completed.returncode:
-            raise RuntimeError(
-                f"{label} failed ({completed.returncode})\n"
+        environment = os.environ.copy()
+        if args.blas_threads is not None:
+            if args.blas_threads < 1:
+                raise ValueError("--blas-threads must be >= 1")
+            for variable in ("OMP_NUM_THREADS", "MKL_NUM_THREADS",
+                             "OPENBLAS_NUM_THREADS", "NUMEXPR_NUM_THREADS"):
+                environment[variable] = str(args.blas_threads)
+        failures = []
+        for attempt in range(args.retries + 1):
+            completed = subprocess.run(
+                command, check=False, text=True, capture_output=True, env=environment
+            )
+            if completed.returncode == 0:
+                print(f"[v5] complete {label}\n{completed.stdout}", flush=True)
+                return label
+            failures.append(
+                f"attempt {attempt + 1}: code={completed.returncode}\n"
                 f"STDOUT:\n{completed.stdout}\nSTDERR:\n{completed.stderr}"
             )
-        print(f"[v5] complete {label}\n{completed.stdout}", flush=True)
-        return label
+            print(
+                f"[v5] retry {label} after failed attempt {attempt + 1}",
+                flush=True,
+            )
+        raise RuntimeError(f"{label} exhausted retries\n" + "\n".join(failures))
 
     if args.workers < 1:
         raise SystemExit("--workers must be >= 1")

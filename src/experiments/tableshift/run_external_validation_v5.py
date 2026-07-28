@@ -418,15 +418,22 @@ def run_unit(args) -> None:
         if summary_path.exists()
         else pd.DataFrame(columns=SUMMARY_COLUMNS)
     )
+    if not summary.empty:
+        # Classical blocks are analytic CPU kernels; earlier resume files may
+        # have inherited the requested quantum backend as a metadata label.
+        summary.loc[
+            summary.family.eq("classical_ext"), "kernel_backend"
+        ] = "analytic_cpu"
+        atomic_to_csv(summary, summary_path)
 
-    def evaluate(family, kernel, dim, blocks):
+    def evaluate(family, kernel, dim, blocks, block_backend):
         nonlocal summary
         for model, regularization in _required_jobs(family, kernel, models):
             if _is_complete(summary, family, kernel, dim, model, regularization):
                 continue
             new_rows = _model_rows(
                 args.task, args.stratum, args.seed, family, kernel, dim,
-                blocks, labels, model, regularization, backend,
+                blocks, labels, model, regularization, block_backend,
             )
             new_frame = pd.DataFrame(new_rows)
             summary = (
@@ -455,7 +462,7 @@ def run_unit(args) -> None:
                     split: factory.block(kernel, values, embedded["train"])
                     for split, values in embedded.items()
                 }
-                evaluate("classical_ext", kernel, dim, blocks)
+                evaluate("classical_ext", kernel, dim, blocks, "analytic_cpu")
 
         if "quantum" in args.families:
             for scale in V4_ANGLE_SCALES:
@@ -480,8 +487,15 @@ def run_unit(args) -> None:
                         )
                         for split, values in scaled.items()
                     }
-                    blocks = fidelity_blocks(states, backend)
-                    evaluate("quantum", kernel, dim, blocks)
+                    block_backend = backend
+                    try:
+                        blocks = fidelity_blocks(states, backend)
+                    except Exception:
+                        if backend != "cuda":
+                            raise
+                        blocks = fidelity_blocks(states, "cpu")
+                        block_backend = "cpu_fallback"
+                    evaluate("quantum", kernel, dim, blocks, block_backend)
                     del states, blocks
         print(
             f"[OK] {args.task}/{args.stratum}/seed_{args.seed} dim={dim}; "
