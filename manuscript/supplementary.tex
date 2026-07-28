@@ -125,6 +125,65 @@ Inference & Fixed-case conditional intervals; dataset-equal summaries; no popula
 \end{tabular}
 \end{table}
 
+\section*{Supplementary Note: Frozen specification curve}
+\label{supp:specification}
+
+The specification curve aggregates only complete paired endpoints already present in the versioned legacy and v4 artifacts; it does not refit a model or alter the experiment grid. Specifications were ordered S1--S10 before aggregation and are not ranked by their observed effect. Within a specification, realizations are averaged within setting, settings within scenario-group, scenario-groups within source dataset, and finally the three source datasets with equal weight. The specification-curve figure in the main article displays every scenario-group as well as the dataset-equal mean.
+
+\begin{table}[t]
+\centering
+\caption{Frozen specification definitions and dataset-equal quantum-minus-classical OOD balanced-accuracy effects. ``Oracle'' selects and evaluates on the same OOD test labels; ``ID-val'' uses a disjoint in-distribution validation split. SVC regularization is fixed at $C=1$ or selected by training-only cross-validation; this axis is not applicable to GPC.}
+\label{supp:tab_specification}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lllllrr}
+\toprule
+ID & Selection & SVC $C$ & Classical reference & Budget & SVC & GPC \\
+\midrule
+S1  & OOD oracle & Fixed & Linear/RBF & Native & $+0.0313$ & $+0.0340$ \\
+S2  & Legacy ID & Fixed & Linear/RBF & Native & $+0.0475$ & $+0.0418$ \\
+S3  & OOD oracle & Fixed & Extended & Native & $+0.0058$ & $+0.0145$ \\
+S4  & Legacy ID & Fixed & Extended & Native & $+0.0014$ & $+0.0122$ \\
+S5  & OOD oracle & Train CV & Linear/RBF & Native & $+0.0034$ & $+0.0125$ \\
+S6  & ID-val & Train CV & Linear/RBF & Native & $-0.0041$ & $+0.0059$ \\
+S7  & OOD oracle & Train CV & Extended & Native & $-0.0054$ & $+0.0012$ \\
+S8  & ID-val & Train CV & Extended & Native & $-0.0038$ & $-0.0029$ \\
+S9  & OOD oracle & Train CV & Extended & Equal & $-0.0032$ & $+0.0038$ \\
+S10 & ID-val & Train CV & Extended & Equal & $-0.0056$ & $-0.0009$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The range of the dataset-equal mean is $0.0531$ for SVC and $0.0447$ for GPC. This spread is descriptive rather than a confidence interval: the specifications share data and candidates, and they are deliberately different estimands. Its purpose is to expose how much of the headline depends on label access, regularization, reference-family strength, and search budget.
+
+\section*{Supplementary Note: External TableShift validation}
+\label{supp:external}
+
+\subsection*{Prospective freeze and acquisition}
+
+The complete external protocol was committed before TableShift data were loaded and before any external quantum or classical result was computed. The source implementation is pinned to TableShift commit \texttt{fca9429814703a07e3902d005d46563a207b7f0a} \citep{gardner2023tableshift}. The fixed tasks were College Scorecard, diabetes readmission, and ACS income; no fallback task was used. Their published domain-split variables are institution type, admission source, and geographic region, respectively. These tasks were selected to span education, health, and socioeconomic-policy data, not because of quantum-kernel performance.
+
+TableShift's split roles are retained without reinterpretation. The \texttt{train} split fits preprocessing, kernels, classifiers, and SVC regularization; \texttt{validation} selects the deployed kernel; and \texttt{id\_test} and \texttt{ood\_test} are reporting endpoints. The source benchmark's \texttt{ood\_validation} split is never loaded into the analysis pipeline. College Scorecard was acquired from its public CC0 archive because the pinned TableShift downloader unconditionally invokes authenticated Kaggle access; only that redundant download call was bypassed, while the pinned parser, schema, and domain splitting were retained. Source-file SHA-256 hashes and the container image digest are stored in the acquisition audit.
+
+\subsection*{Sampling and leakage gates}
+
+For each source split and seed, rows are ordered by the SHA-256 digest of the task, split, seed, and original row position. Sampling is therefore deterministic and label blind. The first stratum uses $(1000,250,250,500)$ train, validation, ID-test, and OOD-test rows; the second uses $(2000,500,500,1000)$, with the smaller sample nested in the larger one. Seeds are $\{42,123,999,7,2024\}$. Automated gates verify source-row disjointness across split roles, nesting across sizes, both classes in every sample, source-schema preservation, and at least 12 non-constant post-encoding features. All 30 task--size--seed units passed; the encoded dimensionality ranged from 209 to 954 features.
+
+All transformations are fitted on \texttt{train} only. Constant training columns are removed; numeric variables receive median imputation; Boolean, categorical, and string variables receive most-frequent imputation and one-hot encoding with unknown categories ignored. The combined matrix is MaxAbs scaled and mapped by TruncatedSVD to $d\in\{4,6,8,10,12\}$ using random state 20260729. Each reduced representation is standardized and mapped to $[0,\pi]$ with training-fitted parameters.
+
+\subsection*{Estimands and conditional uncertainty}
+
+The kernel and classifier pools are identical to the security comparison: 60 quantum and 115 extended-classical geometries, per-candidate train-CV regularization for SVC, and the frozen Laplace GP classifier. For the primary effect, the quantum candidate with highest validation balanced accuracy is evaluated once on \texttt{ood\_test}. Twelve whole five-dimension classical kernel blocks are sampled from the 23 available blocks, producing an equal pool of 60; its validation winner is evaluated on \texttt{ood\_test}. The classical endpoint is the expectation over 5,000 such block subsamples with fixed seed 20260729.
+
+Two diagnostics are computed from the same complete grid. The equal-budget oracle selects and evaluates on \texttt{ood\_test}. The weak-fixed oracle uses only linear and RBF references, fixes SVC at $C=1$, and also selects on the reported OOD labels. Protocol contraction is
+\[
+\Delta_{\mathrm{weak,fixed,oracle}}-
+\Delta_{\mathrm{honest,equal,tuned}}.
+\]
+Positive contraction means that replacing the controlled procedure with the weak oracle makes the quantum-minus-classical effect more favourable.
+
+Seeds are averaged within task and size; the two nested sizes are averaged within task; and tasks receive equal weight. Conditional intervals resample the five seed clusters 9,999 times within task, preserving the nested-size relationship. Leave-one-task-out ranges are reported for the task-equal mean. The tasks are fixed case studies and receive no population $p$-value.
+
 \section*{Supplementary Note: Metrics and geometry descriptors}
 \label{supp:metrics}
 
