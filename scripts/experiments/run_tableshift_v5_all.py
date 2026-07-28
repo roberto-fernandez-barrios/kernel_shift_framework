@@ -41,6 +41,10 @@ def main() -> None:
         "--retries", type=int, default=2,
         help="resume and retry a failed unit this many times",
     )
+    parser.add_argument(
+        "--max-new-candidates", type=int, default=None,
+        help="restart each unit process after a bounded number of new candidates",
+    )
     parser.add_argument("--preflight-only", action="store_true")
     args = parser.parse_args()
 
@@ -66,6 +70,10 @@ def main() -> None:
                 ]
                 if args.preflight_only:
                     command.append("--preflight-only")
+                if args.max_new_candidates is not None:
+                    command.extend([
+                        "--max-new-candidates", str(args.max_new_candidates)
+                    ])
                 jobs.append((task, stratum, seed, command))
 
     def run(job):
@@ -80,19 +88,26 @@ def main() -> None:
                              "OPENBLAS_NUM_THREADS", "NUMEXPR_NUM_THREADS"):
                 environment[variable] = str(args.blas_threads)
         failures = []
-        for attempt in range(args.retries + 1):
+        while len(failures) <= args.retries:
             completed = subprocess.run(
                 command, check=False, text=True, capture_output=True, env=environment
             )
             if completed.returncode == 0:
                 print(f"[v5] complete {label}\n{completed.stdout}", flush=True)
                 return label
+            if completed.returncode == 75:
+                print(
+                    f"[v5] checkpoint {label}; restarting cleanly\n"
+                    f"{completed.stdout}",
+                    flush=True,
+                )
+                continue
             failures.append(
-                f"attempt {attempt + 1}: code={completed.returncode}\n"
+                f"attempt {len(failures) + 1}: code={completed.returncode}\n"
                 f"STDOUT:\n{completed.stdout}\nSTDERR:\n{completed.stderr}"
             )
             print(
-                f"[v5] retry {label} after failed attempt {attempt + 1}",
+                f"[v5] retry {label} after failed attempt {len(failures)}",
                 flush=True,
             )
         raise RuntimeError(f"{label} exhausted retries\n" + "\n".join(failures))

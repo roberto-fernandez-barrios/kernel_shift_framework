@@ -425,9 +425,11 @@ def run_unit(args) -> None:
             summary.family.eq("classical_ext"), "kernel_backend"
         ] = "analytic_cpu"
         atomic_to_csv(summary, summary_path)
+    processed_candidates = 0
 
     def evaluate(family, kernel, dim, blocks, block_backend):
-        nonlocal summary
+        nonlocal summary, processed_candidates
+        did_work = False
         for model, regularization in _required_jobs(family, kernel, models):
             if _is_complete(summary, family, kernel, dim, model, regularization):
                 continue
@@ -446,6 +448,19 @@ def run_unit(args) -> None:
                 keep="last",
             )
             atomic_to_csv(summary, summary_path)
+            did_work = True
+        if did_work:
+            processed_candidates += 1
+            if (
+                args.max_new_candidates is not None
+                and processed_candidates >= args.max_new_candidates
+            ):
+                print(
+                    f"[RESTART] checkpointed {processed_candidates} candidates; "
+                    "resume requested",
+                    flush=True,
+                )
+                raise SystemExit(75)
 
     for dim in args.dims:
         embedded = representations[dim]
@@ -533,9 +548,17 @@ def main() -> None:
     parser.add_argument(
         "--dims", type=int, nargs="+", choices=DIMS, default=list(DIMS)
     )
+    parser.add_argument(
+        "--max-new-candidates",
+        type=int,
+        default=None,
+        help="checkpoint and request a process restart after this many candidates",
+    )
     parser.add_argument("--backend", choices=("auto", "cpu", "cuda"), default="auto")
     parser.add_argument("--preflight-only", action="store_true")
     args = parser.parse_args()
+    if args.max_new_candidates is not None and args.max_new_candidates < 1:
+        parser.error("--max-new-candidates must be >= 1")
     run_unit(args)
 
 
