@@ -428,8 +428,11 @@ def run_unit(args) -> None:
                 args.task, args.stratum, args.seed, family, kernel, dim,
                 blocks, labels, model, regularization, backend,
             )
-            summary = pd.concat(
-                [summary, pd.DataFrame(new_rows)], ignore_index=True
+            new_frame = pd.DataFrame(new_rows)
+            summary = (
+                new_frame
+                if summary.empty
+                else pd.concat([summary, new_frame], ignore_index=True)
             )
             summary = summary.drop_duplicates(
                 ["family", "kernel", "dim", "model", "regularization", "split"],
