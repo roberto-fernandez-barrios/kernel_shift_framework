@@ -12,7 +12,8 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from scripts.analysis.budget_matched_selection import (  # noqa: E402
     FamilyMatrices, expected_max_of_k, p1_for_subsets, parse_kernel,
-    sample_kernel_blocked, sample_kernel_stratified, sample_uniform)
+    sample_kernel_blocked, sample_kernel_stratified, sample_uniform,
+    wide_metrics)
 
 RNG = np.random.default_rng(7)
 
@@ -70,6 +71,18 @@ def test_full_pool_equals_per_run_argmax():
     got = p1_for_subsets(fm, np.arange(fm.X_sel.shape[1])[None, :])[:, 0]
     expect = fm.Y_ood[np.arange(len(got)), fm.X_sel.argmax(axis=1)]
     np.testing.assert_allclose(got, expect, rtol=1e-6)
+
+
+def test_ood_oracle_keeps_selection_and_evaluation_columns():
+    rows = pd.DataFrame({
+        "setting": ["s", "s"], "qs": [1, 1], "seed": [42, 42],
+        "model": ["svc", "svc"], "family": ["quantum", "quantum"],
+        "cfg": ["q", "q"], "split": ["id_val", "ood_test"],
+        "balanced_accuracy": [0.2, 0.8],
+    })
+    wide = wide_metrics(rows, "ood_test")
+    assert wide.loc[0, "sel_metric"] == pytest.approx(0.8)
+    assert wide.loc[0, "bacc_ood"] == pytest.approx(0.8)
 
 
 def test_all_nan_run_yields_nan():
