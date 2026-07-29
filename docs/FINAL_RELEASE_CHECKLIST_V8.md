@@ -49,6 +49,13 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error supplementary.tex
 - [ ] Main and Supplementary PDFs rendered to page images and inspected.
 - [ ] Submission directory contains one unambiguous main PDF and one
   Supplementary PDF.
+- [ ] Article title is at most 15 words, abstract at most 150 words, and the
+  main manuscript contains no separate Conclusions or Limitations section.
+- [ ] All procedural descriptions remain in main-file Methods; Supplementary
+  Information contains results and diagnostics only.
+- [ ] Main manuscript has no more than ten display items and every multi-panel
+  figure uses lower-case panel labels.
+- [ ] Authors verify the public-data ethics and consent statement literally.
 
 ## Metadata and immutable release
 
