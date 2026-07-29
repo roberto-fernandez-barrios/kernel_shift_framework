@@ -483,7 +483,7 @@ so the constructor argument \texttt{entanglement="full"} stored for the Pauli-X/
 
 \subsection{Circuit and sampling-resource audit}
 
-Circuit counts use Qiskit 2.3.1 and the logical basis \{\texttt{rz}, \texttt{sx}, \texttt{x}, \texttt{cx}\} at transpiler optimization level 0, without backend layout or routing. We report each feature-map template and the compute--uncompute fidelity template $U(x)U^\dagger(x')$ after assigning distinct numeric inputs. Counts are compiler- and basis-conditional logical resources, not device schedules.
+Circuit counts use Qiskit 2.3.1 and the logical basis \{\texttt{rz}, \texttt{sx}, \texttt{x}, \texttt{cx}\} at transpiler optimization level 0, without backend layout or routing. We report each feature-map template and the compute--uncompute fidelity template formed by composing the map at $x$ with the inverse map at $x'$ after assigning distinct numeric inputs. Counts are compiler- and basis-conditional logical resources, not device schedules.
 
 For the repeated q1000 finite-shot sensitivity, each case and measurement replicate estimates the off-diagonal training triangle, the ID-validation-, ID-test-, and OOD-test-to-training rectangles, and the off-diagonal OOD square triangle; diagonals are fixed to one. Thus one kernel configuration requires
 \[
