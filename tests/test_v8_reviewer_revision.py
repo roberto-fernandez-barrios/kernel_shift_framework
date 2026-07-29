@@ -83,10 +83,25 @@ def test_circuit_audit_detects_only_zz_entanglement():
 def test_finite_shot_resource_count_matches_sampled_blocks():
     table = shot_resource_table()
     first = table.iloc[0]
-    assert first.distinct_fidelity_estimates_per_case_replicate == 1_624_250
+    assert first.distinct_fidelity_parameterizations_per_case == 1_624_250
+    assert (
+        first.fidelity_estimation_instances_per_case_replicate == 1_624_250
+    )
+    assert (
+        first.distinct_circuit_parameterizations_across_fixed_cases
+        == 1_624_250 * 8
+    )
+    assert (
+        first.fidelity_estimation_instances_full_sensitivity
+        == 1_624_250 * 8 * 30
+    )
     assert first.id_holdout_to_train == 500_000
     assert "id_validation_to_train" not in table.columns
     assert "id_test_to_train" not in table.columns
+    assert (
+        "projected_distinct_circuit_parameterizations_full_sensitivity"
+        not in table.columns
+    )
     assert first.total_shots_per_case_replicate == 1_624_250 * 128
     entangling_cases = sum(run.kernel.startswith("zz_") for run in FIXED_RUNS)
     assert first.n_fixed_cases == len(FIXED_RUNS) == 8

@@ -444,9 +444,23 @@ def validate_resource_outputs(root: Path) -> None:
     if set(levels.shots_per_fidelity.astype(int)) != {128, 512, 2048, 8192}:
         raise ValueError("finite-shot resource levels mismatch")
     if not (
-        levels.distinct_fidelity_estimates_per_case_replicate == 1_624_250
+        levels.distinct_fidelity_parameterizations_per_case == 1_624_250
     ).all():
         raise ValueError("finite-shot fidelity count mismatch")
+    if not (
+        levels.fidelity_estimation_instances_per_case_replicate == 1_624_250
+    ).all():
+        raise ValueError("finite-shot estimation-instance count mismatch")
+    if not (
+        levels.distinct_circuit_parameterizations_across_fixed_cases
+        == 1_624_250 * 8
+    ).all():
+        raise ValueError("finite-shot distinct-parameterization total mismatch")
+    if not (
+        levels.fidelity_estimation_instances_full_sensitivity
+        == 1_624_250 * 8 * 30
+    ).all():
+        raise ValueError("finite-shot full-sensitivity instance count mismatch")
     if levels.hardware_executed.astype(bool).any():
         raise ValueError("resource sensitivity must not claim hardware execution")
     if (

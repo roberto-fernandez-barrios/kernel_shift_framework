@@ -143,8 +143,8 @@ def shot_resource_table() -> pd.DataFrame:
         rows.append({
             "shots_per_fidelity": shots,
             **block_counts,
-            "distinct_fidelity_estimates_per_case_replicate": estimates,
-            "distinct_circuit_parameterizations_per_case_replicate": estimates,
+            "distinct_fidelity_parameterizations_per_case": estimates,
+            "fidelity_estimation_instances_per_case_replicate": estimates,
             "total_shots_per_case_replicate": estimates * shots,
             "n_fixed_cases": N_FIXED_CASES,
             "n_entangling_fixed_cases": N_ENTANGLING_FIXED_CASES,
@@ -152,7 +152,10 @@ def shot_resource_table() -> pd.DataFrame:
                 N_FIXED_CASES - N_ENTANGLING_FIXED_CASES
             ),
             "n_measurement_replicates": N_MEASUREMENT_REPLICATES,
-            "projected_distinct_circuit_parameterizations_full_sensitivity": (
+            "distinct_circuit_parameterizations_across_fixed_cases": (
+                estimates * N_FIXED_CASES
+            ),
+            "fidelity_estimation_instances_full_sensitivity": (
                 estimates * N_FIXED_CASES * N_MEASUREMENT_REPLICATES
             ),
             "projected_shots_full_sensitivity": (
@@ -175,10 +178,8 @@ def shot_resource_table() -> pd.DataFrame:
     total = {
         "shots_per_fidelity": "all_levels",
         **{key: np.nan for key in block_counts},
-        "distinct_fidelity_estimates_per_case_replicate": (
-            estimates * len(SHOTS)
-        ),
-        "distinct_circuit_parameterizations_per_case_replicate": (
+        "distinct_fidelity_parameterizations_per_case": estimates,
+        "fidelity_estimation_instances_per_case_replicate": (
             estimates * len(SHOTS)
         ),
         "total_shots_per_case_replicate": estimates * sum(SHOTS),
@@ -188,11 +189,11 @@ def shot_resource_table() -> pd.DataFrame:
             N_FIXED_CASES - N_ENTANGLING_FIXED_CASES
         ),
         "n_measurement_replicates": N_MEASUREMENT_REPLICATES,
-        "projected_distinct_circuit_parameterizations_full_sensitivity": (
-            estimates
-            * len(SHOTS)
-            * N_FIXED_CASES
-            * N_MEASUREMENT_REPLICATES
+        "distinct_circuit_parameterizations_across_fixed_cases": (
+            estimates * N_FIXED_CASES
+        ),
+        "fidelity_estimation_instances_full_sensitivity": (
+            estimates * len(SHOTS) * N_FIXED_CASES * N_MEASUREMENT_REPLICATES
         ),
         "projected_shots_full_sensitivity": (
             estimates
