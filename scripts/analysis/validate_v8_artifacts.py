@@ -122,6 +122,28 @@ def validate_analysis_outputs(root: Path) -> None:
         raise ValueError("quantum-stratum group coverage mismatch")
     if strata_groups.simultaneous.astype(bool).any():
         raise ValueError("pointwise quantum-stratum intervals marked simultaneous")
+    strata_runs = _read(root, "quantum_strata_run_effects.csv")
+    strata_clusters = _read(root, "quantum_strata_cluster_effects.csv")
+    if len(strata_runs) != 3 * 1080 or len(strata_clusters) != 3 * 8 * 5:
+        raise ValueError("quantum-stratum run/cluster coverage mismatch")
+
+    winners = _read(root, "quantum_winner_composition.csv")
+    if len(winners) != 16:
+        raise ValueError("quantum winner-composition coverage mismatch")
+    totals = winners.groupby(["model", "selector"]).n_winners.sum()
+    if not (totals == 1080).all():
+        raise ValueError("quantum winner counts must sum to 1,080 per endpoint")
+    product_p1 = (
+        winners[
+            (winners.selector == "id_val")
+            & (winners.map_stratum == "separable_product")
+        ]
+        .groupby("model")
+        .n_winners.sum()
+        .to_dict()
+    )
+    if product_p1 != {"gpc": 348, "svc": 594}:
+        raise ValueError("frozen P1' product-map winner counts changed")
 
     factorial = _read(root, "factorial_summary.csv")
     if len(factorial) != 16:
@@ -142,6 +164,10 @@ def validate_analysis_outputs(root: Path) -> None:
         raise ValueError("factorial group table must contain 16 x 8 rows")
     if set(factorial_groups.group) != EXPECTED_GROUPS:
         raise ValueError("factorial fixed-case coverage mismatch")
+    factorial_runs = _read(root, "factorial_run_effects.csv")
+    factorial_clusters = _read(root, "factorial_cluster_effects.csv")
+    if len(factorial_runs) != 16 * 360 or len(factorial_clusters) != 16 * 8 * 5:
+        raise ValueError("factorial run/cluster coverage mismatch")
 
     contrasts = _read(root, "factorial_axis_contrasts.csv")
     means = contrasts[
@@ -186,6 +212,15 @@ def validate_analysis_outputs(root: Path) -> None:
     shortcut = _read(root, "shortcut_ablation_group_effects.csv")
     if len(shortcut) != 6 or set(shortcut.group) != EXPECTED_NETWORK_GROUPS:
         raise ValueError("shortcut-ablation group coverage mismatch")
+    shortcut_runs = _read(root, "shortcut_ablation_run_effects.csv")
+    shortcut_clusters = _read(root, "shortcut_ablation_cluster_effects.csv")
+    shortcut_changes = _read(root, "shortcut_ablation_change_clusters.csv")
+    if (
+        len(shortcut_runs) != 270
+        or len(shortcut_clusters) != 6 * 5
+        or len(shortcut_changes) != 6 * 5
+    ):
+        raise ValueError("shortcut-ablation run/cluster coverage mismatch")
 
     clusters = _read(root, "primary_cluster_values.csv")
     if len(clusters) != 80:
