@@ -1,6 +1,6 @@
 # Paper 1: Q1 completion and submission strategy
 
-Status: npj-first v0.7 reviewer revision in progress, 29 July 2026.
+Status: npj-first v0.8 reviewer revision in progress, 29 July 2026.
 
 ## Target and positioning
 
@@ -17,9 +17,10 @@ The central contribution is the controlled combination of:
 2. target-label-free model selection;
 3. train-only regularization;
 4. structurally matched candidate budgets;
-5. a ten-specification curve;
-6. fixed-case, dependence-aware conditional uncertainty;
-7. prospectively frozen corroboration on three external shifts.
+5. a within-v4 factorial plus a historical cross-generation sensitivity map;
+6. a circuit-aware separation of entangling ZZ and product maps;
+7. fixed-case, dependence-aware conditional uncertainty;
+8. prospectively frozen corroboration on three external shifts.
 
 If npj declines the paper after this fully controlled submission, **EPJ
 Quantum Technology** remains the natural fallback. Journal ranking, APC, and
@@ -31,8 +32,8 @@ University of Deusto systems immediately before submission.
 In these low-qubit simulated regimes, the apparent robustness ordering of
 quantum and classical kernel families under distribution shift depends on
 regularization, target-label access, reference-family strength, and search
-budget. Once the deployment-compatible controls are imposed, no robust
-family-level quantum advantage remains.
+budget. Under the deployment-compatible controls, no consistent evidence of a
+family-level quantum advantage is observed in the fixed low-qubit cases.
 
 This is a methodological result about what the benchmark estimates. It is not
 a claim of computational speedup, hardware advantage, universal classical
@@ -54,11 +55,10 @@ Contextual target-label-free comparison against linear+RBF:
 | SVC | -0.004073 |
 | GPC | +0.005907 |
 
-The primary SVC estimate is classical-favoured or within its conditional
-interval of zero in seven of eight scenario-groups. The only scenario with a
-small positive point estimate under both equal-budget classifiers is
-UNSW-NB15 reconnaissance under held-out campaign shift; both intervals include
-zero.
+The scenario-group estimates are heterogeneous and their intervals are
+pointwise rather than simultaneous. They are reported descriptively and are
+not classified by whether an interval includes zero; inclusion of zero is not
+evidence of equivalence.
 
 The security aggregate gives equal weight to three source datasets: EMBER,
 UNSW-NB15, and ToN-IoT. UNSW DoS and reconnaissance are scenario-groups within
@@ -66,8 +66,19 @@ one source dataset, not independent datasets.
 
 ## Reviewer-driven strengthening
 
-- The complete specification curve and headline endpoint now use the same
-  three-source estimand.
+- The historical S1--S10 map and headline endpoint use the same three-source
+  estimand, but the map is explicitly cross-generation and associational.
+- A 2x2x2x2 SVC factorial within v4 crosses selection, regularization,
+  reference family, and candidate budget without using the legacy/v4 boundary
+  to isolate an axis.
+- The circuit audit distinguishes two entangling ZZ maps from two separable
+  product maps. At matched 30-candidate budgets, the source-dataset-equal SVC
+  effects are -0.00928 and -0.00547, respectively; excluding product maps does
+  not expose a hidden positive quantum effect.
+- Logical circuit depth/CX counts and exact finite-shot sampling-resource
+  projections are reported.
+- A frozen q1000 ablation removes port/protocol/service-derived fields before
+  the shared embedding and reports all six network fixed cases.
 - `kernel_blocked` is explicitly primary because it samples whole
   kernel-shape blocks crossed with all five dimensions. Uniform and
   kernel-stratified sensitivities change no family-level conclusion.
@@ -78,11 +89,12 @@ one source dataset, not independent datasets.
   fixed exact Gram matrices and four shot counts under three conditions:
   unprojected, independent-square PSD, and a coherent train-eigenspace
   Nyström extension (2,880 evaluations). It remains conditional and does not
-  simulate hardware.
+  simulate hardware. The complete sensitivity projects 4.24 trillion shots,
+  before device routing, noise, mitigation, and job overhead.
 - The primary matched budget is 60 candidates per family in all eight
   scenario-groups and both classifiers; the obsolete incomplete-coverage
   output has been removed from the submission artifact.
-- The specification curve is explicitly descriptive. Its S4--S5 boundary is
+- The cross-generation sensitivity map is explicitly descriptive. Its S4--S5 boundary is
   generation-confounded and is not used to attribute an isolated causal
   effect to regularization.
 - External College Scorecard, diabetes readmission, and ACS income shifts
@@ -98,8 +110,9 @@ experiments. The manuscript therefore concentrates its novelty on the joint
 estimand:
 
 > distribution shift + target-label-free selection + train-only
-> regularization + structurally matched search + specification curve +
-> prospective external corroboration.
+> regularization + structurally matched search + within-generation factorial
+> + entangling/product circuit stratification + prospective external
+> corroboration.
 
 The paper should never rely on “quantum kernels lose” as its novelty claim.
 Its contribution is showing how the apparent advantage changes across
@@ -140,16 +153,16 @@ python scripts/reproduce_v6.py --stage analysis
 python scripts/reproduce_v6.py --stage report
 python scripts/reproduce_v6.py --stage audit
 python scripts/analysis/validate_v6_artifacts.py
+python scripts/reproduce_v8.py --stage all
 python -m pytest tests -q
 ```
 
 Current status:
 
-- the full v0.7 reproduction and artifact gates pass;
-- the complete test suite passes (69/69);
-- the final main (43 pages) and Supplementary (6 pages) PDFs compile without
-  undefined citations, undefined references, or overfull boxes and have been
-  inspected page by page;
+- the immutable v0.7 reproduction and artifact gates pass;
+- the v0.8 circuit and resource gates and focused tests pass;
+- the 360-run fixed-C and 270-run shortcut campaigns are in progress;
+- final v0.8 full-suite, PDF, visual, and artifact-identity gates remain open;
 - authors approve the target, claims, and required releases.
 
 The immutable v0.6.0 DOI `10.5281/zenodo.21672470` remains public and resolves
@@ -163,9 +176,9 @@ Supplementary PDFs.
 
 Submit only when:
 
-1. the reserved DOI resolves to the exact tagged source and submitted PDFs;
+1. the v0.8 reserved DOI resolves to the exact tagged source and submitted PDFs;
 2. GitHub, Zenodo, citation metadata, manuscript, and Supplementary
-   Information identify v0.7.0 consistently;
+   Information identify v0.8.0 consistently;
 3. the Collection and Article type are selected in the portal;
 4. the current APC route or institutional agreement is confirmed;
 5. suggested reviewers and conflicts are checked by the authors;
