@@ -7,7 +7,7 @@
 
 Reproducible framework for the **controlled comparison of quantum and classical kernels under distribution shift** — the artifact behind the manuscript:
 
-> **Evaluation Choices Determine Apparent Quantum-Kernel Robustness under Distribution Shift**
+> **Evaluation Choices Determine Apparent Quantum Kernel Robustness under Distribution Shift**
 
 Within each experimental setting, the classifier, preprocessing, and splits are held fixed; **only the kernel changes**. Every configuration's regularization is tuned on training data alone, configurations are selected without out-of-distribution labels, and both families search an equal candidate budget.
 
@@ -21,6 +21,7 @@ Within each experimental setting, the classifier, preprocessing, and splits are 
 - **35 kernel geometries** (23 classical + 12 fidelity feature maps) with symmetric length-scale tuning and per-configuration `C` tuned by cross-validation on train; **equal candidate budgets**.
 - **8 scenario-groups × 15 pipeline realizations**, evaluated under **honest ID-validation selection** (P1′), reported as **fixed case studies with conditional intervals** — no population *p*-value.
 - **Finite-shot fidelity-estimation model** to test how far the statevector-exact geometry transfers to finite measurement.
+- **Prospectively frozen external validation** on College Scorecard, diabetes readmission, and ACS income, with 30 audited units and 37,800 split-level results.
 
 ## Key findings
 
@@ -30,10 +31,13 @@ Within each experimental setting, the classifier, preprocessing, and splits are 
 2. Once each configuration's `C` is tuned on training data alone, selection uses **no OOD labels** (an ID-validation split), and budgets are matched, no robust family-level advantage remains. Against the equal-budget extended classical family, the dataset-equal-weighted $\Delta_{\mathrm{OOD}}$ is **-0.005 for SVC** and **-0.002 for GPC**; against linear+RBF it is **-0.004** and **+0.004**, respectively. The primary SVC comparison is classical-favoured or conditionally tied in **7 of 8 scenario-groups**.
 3. **At matched effective rank the classical kernels are at least as accurate in every scenario-group.** The geometry that carries information about robustness (effective rank, OOD alignment) is a **regime-dependent association**, not a governing law, and it favours neither family.
 4. A **finite-shot analysis** shows the quantum kernels' geometry is a statevector-exact idealization: effective rank inflates under finite estimation, while alignment and accuracy survive.
+5. Across ten complete specifications, the SVC conclusion ranges from **+0.047 to -0.006**. On the three external TableShift tasks, the controlled task-equal SVC effect is **-0.0119** (conditional 95% interval **[-0.0205, -0.0033]**), while protocol contraction is **+0.0208** (**[+0.0113, +0.0307]**): the frozen outcome is **replicated protocol sensitivity**.
 
 **Bottom line:** under equal candidate budgets and no-OOD-label selection, fidelity-based quantum kernels show **no robust out-of-distribution advantage** over well-tuned classical kernels; a short-length-scale Laplacian is a strong, inexpensive baseline.
 
 ![At matched geometry, classical kernels are at least as accurate](docs/assets/fig_v4_rankmatched.png)
+
+![External validation separates oracle and deployable conclusions](docs/assets/fig_v5_external.png)
 
 ## Repository layout
 
@@ -60,11 +64,14 @@ conda env create -f environment.yml && conda activate kernel-shift-framework
 # from the 1080 frozen v4 per-run summaries.
 python scripts/reproduce_v4.py --stage all
 
+# Audit and reproduce the frozen specification curve and external validation.
+python scripts/reproduce_v5.py --stage all
+
 # Verify the protocol utilities and reporting traceability.
 python -m pytest -q
 ```
 
-The master command deliberately does not rerun the expensive Phase-3 experiment grid; it validates and consumes the versioned `summary_v4.csv` files. To recompute that grid from the source benchmark data, use `scripts/experiments/run_v4_all.py` after placing EMBER 2018 feature-version-2 data under `data/raw/ember/` and preparing the public UNSW-NB15 and ToN-IoT inputs documented under `src/utils/netflow/`. The frozen analysis contract is [`docs/ANALYSIS_SPEC_V4.md`](docs/ANALYSIS_SPEC_V4.md).
+The reproduction commands deliberately do not rerun the expensive experiment grids; they validate and consume versioned summaries. The frozen contracts are [`docs/ANALYSIS_SPEC_V4.md`](docs/ANALYSIS_SPEC_V4.md) and [`docs/EXTERNAL_VALIDATION_SPEC.md`](docs/EXTERNAL_VALIDATION_SPEC.md).
 
 ## Manuscript and citation
 

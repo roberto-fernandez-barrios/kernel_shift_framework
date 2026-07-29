@@ -22,14 +22,14 @@ PY = sys.executable
 RUNS_ROOT = Path("results/v5/external/runs")
 STAGES = {
     "audit": [
-        ["scripts/analysis/audit_tableshift_v5.py"],
+        ["-m", "scripts.analysis.audit_tableshift_v5"],
     ],
     "analysis": [
-        ["scripts/analysis/specification_curve_v5.py"],
-        ["scripts/analysis/tableshift_external_v5.py"],
+        ["-m", "scripts.analysis.specification_curve_v5"],
+        ["-m", "scripts.analysis.tableshift_external_v5"],
     ],
     "report": [
-        ["scripts/reporting/make_v5_figures.py"],
+        ["-m", "scripts.reporting.make_v5_figures"],
     ],
 }
 ORDER = ("audit", "analysis", "report")
