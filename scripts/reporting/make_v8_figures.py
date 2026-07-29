@@ -267,7 +267,7 @@ def make_figure(input_dir: Path, output_path: Path) -> None:
     )
     colorbar.set_label(r"$\Delta$ (quantum $-$ classical)")
 
-    for label, axis in zip(("a", "c", "b"), (axis_a, axis_c, axis_b)):
+    for label, axis in zip(("a", "b", "c"), (axis_a, axis_c, axis_b)):
         axis.text(
             -0.10 if axis is axis_b else -0.16,
             1.06,
