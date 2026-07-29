@@ -58,6 +58,29 @@ def validate_campaign_outputs(roots: tuple[Path, ...]) -> None:
             raise ValueError(f"{path}: fixed-C regularization label mismatch")
         if set(frame.split) != {"id_val", "id_test", "ood_test"}:
             raise ValueError(f"{path}: split coverage mismatch")
+        if set(frame.id_split_hash_salt) != {"ksf-v4-idsplit::"}:
+            raise ValueError(f"{path}: ID split hash salt mismatch")
+        v4_path = path.with_name("summary_v4.csv")
+        if not v4_path.is_file():
+            raise FileNotFoundError(v4_path)
+        v4 = pd.read_csv(
+            v4_path,
+            usecols=["family", "model", "cfg", "kernel", "split"],
+        )
+        v4 = v4[v4.model == "svc"]
+        key_columns = ["family", "model", "cfg", "kernel", "split"]
+        fixed_keys = frame[key_columns].sort_values(
+            key_columns,
+            kind="stable",
+        ).reset_index(drop=True)
+        v4_keys = v4[key_columns].sort_values(
+            key_columns,
+            kind="stable",
+        ).reset_index(drop=True)
+        if not fixed_keys.equals(v4_keys):
+            raise ValueError(
+                f"{path}: fixed-C candidate/split inventory differs from v4"
+            )
         audit = json.loads(path.with_name("audit_v8fixed.json").read_text())
         if (
             audit["mode"] != "v8fixed"
