@@ -20,6 +20,7 @@ frozen runs. Deterministic given (splits-dir, seed, dims).
 from __future__ import annotations
 
 import argparse
+import json
 import time
 from pathlib import Path
 from typing import Any, Dict, List
@@ -61,7 +62,9 @@ OUT_FILES = {"lsweep": "summary_classical_lsweep.csv",
              "csens": "summary_csens.csv",
              "ktanull": "mechanism_crossfit.csv",
              "lsweep_geo": "geometry_lsweep.csv",
-             "v4": "summary_v4.csv"}
+             "v4": "summary_v4.csv",
+             "v8fixed": "summary_v8_fixedc.csv",
+             "v8shortcut": "summary_v8_shortcut.csv"}
 N_PERM = 100
 
 V4_ANGLE_SCALES = [0.5, 1.0, 2.0]
@@ -119,6 +122,104 @@ def v4_eval_rows(kname: str, family: str, dim: int, blocks: Dict[str, np.ndarray
                 row[pm] = m.get(pm)
             rows.append(row)
     return rows
+
+
+def v8_svc_eval_rows(
+    kname: str,
+    family: str,
+    dim: int,
+    blocks: Dict[str, np.ndarray],
+    y_eval: Dict[str, np.ndarray],
+    y_train: np.ndarray,
+    regularizations: tuple[str, ...],
+) -> List[Dict[str, Any]]:
+    """Evaluate the frozen v0.8 SVC regularization cells.
+
+    The fixed-C pass supplies the missing within-v4 factorial cell. The
+    shortcut pass records fixed and train-CV outcomes from the same Gram
+    matrices. Both use the v4 ID-validation/test split and never tune on OOD.
+    """
+    rows: List[Dict[str, Any]] = []
+    for regularization in regularizations:
+        if regularization == "fixed_c1":
+            c_star = 1.0
+            c_score = np.nan
+        elif regularization == "train_cv":
+            c_star, c_scores = select_c_by_train_cv(blocks["train"], y_train)
+            c_score = c_scores[c_star]
+        else:  # pragma: no cover - guarded by frozen caller values
+            raise ValueError(f"Unknown regularization cell: {regularization}")
+
+        t0 = time.time()
+        model = SVC(kernel="precomputed", C=c_star, class_weight="balanced")
+        model.fit(blocks["train"], y_train)
+        fit_seconds = time.time() - t0
+        cfg_key = f"{kname}__svc__d{dim}"
+        for split in ("id_val", "id_test", "ood_test"):
+            K_s, y_s = blocks[split], y_eval[split]
+            y_pred = model.predict(K_s).astype(np.int64)
+            scores = np.asarray(model.decision_function(K_s)).ravel()
+            metrics = eval_split(y_s, y_pred, scores)
+            rows.append({
+                "family": family,
+                "model": "svc",
+                "dim": dim,
+                "cfg": cfg_key,
+                "kernel": kname,
+                "split": split,
+                "regularization": regularization,
+                "c_selected": float(c_star),
+                "c_cv_score": c_score,
+                "fit_seconds": float(fit_seconds),
+                "accuracy": metrics["accuracy"],
+                "balanced_accuracy": metrics["balanced_accuracy"],
+                "f1_macro": metrics["f1_macro"],
+                "f1_pos": metrics["f1_pos"],
+                "roc_auc": metrics["roc_auc"],
+                "pr_auc": metrics["pr_auc"],
+            })
+    return rows
+
+
+def v8_shortcut_feature_mask(
+    in_dir: Path,
+    n_features: int,
+) -> tuple[np.ndarray, list[str], list[str]]:
+    """Return the frozen v0.8 port/protocol/service exclusion mask."""
+    metadata_path = in_dir / "meta_export.json"
+    if not metadata_path.exists():
+        raise ValueError("v8shortcut requires a netflow meta_export.json")
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    names = list(metadata.get("feature_names", []))
+    if len(names) != n_features:
+        raise ValueError(
+            f"feature inventory has {len(names)} names for {n_features} columns"
+        )
+
+    if in_dir.name.startswith("unsw_"):
+        excluded = {
+            "ct_src_dport_ltm",
+            "ct_dst_sport_ltm",
+            "is_sm_ips_ports",
+        }
+        remove = [name in excluded for name in names]
+    elif in_dir.name == "toniot_scanning":
+        remove = [
+            name in {"src_port", "dst_port", "service"}
+            or name.startswith("proto_")
+            or name.startswith("service_")
+            for name in names
+        ]
+    else:
+        raise ValueError(f"no frozen v8shortcut rule for {in_dir.name}")
+
+    removed = [name for name, drop in zip(names, remove) if drop]
+    keep = np.logical_not(np.asarray(remove, dtype=bool))
+    if not removed or not keep.any():
+        raise ValueError(
+            f"invalid v8shortcut mask for {in_dir.name}: removed={removed}"
+        )
+    return keep, names, removed
 
 
 def make_plain_pipeline(dim: int, seed: int) -> Pipeline:
@@ -353,6 +454,161 @@ def run_v4(args, X, y, idx, y_by_split) -> None:
     print(f"[OK] Wrote {args.out_dir / OUT_FILES['v4']}")
 
 
+def run_v8(args, X, idx, y_by_split) -> None:
+    """Run the prospectively frozen v0.8 fixed-C or shortcut sensitivity."""
+    if len(idx["train"]) != 1000 or len(idx["id_test"]) != 500 or len(idx["ood_test"]) != 500:
+        raise ValueError(
+            "v8fixed/v8shortcut are frozen to q1000/id500/ood500 runs"
+        )
+
+    y_id = y_by_split["id_test"]
+    val_pos, test_pos, audit = split_id_val_test(idx["id_test"], y_id)
+    y_eval = {
+        "id_val": y_id[val_pos],
+        "id_test": y_id[test_pos],
+        "ood_test": y_by_split["ood_test"],
+    }
+
+    if args.mode == "v8shortcut":
+        keep, feature_names, removed = v8_shortcut_feature_mask(
+            args.in_dir, X.shape[1]
+        )
+        regularizations = ("fixed_c1", "train_cv")
+        feature_policy = "port_protocol_service_ablation"
+    else:
+        keep = np.ones(X.shape[1], dtype=bool)
+        feature_names = [f"feature_{i}" for i in range(X.shape[1])]
+        removed = []
+        regularizations = ("fixed_c1",)
+        feature_policy = "full_v4_features"
+
+    summary_rows: List[Dict[str, Any]] = []
+
+    def eval_config(
+        kname: str,
+        family: str,
+        dim: int,
+        K_tr: np.ndarray,
+        K_id_full: np.ndarray,
+        K_ood: np.ndarray,
+    ) -> None:
+        blocks = {
+            "train": K_tr,
+            "id_val": K_id_full[val_pos],
+            "id_test": K_id_full[test_pos],
+            "ood_test": K_ood,
+        }
+        new_rows = v8_svc_eval_rows(
+            kname,
+            family,
+            dim,
+            blocks,
+            y_eval,
+            y_by_split["train"],
+            regularizations,
+        )
+        for row in new_rows:
+            row.update({
+                "feature_policy": feature_policy,
+                "n_input_features": int(len(feature_names)),
+                "n_retained_features": int(keep.sum()),
+                "n_removed_features": int(len(removed)),
+                "removed_features": "|".join(removed),
+                "id_split_hash_salt": "ksf-v4-idsplit::",
+            })
+        summary_rows.extend(new_rows)
+
+    for dim in args.dims:
+        t_dim = time.time()
+        embed = make_embedding_pipeline(
+            dim=dim,
+            select_k=None,
+            use_scaling=True,
+            angle_min=0.0,
+            angle_max=float(np.pi),
+            seed=args.seed,
+        )
+        train_raw = np.asarray(X[idx["train"]])[:, keep]
+        embed.fit(train_raw, y_by_split["train"])
+        X_emb = {
+            split: np.asarray(
+                embed.transform(np.asarray(X[indices])[:, keep]),
+                dtype=np.float64,
+            )
+            for split, indices in idx.items()
+        }
+        factory = ClassicalKernelFactory(X_emb["train"], seed=args.seed)
+
+        for kname in v4_classical_kernels():
+            eval_config(
+                kname,
+                "classical_ext",
+                dim,
+                factory.block(kname, X_emb["train"], X_emb["train"]),
+                factory.block(kname, X_emb["id_test"], X_emb["train"]),
+                factory.block(kname, X_emb["ood_test"], X_emb["train"]),
+            )
+
+        for scale in V4_ANGLE_SCALES:
+            X_q = (
+                X_emb
+                if scale == 1.0
+                else {split: values * scale for split, values in X_emb.items()}
+            )
+            suffix = "" if scale == 1.0 else f"__as{scale:g}"
+            for qcfg in DEFAULT_QUANTUM_CONFIGS:
+                fmap = build_feature_map(qcfg, feature_dim=dim)
+                statevectors = {
+                    split: compute_statevectors_batch(
+                        values, fmap, dtype=np.complex64
+                    )
+                    for split, values in X_q.items()
+                }
+                eval_config(
+                    qcfg["id"] + suffix,
+                    "quantum",
+                    dim,
+                    kernel_block_abs2(
+                        statevectors["train"],
+                        statevectors["train"],
+                        out_dtype=np.float64,
+                    ),
+                    kernel_block_abs2(
+                        statevectors["id_test"],
+                        statevectors["train"],
+                        out_dtype=np.float64,
+                    ),
+                    kernel_block_abs2(
+                        statevectors["ood_test"],
+                        statevectors["train"],
+                        out_dtype=np.float64,
+                    ),
+                )
+        print(
+            f"[OK] dim={dim} done in {time.time() - t_dim:.1f}s ({args.mode})",
+            flush=True,
+        )
+
+    output_path = args.out_dir / OUT_FILES[args.mode]
+    args.out_dir.mkdir(parents=True, exist_ok=True)
+    output = pd.DataFrame(summary_rows)
+    output.to_csv(output_path, index=False)
+    audit_payload = {
+        **audit,
+        "mode": args.mode,
+        "feature_policy": feature_policy,
+        "n_input_features": int(len(feature_names)),
+        "n_retained_features": int(keep.sum()),
+        "n_removed_features": int(len(removed)),
+        "removed_features": removed,
+    }
+    (args.out_dir / f"audit_{args.mode}.json").write_text(
+        json.dumps(audit_payload, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    print(f"[OK] Wrote {output_path}")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--in-dir", type=Path, required=True)
@@ -376,6 +632,9 @@ def main() -> None:
 
     if args.mode == "v4":
         run_v4(args, X, y, idx, y_by_split)
+        return
+    if args.mode in ("v8fixed", "v8shortcut"):
+        run_v8(args, X, idx, y_by_split)
         return
 
     summary_rows: List[Dict[str, Any]] = []
