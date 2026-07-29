@@ -18,9 +18,9 @@ advantage". Fallback: *EPJ Quantum Technology*.
 - [x] Main manuscript reduced below 8,000 counted words.
 - [x] Every reproducibility-critical method is reported in the main manuscript;
   Supplementary Information contains extended results and diagnostics only.
-- [ ] Rebuild the main and Supplementary PDFs without undefined citations,
+- [x] Rebuild the main and Supplementary PDFs without undefined citations,
   undefined references, or overfull boxes.
-- [ ] Render and inspect both PDFs page by page after the v0.7 changes.
+- [x] Render and inspect both PDFs page by page after the v0.7 changes.
 - [x] Reporting regression tests cover the three-source estimand, complete
   60-candidate budget coverage, rank matching, coherent finite-shot PSD
   extension, and frozen hashes.
@@ -64,7 +64,7 @@ Check the logs:
 
 ## Metadata to align in the v0.7 release commit
 
-- [ ] Set version `0.7.0` consistently in `pyproject.toml` and
+- [x] Set version `0.7.0` consistently in `pyproject.toml` and
   `CITATION.cff`; use the immutable `v0.7.0` tag.
 - [x] Ensure the README title, manuscript title, release notes, and Zenodo
   description state the same protocol-dependent conclusion.
@@ -73,14 +73,14 @@ Check the logs:
 - [x] Confirm the code and artifact rights holder and approval of the
   BSD-3-Clause licence; see `docs/LEGAL_RELEASE_NOTE.md`.
 - [x] Confirm third-party dataset redistribution boundaries.
-- [ ] Insert the reserved immutable v0.7.0 DOI in `CITATION.cff`, README, the
+- [x] Insert the reserved immutable v0.7.0 DOI in `CITATION.cff`, README, the
   main manuscript, Supplementary Information, and cover letter.
 
 ## Archive and public repository
 
 - [x] v0.6.0 is public on GitHub and Zenodo; DOI
   `10.5281/zenodo.21672470` resolves and the historical tag is immutable.
-- [ ] Reserve the immutable DOI for a new Zenodo v0.7.0 version derived from
+- [x] Reserve DOI `10.5281/zenodo.21676563` for a new Zenodo v0.7.0 version derived from
   the public v0.6.0 record.
 - [ ] Commit and push the exact tested v0.7 source and generated PDFs.
 - [ ] Tag the exact v0.7 release commit; do not move or overwrite historical
