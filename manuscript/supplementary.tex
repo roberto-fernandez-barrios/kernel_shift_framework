@@ -317,6 +317,50 @@ Scenario & Clf. & $\Delta$ & 95\% cluster-$t$ & 95\% BCa & LOO range \\
 \end{tabular}
 \end{table}
 
+\section*{Supplementary Results: Quantum-map strata}
+\label{supp:quantum_strata}
+
+Table~\ref{supp:tab_quantum_strata} reports every fixed-case SVC effect after
+separating the 30 entangling-ZZ and 30 separable-product candidates. Each
+stratum is compared with the expected P1$'$ winner over 5,000 blocked draws
+of six complete extended-classical blocks, also 30 candidates. The full pool
+uses 60 candidates per family. Intervals are pointwise and conditional on five
+q-split clusters; their inclusion of zero is not an equivalence decision.
+
+\begin{table}[ht]
+\centering
+\caption{Circuit-stratified quantum-minus-classical OOD balanced-accuracy
+effects under train-CV and P1$'$. Brackets for scenario-groups are pointwise
+95\% conditional cluster-$t$ intervals ($n=5$ q-split clusters), not
+simultaneous intervals. The source-dataset-equal row gives the mean followed
+by the range of its three constituent source-dataset means, not a confidence
+interval.}
+\label{supp:tab_quantum_strata}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lccc}
+\toprule
+Scenario & All maps ($B=60$) & Entangling ZZ ($B=30$) & Product maps ($B=30$) \\
+\midrule
+EMBER $m1$ & $-0.0057\;[-0.0340,+0.0225]$ & $-0.0063\;[-0.0279,+0.0153]$ & $+0.0036\;[-0.0132,+0.0204]$ \\
+EMBER $m2$ & $-0.0065\;[-0.0138,+0.0008]$ & $-0.0053\;[-0.0130,+0.0024]$ & $-0.0135\;[-0.0166,-0.0104]$ \\
+UNSW-DoS (campaign) & $-0.0033\;[-0.0139,+0.0073]$ & $-0.0129\;[-0.0184,-0.0073]$ & $-0.0016\;[-0.0116,+0.0083]$ \\
+UNSW-DoS (constructed) & $-0.0045\;[-0.0119,+0.0030]$ & $-0.0149\;[-0.0299,+0.0001]$ & $-0.0007\;[-0.0063,+0.0049]$ \\
+UNSW-Recon (campaign) & $+0.0049\;[-0.0058,+0.0157]$ & $-0.0014\;[-0.0070,+0.0041]$ & $+0.0057\;[-0.0023,+0.0137]$ \\
+UNSW-Recon (constructed) & $-0.0088\;[-0.0145,-0.0032]$ & $-0.0171\;[-0.0286,-0.0056]$ & $-0.0025\;[-0.0066,+0.0015]$ \\
+ToN-IoT (campaign) & $-0.0149\;[-0.0270,-0.0028]$ & $-0.0196\;[-0.0303,-0.0089]$ & $-0.0225\;[-0.0347,-0.0102]$ \\
+ToN-IoT (constructed) & $-0.0011\;[-0.0050,+0.0028]$ & $-0.0013\;[-0.0047,+0.0021]$ & $-0.0009\;[-0.0036,+0.0018]$ \\
+\midrule
+Source-dataset-equal & $-0.0057\;[-0.0080,-0.0029]$ & $-0.0093\;[-0.0116,-0.0058]$ & $-0.0055\;[-0.0117,+0.0002]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For P1$'$ selection, product maps account for 594/1,080 SVC winners and
+348/1,080 GPC winners. Under same-test OOD selection, the corresponding
+counts are 650/1,080 and 528/1,080. Complete counts by individual map are
+provided in \texttt{quantum\_winner\_composition.csv}.
+
 \section*{Supplementary Results: Circuit resources}
 \label{supp:circuits}
 
