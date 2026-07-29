@@ -37,6 +37,7 @@ STAGES = {
     "audit": [
         ["-m", "scripts.analysis.validate_v6_artifacts"],
         ["-m", "scripts.analysis.validate_v8_artifacts"],
+        ["-m", "scripts.analysis.validate_manuscript_v8"],
     ],
 }
 ORDER = ("analysis", "report", "audit")
