@@ -23,6 +23,7 @@ from scripts.analysis.reviewer_revision_v8 import (  # noqa: E402
     factorial_pairwise_interactions,
     stable_rng,
 )
+from scripts.experiments.run_shots_mc_v6 import FIXED_RUNS  # noqa: E402
 from src.experiments.ember.extended.run_classical_extensions import (  # noqa: E402
     v8_shortcut_feature_mask,
     v8_svc_eval_rows,
@@ -87,9 +88,10 @@ def test_finite_shot_resource_count_matches_sampled_blocks():
     assert "id_validation_to_train" not in table.columns
     assert "id_test_to_train" not in table.columns
     assert first.total_shots_per_case_replicate == 1_624_250 * 128
-    assert first.n_fixed_cases == 8
-    assert first.n_entangling_fixed_cases == 4
-    assert first.n_product_fixed_cases == 4
+    entangling_cases = sum(run.kernel.startswith("zz_") for run in FIXED_RUNS)
+    assert first.n_fixed_cases == len(FIXED_RUNS) == 8
+    assert first.n_entangling_fixed_cases == entangling_cases == 4
+    assert first.n_product_fixed_cases == len(FIXED_RUNS) - entangling_cases
     assert (
         first.projected_shots_entangling_cases_only
         == first.projected_shots_full_sensitivity / 2
