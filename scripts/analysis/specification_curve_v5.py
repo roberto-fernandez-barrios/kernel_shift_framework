@@ -7,11 +7,15 @@ fixed in docs/EXTERNAL_VALIDATION_SPEC.md and is never sorted by effect size.
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from src.analysis.source_datasets import source_dataset_for_group
 
 
 SPECIFICATIONS = (
@@ -32,13 +36,7 @@ MODELS = ("svc", "gpc")
 
 def dataset_for_group(group: str) -> str:
     """Map the eight scenario groups to the three source datasets."""
-    if group.startswith("ember_"):
-        return "ember"
-    if group.startswith("unsw_"):
-        return "unsw"
-    if group.startswith("toniot_"):
-        return "toniot"
-    raise ValueError(f"Unrecognized scenario group: {group}")
+    return source_dataset_for_group(group)
 
 
 def _validate_complete(
@@ -201,7 +199,10 @@ def validate_final(by_group: pd.DataFrame) -> pd.DataFrame:
 def plot_curve(summary: pd.DataFrame, by_group: pd.DataFrame, output: Path) -> None:
     """Plot group-level points and the dataset-equal mean in frozen order."""
     order = [spec_id for spec_id, _ in SPECIFICATIONS]
-    fig, axes = plt.subplots(1, 2, figsize=(11.8, 5.8), sharey=True)
+    # The figure is placed at manuscript text width.  Keep the native canvas
+    # close to that width so labels remain at least approximately 8 pt after
+    # typesetting rather than being down-scaled from a presentation-size plot.
+    fig, axes = plt.subplots(1, 2, figsize=(7.2, 4.5), sharey=True)
     colors = {"svc": "#1f5a7a", "gpc": "#9a4f20"}
     for ax, model in zip(axes, MODELS):
         group_part = by_group[by_group.model == model]
@@ -218,21 +219,22 @@ def plot_curve(summary: pd.DataFrame, by_group: pd.DataFrame, output: Path) -> N
             color=colors[model],
             edgecolor="white",
             linewidth=0.6,
-            label="Dataset-equal mean",
             zorder=3,
         )
         ax.axvline(0, color="#333333", linewidth=0.9, linestyle="--", zorder=1)
         ax.grid(axis="x", color="#e4e6e8", linewidth=0.7)
-        ax.set_title(model.upper())
-        ax.set_xlabel("Quantum minus classical OOD balanced accuracy")
-        ax.legend(loc="lower right", frameon=False)
+        ax.set_title(model.upper(), fontsize=9)
+        ax.set_xlabel(
+            r"$\Delta_{\mathrm{OOD}}$ (quantum $-$ classical)", fontsize=8
+        )
+        ax.tick_params(axis="x", labelsize=7.5)
     axes[0].invert_yaxis()
     axes[0].set_yticks(np.arange(len(order)))
     axes[0].set_yticklabels(
-        [f"{sid}  {SPEC_LABELS[sid]}" for sid in order], fontsize=8
+        [f"{sid}  {SPEC_LABELS[sid]}" for sid in order], fontsize=7.5
     )
     fig.suptitle("Specification curve: protocol choices reverse the apparent effect",
-                 fontsize=12)
+                 fontsize=9.5)
     fig.tight_layout()
     output.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output, bbox_inches="tight")

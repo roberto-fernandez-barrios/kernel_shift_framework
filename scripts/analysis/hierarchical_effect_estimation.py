@@ -29,11 +29,15 @@ Input: run-level P1 files from budget_matched_selection.py
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from scipy import stats
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from src.analysis.source_datasets import source_dataset_for_group
 
 BCA_SEED = 20260719
 N_BOOT = 9999
@@ -45,8 +49,8 @@ ASSUMPTIONS = ("qsplit clusters ~independent given fixed benchmark pools "
 
 
 def dataset_of(group: str) -> str:
-    return group.rsplit("_m", 1)[0].rsplit("_natural", 1)[0].replace("ember", "ember") \
-        if not group.startswith("ember") else "ember"
+    """Backward-compatible alias for the canonical three-source mapping."""
+    return source_dataset_for_group(group)
 
 
 def parse_setting(setting: str) -> tuple[str, str]:

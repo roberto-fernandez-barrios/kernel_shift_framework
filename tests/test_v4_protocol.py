@@ -10,7 +10,8 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.experiments.ember.extended.v4_protocol import (  # noqa: E402
-    perturb_kernel_finite_shots, select_c_by_train_cv, split_id_val_test)
+    perturb_kernel_finite_shots, sample_kernel_finite_shots,
+    select_c_by_train_cv, split_id_val_test)
 
 
 # ---------------------------------------------------------------------------
@@ -143,3 +144,20 @@ def test_shots_before_after_projection_reported():
     for key in ("min_eig_before_psd", "min_eig_after_psd",
                 "fro_change_sampling", "fro_change_projection"):
         assert key in audit
+
+
+def test_shots_exposes_pre_and_post_psd_without_changing_legacy_result():
+    K = _exact_square()
+    pre, post, audit = sample_kernel_finite_shots(
+        K, 128, np.random.default_rng(17), square=True
+    )
+    legacy, legacy_audit = perturb_kernel_finite_shots(
+        K, 128, np.random.default_rng(17), square=True
+    )
+    np.testing.assert_allclose(post, legacy)
+    assert np.linalg.eigvalsh(pre).min() == pytest.approx(
+        audit["min_eig_before_psd"]
+    )
+    assert audit["effective_rank_before_psd"] > 0
+    assert audit["effective_rank_after_psd"] > 0
+    assert audit == legacy_audit

@@ -35,10 +35,11 @@ def test_parse_setting():
 def test_dataset_of():
     assert dataset_of("ember_m1") == "ember"
     assert dataset_of("ember_m2") == "ember"
-    assert dataset_of("unsw_dos_natural_cur") == "unsw_dos"
-    assert dataset_of("unsw_dos_m2_centroid") == "unsw_dos"
-    assert dataset_of("toniot_scanning_m2_centroid") == "toniot_scanning"
-    assert dataset_of("toniot_scanning_natural_cur") == "toniot_scanning"
+    assert dataset_of("unsw_dos_natural_cur") == "unsw"
+    assert dataset_of("unsw_dos_m2_centroid") == "unsw"
+    assert dataset_of("unsw_recon_natural_cur") == "unsw"
+    assert dataset_of("toniot_scanning_m2_centroid") == "toniot"
+    assert dataset_of("toniot_scanning_natural_cur") == "toniot"
 
 
 def test_nested_means_balanced_equals_plain_mean():

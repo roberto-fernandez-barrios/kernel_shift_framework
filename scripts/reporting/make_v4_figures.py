@@ -92,14 +92,21 @@ def fig_rankmatched() -> None:
     for i, grp in enumerate(ORDER):
         r = rk.loc[grp]
         ax.barh(i, r.median_delta, color=C_CLASSICAL, alpha=0.85, height=0.6, zorder=2)
-        ax.text(r.median_delta - 0.0004, i, f"{100*r.frac_quantum_better:.0f}%",
-                va="center", ha="right", fontsize=6.2, color="#333333")
+        ax.text(
+            -0.00015,
+            i,
+            f"{100*r.frac_quantum_better:.0f}%",
+            va="center",
+            ha="right",
+            fontsize=6.2,
+            color="white",
+        )
     ax.set_yticks(y)
     ax.set_yticklabels([SHORT[g] for g in ORDER])
     ax.invert_yaxis()
     ax.set_xlabel(r"median $\Delta_{\mathrm{OOD}}$ at matched effective rank"
                   "\n(quantum $-$ nearest-rank classical)")
-    ax.set_title("At matched geometry, classical kernels are at least as accurate")
+    ax.set_title("Nearest-rank paired differences are negative in all groups")
     fig.tight_layout()
     fig.savefig(OUT / "fig_v4_rankmatched.pdf", bbox_inches="tight")
     plt.close(fig)

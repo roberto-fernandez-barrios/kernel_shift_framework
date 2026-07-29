@@ -106,6 +106,80 @@ def select_c_by_train_cv(K_tr: np.ndarray, y_tr: np.ndarray,
 # ---------------------------------------------------------------------------
 # 3. Finite-shot fidelity-estimation perturbation model (author constraint 6)
 # ---------------------------------------------------------------------------
+def _effective_rank_from_eigenvalues(eigenvalues: np.ndarray) -> float:
+    values = np.clip(np.asarray(eigenvalues, dtype=float), 0.0, None)
+    total = values.sum()
+    if total <= 0:
+        return 1.0
+    probabilities = values / total
+    probabilities = probabilities[probabilities > 1e-15]
+    return float(np.exp(-(probabilities * np.log(probabilities)).sum()))
+
+
+def sample_kernel_finite_shots(
+    K: np.ndarray,
+    shots: int,
+    rng: np.random.Generator,
+    square: bool,
+) -> tuple[np.ndarray, np.ndarray, dict]:
+    """Return sampled pre-PSD and post-PSD finite-shot kernel blocks.
+
+    Rectangular blocks have no PSD projection, so the first two returned
+    matrices are identical. Keeping both square matrices lets downstream
+    analyses distinguish measurement-sampling changes from the regularizing
+    effect of eigenvalue clipping.
+    """
+    if shots <= 0:
+        raise ValueError("shots must be positive")
+    Kc = np.clip(np.asarray(K, dtype=np.float64), 0.0, 1.0)
+    audit: dict = {"shots": int(shots), "square": bool(square)}
+    if square:
+        if Kc.ndim != 2 or Kc.shape[0] != Kc.shape[1]:
+            raise ValueError("square=True requires a square matrix")
+        n = Kc.shape[0]
+        iu = np.triu_indices(n, k=1)
+        estimated = rng.binomial(shots, Kc[iu]) / shots
+        sampled = np.eye(n)
+        sampled[iu] = estimated
+        sampled[(iu[1], iu[0])] = estimated
+        sampled = np.clip(sampled, 0.0, 1.0)
+
+        eigenvalues, eigenvectors = np.linalg.eigh(sampled)
+        audit["min_eig_before_psd"] = float(eigenvalues.min())
+        audit["frac_negative_eig"] = float((eigenvalues < -1e-12).mean())
+        clipped = np.clip(eigenvalues, 0.0, None)
+        if eigenvalues.min() < -1e-12:
+            projected = (eigenvectors * clipped) @ eigenvectors.T
+            projected = (projected + projected.T) / 2.0
+        else:
+            projected = sampled.copy()
+        audit["min_eig_after_psd"] = float(clipped.min())
+        audit["max_diag_dev_after_psd"] = float(
+            np.abs(np.diag(projected) - 1.0).max()
+        )
+        audit["max_range_dev_after_psd"] = float(
+            max(0.0, -projected.min(), projected.max() - 1.0)
+        )
+        audit["fro_change_sampling"] = float(
+            np.linalg.norm(sampled - Kc, "fro")
+        )
+        audit["fro_change_projection"] = float(
+            np.linalg.norm(projected - sampled, "fro")
+        )
+        audit["effective_rank_before_psd"] = _effective_rank_from_eigenvalues(
+            eigenvalues
+        )
+        audit["effective_rank_after_psd"] = _effective_rank_from_eigenvalues(
+            clipped
+        )
+        return sampled, projected, audit
+
+    sampled = np.clip(rng.binomial(shots, Kc) / shots, 0.0, 1.0)
+    audit["fro_change_sampling"] = float(np.linalg.norm(sampled - Kc, "fro"))
+    audit["fro_change_projection"] = 0.0
+    return sampled, sampled.copy(), audit
+
+
 def perturb_kernel_finite_shots(K: np.ndarray, shots: int, rng: np.random.Generator,
                                 square: bool) -> tuple[np.ndarray, dict]:
     """Perturb an exact fidelity Gram block as if each entry were estimated
@@ -120,38 +194,5 @@ def perturb_kernel_finite_shots(K: np.ndarray, shots: int, rng: np.random.Genera
     defined for them). Returns (K_perturbed, audit) where audit carries the
     before/after-projection diagnostics required by the spec.
     """
-    Kc = np.clip(np.asarray(K, dtype=np.float64), 0.0, 1.0)
-    audit: dict = {"shots": int(shots), "square": bool(square)}
-    if square:
-        n = Kc.shape[0]
-        iu = np.triu_indices(n, k=1)
-        est = rng.binomial(shots, Kc[iu]) / shots
-        Ks = np.eye(n)
-        Ks[iu] = est
-        Ks[(iu[1], iu[0])] = est
-        Ks = np.clip(Ks, 0.0, 1.0)
-        ev = np.linalg.eigvalsh(Ks)
-        audit["min_eig_before_psd"] = float(ev.min())
-        audit["frac_negative_eig"] = float((ev < -1e-12).mean())
-        if ev.min() < -1e-12:
-            # PSD projection is the FINAL step (spec constraint 6 order):
-            # clipping entries after projecting would reintroduce negative
-            # eigenvalues. Residual deviations of the diagonal/range are
-            # reported instead of silently re-clipped away.
-            w, V = np.linalg.eigh(Ks)
-            Kp = (V * np.clip(w, 0.0, None)) @ V.T
-            Kp = (Kp + Kp.T) / 2.0
-        else:
-            Kp = Ks
-        audit["min_eig_after_psd"] = float(np.linalg.eigvalsh(Kp).min())
-        audit["max_diag_dev_after_psd"] = float(np.abs(np.diag(Kp) - 1.0).max())
-        audit["max_range_dev_after_psd"] = float(
-            max(0.0, -Kp.min(), Kp.max() - 1.0))
-        audit["fro_change_sampling"] = float(np.linalg.norm(Ks - Kc, "fro"))
-        audit["fro_change_projection"] = float(np.linalg.norm(Kp - Ks, "fro"))
-        return Kp, audit
-    est = rng.binomial(shots, Kc) / shots
-    Kp = np.clip(est, 0.0, 1.0)
-    audit["fro_change_sampling"] = float(np.linalg.norm(Kp - Kc, "fro"))
-    audit["fro_change_projection"] = 0.0
-    return Kp, audit
+    _, projected, audit = sample_kernel_finite_shots(K, shots, rng, square)
+    return projected, audit
