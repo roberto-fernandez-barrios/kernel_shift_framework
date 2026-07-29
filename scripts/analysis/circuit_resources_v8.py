@@ -128,13 +128,11 @@ def circuit_table() -> pd.DataFrame:
 
 def shot_resource_table() -> pd.DataFrame:
     n_train = 1000
-    n_id_val = 250
-    n_id_test = 250
+    n_id_holdout = 500
     n_ood = 500
     block_counts = {
         "train_upper_off_diagonal": n_train * (n_train - 1) // 2,
-        "id_validation_to_train": n_id_val * n_train,
-        "id_test_to_train": n_id_test * n_train,
+        "id_holdout_to_train": n_id_holdout * n_train,
         "ood_test_to_train": n_ood * n_train,
         "ood_square_upper_off_diagonal": n_ood * (n_ood - 1) // 2,
     }
