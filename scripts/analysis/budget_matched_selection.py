@@ -25,9 +25,8 @@ Outputs under --out-dir (default results/v4/budget/):
   matched60_by_setting.csv      fixed mirror design (secondary sensitivity)
   p1_runs__{full,matched60,budget60}.csv   run-level interface for GATE 2
 
-Selection column is configurable: legacy id_test (--select-col bacc_id, the
-software-validation pass, spec constraint 7) or the v4 ID-validation column
-once the recompute lands (--select-col bacc_id_val).
+Selection column is configurable: legacy `id_test`, the v4 `id_val`, or
+`ood_test` for an explicitly non-deployable same-test oracle diagnostic.
 """
 from __future__ import annotations
 
@@ -107,7 +106,11 @@ def wide_metrics(df: pd.DataFrame, select_split: str) -> pd.DataFrame:
     if select_split not in w.columns:
         raise SystemExit(f"selection split '{select_split}' not present in the data "
                          f"(available: {[c for c in w.columns if '_' in str(c)]})")
-    return w.rename(columns={select_split: "sel_metric", "ood_test": "bacc_ood"})
+    # The oracle uses the same column for selection and evaluation, so a plain
+    # rename would overwrite one of the two semantic roles.
+    w["sel_metric"] = w[select_split]
+    w["bacc_ood"] = w["ood_test"]
+    return w
 
 
 def build_matrices(w: pd.DataFrame, model: str, fam_mask: pd.Series,
@@ -235,9 +238,11 @@ def main() -> None:
     ap.add_argument("--base-file", default="extended_kernels_qsplits__summary.csv",
                     help="per-run base summary; the confirmatory v4 pass uses "
                          "summary_v4.csv (with --extra-files '' --select-col id_val)")
-    ap.add_argument("--select-col", choices=["id_test", "id_val"], default="id_test",
+    ap.add_argument("--select-col", choices=["id_test", "id_val", "ood_test"],
+                    default="id_test",
                     help="id_test = legacy software-validation pass (spec constraint 7); "
-                         "id_val = confirmatory v4 protocol")
+                         "id_val = confirmatory v4 protocol; "
+                         "ood_test = same-test oracle diagnostic only")
     ap.add_argument("--out-dir", type=Path, default=Path("results/v4/budget"))
     ap.add_argument("--n-resamples", type=int, default=5000)
     ap.add_argument("--n-curve-resamples", type=int, default=2000)

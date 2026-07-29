@@ -98,7 +98,7 @@
 
 \begin{document}
 
-\title[Kernel Geometry under Distribution Shift]{Quantum and Classical Kernels under Distribution Shift: A Controlled Study of Kernel Geometry and Out-of-Distribution Robustness}
+\title[Quantum Kernels under Distribution Shift]{Evaluation Choices Determine Apparent Quantum Kernel Robustness under Distribution Shift}
 
 
 %%=============================================================%%
@@ -126,7 +126,7 @@
 %% Sample for unstructured abstract %%
 %%==================================%%
 
-\abstract{Whether quantum kernels improve robustness under distribution shift is usually asked as a quantum-versus-classical question. We show that the answer is decided almost entirely by the fairness of the comparison, and that under a fair comparison no robust advantage remains. We present a controlled kernel-swap study in which the classifier, preprocessing, and split construction are held fixed while only the kernel varies, instantiated on four security benchmarks spanning two modalities and three shift mechanisms (EMBER static malware; UNSW-NB15 and ToN-IoT network flows under a constructed covariate shift and a held-out attack-campaign shift), two classifier families (support vector classification and a Laplace-approximation Gaussian process classifier), and eight scenario-groups with fifteen pipeline realizations each; all quantum kernels are computed by exact statevector simulation, and no hardware claim is made. Against the customary linear and RBF baselines selected on the test split, fidelity-based quantum kernels appear to improve out-of-distribution balanced accuracy---but this apparent advantage is an artefact of two evaluation choices. When the regularization of every configuration is tuned by cross-validation on training data alone, configurations are selected without any out-of-distribution labels (on an in-distribution validation split), and both families search an equal budget of kernel geometries, the advantage disappears against both references: the dataset-equal-weighted out-of-distribution difference is $-0.004$ under support vector classification and $-0.004$ to $+0.004$ under the probabilistic classifier, classical-favoured or tied in seven of eight scenario-groups. At matched effective rank the classical kernels are at least as accurate in every group. A geometry analysis finds that effective rank and out-of-distribution kernel-target alignment are robustly \emph{associated} with performance, but the association is regime-dependent rather than a single causal mechanism, and it favours neither family. Reporting effect sizes with conditional intervals rather than population $p$-values, and treating each benchmark as a fixed case study, we conclude that a well-tuned heavy-tailed classical kernel matches fidelity kernels under matched conditions; a finite-shot estimation model shows that the quantum kernels' geometry is moreover a statevector-exact idealization. The study contributes a reusable protocol for attributing---and, as often, dissolving---apparent quantum-kernel advantages under distribution shift.}
+\abstract{Quantum-kernel robustness claims depend on how candidates are tuned and selected. We audit this dependence with a controlled kernel-swap benchmark, a ten-specification curve, and a prospectively frozen external validation on three real-world domain shifts. In security benchmarks, fixed regularization, weak references and same-test oracle selection produce apparent gains up to $+0.037$, whereas train-only tuning, target-label-free selection and equal budgets yield quantum-minus-classical effects of $-0.005$ for support-vector classification and $-0.002$ for Gaussian-process classification. Externally, the controlled support-vector effect is $-0.0119$ (conditional 95\% interval $[-0.0205,-0.0033]$), while the weak-oracle effect is $+0.0089$ and protocol contraction is $+0.0208$. Contraction also remains positive for the probabilistic classifier, although its controlled effect crosses zero. Geometry is associated with accuracy but shared by both families, and finite-shot estimation distorts exact-statevector rank. The apparent robustness advantage is therefore an evaluation-dependent result in the low-qubit regimes studied.}
 
 
 
@@ -153,101 +153,25 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Quantum kernel methods are one of the clearest and most actively studied directions in quantum machine learning. By embedding classical data into quantum states and defining similarity through state overlaps, they provide a principled way to study how quantum-induced feature geometry affects supervised learning while keeping the downstream classifier fixed \cite{havlicek2019quantumenhanced,schuld2019featurehilbert,schuld2021kernelmethods}. At the same time, the recent QML literature has made an equally important point: empirical conclusions about quantum models can depend strongly on the data regime, the encoding, and the evaluation protocol \cite{huang2021powerofdata,schuld2021encoding,gilfuster2024rethinkinggeneralization,bowles2024betterthanclassical,schnabel2025scrutiny}. For that reason, claims about the usefulness of quantum kernels are most informative when they are established under controlled, reproducible, and carefully matched comparisons rather than through heterogeneous pipelines or loosely aligned baselines.
+Quantum kernel methods embed classical data into quantum states and use state overlaps as similarities for otherwise classical learners \cite{havlicek2019quantumenhanced,schuld2019featurehilbert,schuld2021kernelmethods}. This separation makes them a clean setting for asking whether quantum-induced feature geometry provides useful inductive bias. It also makes comparison unusually sensitive to evaluation design: the downstream learner can be held fixed, but conclusions still depend on the encoding, bandwidth, regularization, classical reference set, and rule used to select a candidate \cite{huang2021powerofdata,schuld2021encoding,bowles2024betterthanclassical,schnabel2025scrutiny}.
 
-This need for control becomes even more important under distribution shift. In many applied settings, the relevant question is not only whether a model separates classes well under in-distribution (ID) conditions, but whether its behavior remains reliable once the evaluation distribution changes. The broader distribution-shift and domain-generalization literature has repeatedly shown that apparent robustness gains can weaken, disappear, or become difficult to interpret when model-selection strategy, hyperparameter search, split construction, or evaluation standardization are not carefully controlled \cite{quinonero-candela2008datasetshift,zhou2023dgsurvey,gulrajani2021domainbed,koh2021wilds,yao2022wildtime}. A convincing robustness study must therefore satisfy two requirements at once: it must isolate the factor of interest tightly enough to support attribution, and it must evaluate that factor broadly enough to determine whether the observed behavior reflects a meaningful regime-level effect rather than a narrow configuration artifact.
+Recent benchmarks have accordingly shifted the question from whether an isolated quantum model can perform well to whether a claimed gain survives strong and symmetric controls. Broad QML studies find competitive classical baselines once pipelines are aligned \cite{bowles2024betterthanclassical}; quantum-kernel benchmarks show substantial sensitivity to feature map and hyperparameter choice \cite{schnabel2025scrutiny}; and a concurrent tabular study using nested cross-validation, spectral analysis, and hardware validation finds no significant quantum win across its tested pairs \cite{kakavand2026benchmarking}. These studies evaluate predominantly identically distributed train--test settings. They do not address a further deployment question: what happens when the target distribution changes and its labels cannot be used to choose the deployed kernel?
 
-These issues are especially acute in security applications. Drift is not incidental to the problem; it is part of the problem definition itself. Static PE malware classification has been widely studied through benchmarks such as EMBER \cite{anderson2018ember}, while more recent work has highlighted the gap between laboratory evaluation and performance on drifted malware, as well as the difficulty of adapting with limited post-drift data \cite{barbero2022transcending,li2025revisitingdrift}. The emergence of updated resources such as EMBER2024 further reflects an active push toward more realistic, broader, and more deployment-relevant malware evaluation \cite{joyce2025ember2024}. Network intrusion detection faces the same structural challenge: traffic distributions move as services, infrastructure, and attack campaigns evolve, and public benchmarks such as UNSW-NB15 and ToN-IoT expose exactly this kind of regime change \cite{moustafa2015unsw,alsaedi2020toniot}. Taken together, this literature suggests that a useful security-ML study should not merely report accuracy on a convenient split; it should examine how model choices behave when the evaluation explicitly targets shift, and it should do so across more than one data modality and drift mechanism.
+Distribution shift makes model selection part of the estimand. Work on domain generalization and real-world shift has shown that robustness gains can disappear when search budgets, hyperparameters, and selection criteria are standardized \cite{gulrajani2021domainbed,koh2021wilds,yao2022wildtime,zhou2023dgsurvey}. A selector that inspects the shifted test labels estimates an oracle upper bound, not deployable performance; a family with more candidates has more opportunities to win that selection. Fair quantum--classical evaluation under shift must therefore control not only the classifier and data split, but also regularization, candidate budget, and label access.
 
-Kernel methods are a natural setting in which to ask such questions cleanly. Because kernel-based support vector machines separate the choice of classifier from the choice of similarity function, they offer a principled way to study how representational geometry affects ID and OOD behavior while keeping the learning machinery fixed \cite{cortes1995svm,scholkopf2002learningwithkernels}. This perspective becomes particularly interesting in quantum machine learning, where quantum kernels are defined through implicit feature maps into quantum Hilbert spaces and estimated via state overlaps or related fidelity-based similarities \cite{havlicek2019quantumenhanced,schuld2019featurehilbert,schuld2021kernelmethods}. From this viewpoint, quantum kernels are not a vague alternative model class, but a concrete family of kernel constructions whose empirical value can---and should---be tested under the same standards applied to classical kernels.
+Security detection provides a useful stress test because shift is intrinsic to the application. Malware evolves over time, and experimental bias can overstate detector performance \cite{anderson2018ember,pendlebury2019tesseract,arp2022dosdonts}; network traffic changes with infrastructure and attack campaigns \cite{moustafa2015unsw,alsaedi2020toniot}. Quantum classifiers have already been evaluated on intrusion-detection benchmarks, sometimes with reported gains over small classical reference sets on i.i.d.\ splits \cite{abreu2024qmlids,abreu2025quantumnetsec,bellante2025evaluating}. We use these datasets not to propose a security system, but to expose kernel families to reproducible constructed shifts and to a held-out attack-campaign shift.
 
-At the same time, the quantum-kernel literature has matured to the point where optimistic demonstrations and critical scrutiny must now be read together. Foundational work established the feature-space interpretation of quantum kernels and motivated them as expressive alternatives to classical similarities \cite{havlicek2019quantumenhanced,schuld2019featurehilbert}. Subsequent studies emphasized that performance in quantum machine learning can depend strongly on the data regime, the encoding, and the effective geometry induced by the model \cite{huang2021powerofdata,schuld2021encoding}. More recent work has sharpened this message further: understanding generalization in quantum machine learning requires care beyond classical intuition, and benchmarking conclusions can be highly sensitive to protocol choices \cite{gilfuster2024rethinkinggeneralization,bowles2024betterthanclassical,schnabel2025scrutiny}. This makes broad claims of superiority difficult to defend and reinforces the need for conservative, protocol-aware empirical studies.
+The closest robustness-specific concurrent work studies additive input corruption and proposes a spectral phase encoding \cite{herrero2026spectralphase}. Our question is complementary: rather than optimize a new encoding, we audit how evaluation choices change a family-level conclusion under constructed and held-out-campaign shifts. The distinguishing axes are no-OOD-label selection, equal candidate budgets, per-configuration train-only regularization, fixed-case inference, and a geometry analysis tied specifically to behaviour after the distribution moves.
 
-The gap we address lies precisely at this intersection, and it has three parts. First, there remains limited evidence from controlled, variability-aware comparisons between classical and quantum kernel families in security-relevant settings where out-of-distribution robustness is part of the evaluation target: existing studies often differ simultaneously in model class, preprocessing, search space, or data protocol, making it difficult to attribute observed gains to the kernel itself. Second, when such comparisons are attempted, the classical reference set is typically narrow---linear and RBF kernels under a single classifier---so an apparent quantum advantage may reflect the weakness of the baselines rather than a property of the quantum family; probabilistic classifiers with principled uncertainty quantification, and classical kernels with richer spectral structure, are usually absent. Third, and most fundamentally, empirical wins and losses are rarely accompanied by an account of \emph{why} a kernel family should behave better or worse under shift, leaving results as observations in search of an explanation. For a question as specific as whether quantum kernels help under distribution shift, these confounds and omissions are not peripheral; they are decisive.
+We implement a controlled \emph{kernel-swap} benchmark in which preprocessing, splits, classifier, and family-internal selection logic are fixed while only the kernel changes. Four security scenarios from EMBER, UNSW-NB15, and ToN-IoT yield eight scenario-groups across constructed and held-out-campaign shifts. Support-vector and Laplace Gaussian-process classifiers consume the same precomputed Gram matrices. The quantum family contains four fidelity feature-map families with angle-scale sweeps; the classical family extends linear and RBF references with polynomial, Laplacian, and Mat\'ern kernels and symmetric bandwidth freedom. Each configuration's regularization is tuned from training data alone. The primary deployed candidate is selected on a disjoint ID-validation split, and the two extended families receive equal candidate budgets. Fifteen pipeline realizations per setting quantify conditional variability; the benchmarks are treated as fixed case studies rather than as random draws from an undefined population.
 
-In this paper, we study that question through a strictly controlled \emph{kernel-swap} protocol, instantiated broadly enough to close all three gaps at once. Within each experimental setting we hold the classifier, the preprocessing pipeline, the split definitions, and the family-internal model-selection logic fixed, and vary only the kernel. The protocol is applied to four security benchmarks spanning two data modalities and two shift mechanisms: EMBER static PE malware under two constructed covariate-shift splits \cite{anderson2018ember}, and UNSW-NB15 and ToN-IoT network-flow scenarios under both an analogous constructed split and a \emph{held-out attack-campaign shift}, in which the target attack campaign is absent from training and the capture partition changes \cite{moustafa2015unsw,alsaedi2020toniot}. Two classifier families consume the same precomputed kernels: support vector classification, and a binary Laplace-approximation Gaussian process classifier \cite{rasmussen2006gpml} that adds probabilistic predictions---whose calibration under shift we assess rather than assume---without changing anything else in the pipeline. The classical family ranges from the customary linear and RBF baselines to polynomial, Laplacian, and Mat\'ern kernels with train-only median-heuristic length scales; the quantum family comprises fidelity kernels induced by commonly used feature-map families. Crucially, both families receive the same length-scale tuning freedom (a length-scale sweep for the RBF, Laplacian, and Mat\'ern kernels, and an angle-scaling sweep for the quantum maps), each configuration's regularization is tuned by cross-validation on the training split alone, both families search an equal candidate budget, and the deployed configuration is chosen by a rule that never consults the out-of-distribution labels. The design comprises eight scenario-groups (two on EMBER, six on network flows), each realized as fifteen pipeline realizations per setting; we report effect sizes with conditional intervals and treat the benchmarks as fixed case studies rather than pooling correlated settings into a population significance test.
+The comparison is coupled to a mechanistic audit. We measure effective rank, centered kernel-target alignment, concentration, and geometric difference \cite{roy2007effective,cristianini2001kta,cortes2012centeredalignment,huang2021powerofdata}; use partial association, leave-one-dataset-out prediction, and effective-rank matching to restrict interpretation; and perturb fidelity estimates with finite shots to test whether exact statevector geometry survives measurement.
 
-Beyond measuring who wins, we ask why. For every kernel, dimension, and setting we compute geometry descriptors of the induced Gram matrices---the effective rank of the training kernel \cite{roy2007effective}, centered kernel-target alignment on the ID and OOD splits \cite{cristianini2001kta,cortes2012centeredalignment}, kernel concentration statistics, and the geometric difference between classical and quantum kernels \cite{huang2021powerofdata}---and test which of these quantities predict out-of-distribution behavior within and across settings. This mechanistic layer converts the benchmark from a scoreboard into an instrument for attribution.
+The evaluation choices change the conclusion. With same-test oracle selection, fixed regularization, and customary linear+RBF baselines, fidelity kernels appear to improve OOD balanced accuracy by as much as $+0.037$. With train-only regularization, no-OOD-label selection, and equal candidate budgets, the dataset-equal quantum-minus-classical delta is $-0.005$ for SVC and $-0.002$ for the GP classifier. The primary SVC comparison is classical-favoured or conditionally tied in seven of eight scenario-groups. Effective rank and OOD alignment remain associated with accuracy, but the association is regime-dependent and shared by both families; at matched effective rank, the classical configuration is at least as accurate in every group. Finite-shot estimation inflates effective rank and destabilizes candidate selection.
 
-The resulting picture is sharper than a quantum-versus-classical verdict, and more useful. Against linear and RBF baselines selected on the test split, fidelity-based quantum kernels appear to improve OOD balanced accuracy---the result that dominates the optimistic literature. But this apparent advantage rests on two evaluation choices that both flatter the quantum family: selection that consults the shifted test labels (an oracle), and a fixed regularization constant that leaves the classical baselines untuned. Correcting them removes the advantage. When the regularization of every configuration is tuned by cross-validation on the training split alone, configurations are selected without any OOD labels (on an in-distribution validation split held out from the test), and both families search an equal budget of kernel geometries, the OOD difference collapses to near zero against \emph{both} references: the dataset-equal-weighted delta is $-0.004$ under SVC against linear+RBF and against the extended classical family alike, and the extended family is favoured or tied in seven of eight scenario-groups. Only one regime---UNSW-NB15 reconnaissance under held-out attack-campaign drift---retains a small quantum lean under both classifiers. A geometry analysis shows why the two families are so close: effective rank and OOD kernel-target alignment are robustly \emph{associated} with performance, but the association is regime-dependent rather than a single law, and when quantum and classical configurations are matched by effective rank the classical kernels are at least as accurate in every scenario-group. What remains as a candidate quantum contribution is a modest in-distribution separability edge under the probabilistic classifier; even that shrinks once selection is honest. The property that governs behaviour under shift is kernel geometry, and both families reach it.
+The contribution is therefore an evaluation result rather than an advantage claim: it identifies which protocol choices create the optimistic quantum-kernel robustness result, supplies a deployable equal-budget comparison under shift, and shows that the observed geometry does not uniquely identify quantum provenance. The scope is deliberately limited to the low-qubit fidelity kernels, datasets, and shift constructions studied here.
 
-Our contributions are fourfold. First, a controlled, reproducible kernel-swap protocol for robustness studies that extends across two classifier families, across a broad classical reference set with symmetric length-scale tuning and per-configuration regularization tuned on training data alone, and across datasets, modalities, and shift mechanisms, evaluated under honest, no-OOD-label selection at equal candidate budgets. Second, a variability-aware regime map of quantum-versus-classical kernel behaviour under shift, whose central finding is a negative one obtained under fair conditions: once regularization is tuned, budgets are matched, and selection does not consult the shifted labels, the apparent OOD advantage of fidelity kernels dissolves against both the customary weak baselines and a geometry-matched classical family, leaving no robust family-level advantage. Third, a geometric account---effective rank and OOD kernel-target alignment are robustly associated with, but do not causally determine, out-of-distribution performance---together with the controls (partial correlations, leave-one-dataset-out prediction, rank matching) that keep the claim at the level of association and show it favours neither family. Fourth, a finite-shot fidelity-estimation analysis showing that the quantum kernels' geometry is a statevector-exact idealization---effective rank in particular inflates under finite estimation---so that even the geometric description does not transfer unchanged to resource-limited settings. We release the full protocol and artifact so that future quantum-kernel claims under shift can be checked against a fair baseline.
-
-\section{Related Work}
-\label{sec:related_work}
-
-\subsection{Distribution shift, domain generalization, and evaluation rigor}
-
-The broader literature on distribution shift has established that predictive performance can degrade substantially when training and test data are drawn from different distributions, and that robust evaluation under shift requires more than reporting strong in-distribution performance \cite{quinonero-candela2008datasetshift,shimodaira2000covariateshift,sugiyama2007iwcv}. Within machine learning, domain generalization (DG) has emerged as one of the main formal settings for studying out-of-distribution (OOD) performance without access to target-domain labels during training \cite{zhou2023dgsurvey}. This literature has also made clear that empirical conclusions about robustness are highly sensitive to evaluation design.
-
-A particularly important development is the move toward benchmark-driven scrutiny of robustness claims: DomainBed showed that many reported domain-generalization improvements dissolve once datasets, architectures, hyperparameter budgets, and model-selection criteria are held consistent \cite{gulrajani2021domainbed}; WILDS demonstrated that standard training leaves large OOD gaps under naturally occurring real-world shifts \cite{koh2021wilds}; and Wild-Time established temporal shift as a distinct, practically relevant regime that existing methods struggle to close \cite{yao2022wildtime}. These works matter here not because security detection is a standard DG benchmark, but because they establish a methodological principle we adopt wholesale: when the goal is to compare robustness under shift, fairness of protocol is part of the contribution. Our comparison therefore fixes the classifier family, preprocessing, and split definitions, so that the role of the kernel can be interpreted with minimal confounding.
-
-\subsection{Security detection under drift and evolving evaluation benchmarks}
-
-In malware detection, the relevance of distribution shift is especially acute. Malware ecosystems evolve continuously as attackers modify payloads, packers, obfuscation strategies, delivery mechanisms, and development toolchains. Static detection models are therefore exposed to changing distributions in ways that are operationally consequential rather than merely academic. Public benchmarks have played an important role in making this problem more reproducible. EMBER remains one of the most widely used open datasets for static PE malware detection and helped standardize large-scale evaluation in this area \cite{anderson2018ember}. More recent resources such as EMBER2024 push this effort further by broadening scope, increasing scale, and enabling more holistic evaluation across multiple malware-related tasks \cite{joyce2025ember2024}. Other datasets such as BODMAS and SOREL-20M likewise reflect the field's effort to move toward larger and more realistic benchmark settings \cite{yang2021bodmas,harang2020sorel20m}.
-
-At the same time, a growing body of work has shown that strong laboratory performance does not guarantee robustness to evolving malware. The Transcend line introduced conformal criteria to identify aging classifiers in deployment before their accuracy visibly degrades \cite{jordaney2017transcend}, later refined by Barbero et al.\ \cite{barbero2022transcending}; CADE detects and explains drifting samples without out-of-distribution labels \cite{yang2021cade}; and Li et al.\ studied adaptation to real drifted malware under limited post-drift supervision \cite{li2025revisitingdrift}. On the methodological side, TESSERACT established that spatial and temporal experimental bias can manufacture illusory detector performance \cite{pendlebury2019tesseract}, and Arp et al.\ catalogued the recurring pitfalls of ML evaluations in computer security---sampling bias, label leakage, and inappropriate baselines among them \cite{arp2022dosdonts}. Our protocol is, in large part, an application of those prescriptions to kernel comparison: fixed splits, leakage checks, held-out attack-campaign separation in the network construction, and baselines strengthened until they stop flattering the method under study. Taken together, these studies support a clear conclusion: in security detection, robustness under shift is not a niche desideratum but a primary evaluation target.
-
-The same structural problem, with faster drift dynamics, defines network intrusion detection: benchmark corpora such as UNSW-NB15 and ToN-IoT capture traffic whose attack composition and background behavior change across collection regimes \cite{moustafa2015unsw,alsaedi2020toniot}, and adaptive NIDS pipelines are routinely retrained for exactly this reason. Using both modalities in one protocol lets us ask whether kernel-level robustness effects are properties of a dataset family or of the kernels.
-
-Quantum machine learning has itself entered this application space. Quantum-enhanced classifiers and QSVMs have been applied to network intrusion detection since at least Gouveia and Correia \cite{gouveia2020towards}, the area has been systematically reviewed \cite{nicesio2023review,nieto2026survey}, and recent systems evaluate quantum kernels directly on the benchmarks we use, reporting quantum advantages on UNSW-NB15 and ToN-IoT \cite{abreu2024qmlids,abreu2025quantumnetsec}; a critical evaluation on PCA-based intrusion detection found classical methods to remain competitive under realistic constraints \cite{bellante2025evaluating}. A common trait of the optimistic studies is decisive for the present paper: they compare against a small set of classical baselines on i.i.d.\ splits---precisely the two evaluation choices our results show to inflate apparent quantum advantages. Our study can be read as the missing stress test for this literature: under matched baselines, symmetric tuning, and explicit shift, part of the advantage survives and part of it does not, and the geometry explains which.
-
-Our work differs from this line in emphasis. Rather than proposing a new drift-adaptation mechanism, drift detector, or continual-update strategy, we ask a narrower but complementary question: under a tightly controlled protocol, does the choice of kernel family itself materially affect OOD robustness? This question is well motivated by the security literature, yet comparatively underexplored in a way that isolates kernels from the many other moving parts of the pipeline.
-
-\subsection{Kernel methods, quantum kernels, and careful benchmarking in QML}
-
-Kernel methods provide a natural framework for studying robustness under controlled model comparisons because they separate the learning algorithm from the similarity function used to compare inputs. In classical machine learning, support vector machines and related kernel methods have long provided a principled route for controlling model capacity while varying the geometry of the induced feature space \cite{cortes1995svm,scholkopf2002learningwithkernels}. This makes kernels especially attractive when the scientific question concerns representation and similarity rather than wholesale changes in classifier architecture.
-
-Quantum kernel methods arise from the observation that data can be embedded into quantum states and compared through overlaps in a quantum feature space. Havl{\'\i}{\v{c}}ek et al.\ popularized this perspective in the context of supervised classification with quantum-enhanced feature spaces \cite{havlicek2019quantumenhanced}, while Schuld and Killoran provided a broader theoretical account linking quantum models to kernel methods through feature Hilbert spaces \cite{schuld2019featurehilbert}. Later work sharpened this connection by arguing that supervised quantum machine learning models can often be interpreted directly as kernel methods, making the kernel viewpoint central rather than incidental \cite{schuld2021kernelmethods}. Additional work on data encoding further showed that representational behavior depends critically on how classical inputs are mapped into quantum states, which is directly relevant when comparing quantum feature maps as alternative kernel constructions \cite{schuld2021encoding}. Two spectral results frame what such kernels can and cannot do: K\"ubler et al.\ showed that the inductive bias of quantum kernels is governed by the spectrum of the induced integral operator, with flat spectra implying poor in-distribution sample efficiency \cite{kubler2021inductivebias}, and Thanasilp et al.\ established that broad families of fidelity kernels concentrate exponentially toward trivial values as systems grow, erasing trainability \cite{thanasilp2024concentration}. Both results interact nontrivially with our findings and are taken up in the discussion.
-
-However, the contemporary QML literature also makes clear that promising empirical behavior should not be read uncritically. Huang et al.\ showed that the role of data can be decisive in quantum machine learning, suggesting that observed performance gains are deeply regime-dependent rather than model-intrinsic \cite{huang2021powerofdata}. Caro et al.\ studied generalization from few training examples \cite{caro2022generalization} and later proved out-of-distribution generalization guarantees for learning quantum dynamics \cite{caro2023oodquantumdynamics}---a setting whose inputs are quantum states rather than classical data, and thus complementary to the classical-input shift studied here---while Gil-Fuster et al.\ argued that understanding generalization in QML requires rethinking familiar classical intuitions, since standard explanations may fail to account for observed behavior in quantum models \cite{gilfuster2024rethinkinggeneralization}. In parallel, broader perspective pieces have emphasized both the promise and the unresolved challenges of QML as a field \cite{cerezo2022qmlchallenges}.
-
-Most importantly for the present work, recent benchmarking studies have raised the standard for empirical claims in QML. Bowles et al.\ argued that experimental design choices can dominate conclusions and showed, in a broad simulated benchmark, that out-of-the-box classical models often remain strong baselines against quantum alternatives \cite{bowles2024betterthanclassical}. Schnabel and Roth extended this benchmarking perspective specifically to quantum kernel methods, conducting a large-scale study across many design choices and showing that performance depends strongly on kernel type, encoding strategy, and hyperparameter configuration rather than on a simple classical-versus-quantum dichotomy \cite{schnabel2025scrutiny}. Related controlled evidence from adjacent QML settings points in the same methodological direction: recent work in hybrid quantum reinforcement learning shows that varying multiple pipeline components at once can obscure attribution, and highlights the importance of component-isolating, reproducible evaluation under fixed experimental conditions \cite{lazaro2025dissectingqrl}. This line of work is especially relevant to our paper because it supports a conservative framing: the value of quantum kernels, if any, must be demonstrated under controlled and transparent comparisons, and should be expected to be regime-dependent.
-
-Three further strands supply the analytical tools of this study. First, work on kernel bandwidth in QML has shown that rescaling the data encoding is as consequential for fidelity kernels as the length scale is for classical kernels, and can determine whether quantum models generalize at all \cite{shaydulin2022bandwidth,canatar2023bandwidth,egginger2024hyperparameter}; we operationalize this insight as a fairness requirement---symmetric bandwidth freedom for both families---rather than as a quantum-side tuning trick. Second, kernel-target alignment \cite{cristianini2001kta,cortes2012centeredalignment} and effective rank \cite{roy2007effective} are classical tools for characterizing Gram-matrix geometry, and the theory of spectral bias and task-model alignment shows that in-distribution generalization of kernel methods is governed precisely by the compatibility between the kernel's spectrum and the target function \cite{bordelon2020spectrum,canatar2021taskmodel}; alignment has also served as a training objective for quantum embedding kernels \cite{hubregtsen2022training}, a line our negative result on a-priori alignment-based selection speaks to directly. To our knowledge, the joint use of these descriptors as \emph{predictors of OOD behavior under distribution shift}, across classical and quantum kernels alike, is new: we study the shift-facing counterpart of task-model alignment---whether the aligned spectrum survives once the distribution moves. Third, Gaussian process classification \cite{rasmussen2006gpml} provides the standard route to probabilistic predictions in kernel methods; including a Laplace-approximation GP classifier in the kernel-swap protocol lets us assess uncertainty quality under shift without changing anything else in the pipeline.
-
-Finally, we note concurrent work. A 2026 preprint studies the robustness of quantum kernel methods under additive input corruption and proposes a spectral phase encoding to mitigate it \cite{herrero2026spectralphase}. It shares our move away from clean-data peak performance, but differs in all three defining aspects: it perturbs inputs with synthetic noise rather than evaluating under covariate or attack-campaign shift, it proposes an encoding rather than auditing families under a fixed protocol, and it does not use Gram-matrix geometry as the explanatory variable. Large-scale quantum-kernel benchmarking without varied train--test distributions \cite{bowles2024betterthanclassical,schnabel2025scrutiny} remains the closest genre; the shift axis and the mechanism are the present paper's additions to it.
-
-Our study is positioned at the intersection of these literatures. From the distribution-shift literature, we adopt the principle that robustness claims must rest on evaluation protocols that control major confounds. From the security literature, we take the practical motivation that temporal and distributional change are intrinsic to realistic deployment, in malware and network intrusion detection alike. From the QML literature, we take both the motivation for studying quantum kernels and the caution that benchmarking quality is central to interpretation. Relative to prior work, our contribution is not to claim universal superiority for quantum kernels, nor to propose a new adaptation method for drifted security data, but to provide a controlled, variability-aware, multi-dataset comparison of classical and quantum kernel families in which out-of-distribution robustness is the primary evaluation target---and to accompany the comparison with a mechanistic account of why its outcomes are what they are.
-
-\section{Methods}
-\label{sec:methods}
-
-\subsection{Problem setting}
-
-We study binary security classification---malware versus benign software, and attack versus benign traffic---under distribution shift. Let $D_{\mathrm{ID}}$ denote the in-distribution data-generating process and $D_{\mathrm{OOD}}$ an out-of-distribution process induced by a shift mechanism, which may be constructed or arising from a held-out attack campaign. Given a training set $T \sim D_{\mathrm{ID}}$, we evaluate the learned classifier on both an ID test set $S_{\mathrm{ID}}$ and an OOD test set $S_{\mathrm{OOD}}$. Our objective is not only to measure separability under the i.i.d.\ assumption, but to compare how kernel families behave when generalization is evaluated explicitly under shift.
-
-The central methodological requirement of the study is attribution. Because the scientific question concerns the effect of the kernel, comparisons must avoid confounds from changes in classifier family, preprocessing, optimization protocol, or split design. We therefore adopt a strictly controlled \emph{kernel-swap} protocol in which all components of the pipeline are held fixed except the kernel function itself. This design follows the same evaluation logic that motivates rigorous OOD benchmarking in the broader distribution-shift literature: when the target of inference is robustness, protocol control is not an implementation detail but part of the contribution.
-
-\subsection{Datasets and split construction}
-
-The protocol is instantiated on four benchmark scenarios spanning two data modalities. The first is EMBER, the standard public benchmark for static PE malware detection \cite{anderson2018ember}, which is widely used, supports reproducible feature-based experimentation, and has motivated later benchmark extensions such as EMBER2024 \cite{joyce2025ember2024}. The remaining three are network-flow intrusion scenarios: two derived from UNSW-NB15 (with DoS and Reconnaissance, respectively, as the drifting attack category) \cite{moustafa2015unsw} and one from ToN-IoT (Scanning) \cite{alsaedi2020toniot}. In all cases our goal is not to benchmark absolute detection performance on a standard split, but to construct controlled ID/OOD regimes that allow kernel-family comparisons under distribution shift.
-
-For each experimental setting, we adopt a fixed three-way split design:
-\[
-T,\quad S_{\mathrm{ID}},\quad S_{\mathrm{OOD}},
-\]
-where $T$ is used for training, $S_{\mathrm{ID}}$ measures in-distribution performance, and $S_{\mathrm{OOD}}$ measures robustness under the induced shift. All models compared within a setting use exactly the same split definitions. This point is essential: a classical and a quantum model are never compared on different train/test partitions.
-
-\paragraph{EMBER shift constructions.}
-On EMBER we operationalize shift through two controlled OOD-construction variants, denoted $m1$ and $m2$, both built on the histogram + byte-entropy feature blocks and both designed to preserve class balance across splits. Both are \emph{label-conditional tail shifts}: the OOD pool is assembled from the extremes of a within-class score distribution, so the construction uses the labels to decide which samples are held out. We use this term rather than ``covariate shift'' deliberately. Because selection is conditioned on the class, we cannot assert that $P(Y\mid X)$ is preserved, which is what the covariate-shift assumption requires; class balance is preserved by construction, but that is a weaker property. The constructions are reproducible and interpretable stress tests of kernel geometry, not certified instances of a formal shift model, and none of our conclusions depend on their being so.
-
-\paragraph{Variant $m1$: sparsity-score extremes within class.}
-For each sample, we compute a sparsity-related score on a predefined feature block. In the main configuration used in the experiments, this score corresponds to the number of non-zero entries within the selected block. The OOD set is formed by taking, within each class separately, the low-score and high-score extremes, i.e., the two tails of the within-class score distribution. The remaining samples form an ID pool from which the training and ID test sets are obtained by stratified sampling. Intuitively, this construction creates an OOD regime driven by atypical sparsity structure while keeping the label distribution under control.
-
-\paragraph{Variant $m2$: distance-to-train extremes within class.}
-We first fix the final training set at an exact target size. Using only this training set, we compute class-conditional centroids and assign each non-training sample a score equal to its Euclidean distance to the centroid of its own class. To reduce noise and avoid leakage, this distance can be computed in a TruncatedSVD-projected space fitted on the training set only. The OOD set is then defined, again within each class separately, by the low- and high-distance extremes from the non-training pool, with exact target OOD size and proportional class allocation. The ID test set is drawn from the remainder. This produces a complementary shift regime in which OOD samples are unusual relative to the final training geometry rather than to a sparsity statistic alone.
-
-\paragraph{Network-flow scenarios and shift constructions.}
-Each network scenario is defined by a \emph{reference} pool (traffic from the pre-drift regime) and a \emph{current} pool (traffic containing the drifted attack campaign), prepared with a numeric-only feature policy that removes identifiers, label-derived columns, and categorical protocol fields; UNSW-NB15 scenarios retain 39 flow features and ToN-IoT 89. We verified explicitly that no feature is label-derived: the maximum feature--label correlation across scenarios is $0.62$ (attained by well-known legitimate features such as \texttt{sttl}), far from the near-perfect correlation that would signal leakage, and the verification script is part of the public artifact. On these pools we instantiate two shift mechanisms. The first, \emph{m2-centroid}, is the direct analog of EMBER's $m2$: within the class-balanced reference pool, a provisional training pool is fixed, class-conditional centroids are computed in a train-only MaxAbs+TruncatedSVD space, and the OOD pool consists of the within-class low- and high-distance tails. The second, which we call \emph{attack-campaign regime shift}, applies no geometric selection: the training and ID pools are drawn from the reference regime and the OOD pool from the class-balanced current regime. The pools themselves are constructed---and we state the criterion precisely, since it determines what the mechanism is being tested against. The reference pool contains benign traffic plus every attack category \emph{except} the target campaign; the current pool contains benign traffic plus the target campaign. For UNSW-NB15 the two pools additionally come from the two different official partitions of the testbed capture. The OOD regime therefore combines an emerging attack campaign, absent from training, with a capture-partition change, and it is not a temporal split in the timestamp sense. Class priors are balanced separately in both pools, so prevalence shift is deliberately excluded and the measured effect is attributable to the change in traffic composition rather than to base rates. This is the most operationally realistic of our three mechanisms, and the least synthetic, but it is not free of construction; the full raw-to-pool pipeline is part of the public artifact.
-
-Together, these constructions are not intended as universal models of real-world drift. Rather, they provide reproducible shift mechanisms of three distinct kinds---within-class sparsity-tail shifts, train-geometry-tail shifts, and a held-out attack-campaign shift---that are sufficiently different to support regime-level conclusions while preserving comparability across kernel families. In every setting, all models are compared on exactly the same $T$, $S_{\mathrm{ID}}$, and $S_{\mathrm{OOD}}$.
-
-\subsection{Controlled kernel-swap protocol}
-
-Our core experimental principle is to isolate the kernel as the only variable of interest; Figure~\ref{fig:protocol} summarizes the resulting pipeline. All compared models share the following components:
-
-% Figure generated by scripts/reporting/make_v2_figures.py
+% Figure generated by scripts/reporting/make_v4_figures.py
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{fig_v4_protocol.pdf}
@@ -255,257 +179,80 @@ Our core experimental principle is to isolate the kernel as the only variable of
 \label{fig:protocol}
 \end{figure*}
 
-\begin{itemize}
-    \item \textbf{Classifier:} within each comparison, a single classifier consuming precomputed Gram matrices. Two classifier families are studied in parallel: Support Vector Classification with \texttt{kernel="precomputed"}, and a binary Gaussian process classifier under the Laplace approximation.
-    \item \textbf{Preprocessing:} the same scaling and dimensionality-reduction pipeline for all classical and quantum models.
-    \item \textbf{Split design:} identical $T$, $S_{\mathrm{ID}}$, and $S_{\mathrm{OOD}}$ within each setting.
-    \item \textbf{Selection logic:} the same family-internal model-selection principle applied consistently to classical and quantum candidates.
-\end{itemize}
-
-This yields a comparison between kernel families rather than between heterogeneous model pipelines. In particular, it prevents observed OOD differences from being attributed to changes in classifier architecture, feature engineering, or split construction. The choice of precomputed-kernel classifiers is deliberate: it allows both classical and quantum similarities to be consumed by exactly the same decision rule, thereby making the comparison interpretable in kernel-method terms \cite{cortes1995svm,scholkopf2002learningwithkernels}.
-
-The Gaussian process classifier implements the standard binary Laplace approximation with a logistic link (Algorithms~3.1 and~3.2 in \cite{rasmussen2006gpml}), applied directly to the same unit-diagonal precomputed kernels as the SVC. Its role in the study is twofold. Methodologically, it tests whether the kernel-family conclusions are classifier-specific or transfer across learning machinery. Substantively, it produces predictive probabilities rather than scores, which allows robustness under shift to be examined through the lens of uncertainty quantification---log-loss, Brier score, expected calibration error, and predictive entropy on ID versus OOD data---rather than through accuracy alone. We stress that no post-hoc calibration procedure (temperature scaling, isotonic regression, Platt scaling) is applied: the probabilities are those the Laplace approximation produces, and we \emph{assess} their calibration rather than assert it. Kernel-swap comparisons are always performed within a classifier, never across classifiers.
-
-Although the classical and quantum candidate sets are not identical in cardinality, fairness in this study is defined at the protocol level: both families are evaluated under the same classifier, preprocessing, splits, dimensionality sweep, and family-internal selection criterion, so that the effect attributed to the kernel is not confounded by changes elsewhere in the pipeline.
-
-\subsection{Preprocessing and feature representation}
-
-All models use the same preprocessing pipeline. Let $x \in \mathbb{R}^p$ denote the original feature vector of the dataset at hand. We apply the following steps:
-
-\begin{enumerate}
-    \item \textbf{MaxAbs scaling.} We first apply \texttt{MaxAbsScaler} to normalize feature magnitudes while preserving sparsity structure.
-    \item \textbf{Dimensionality reduction.} We project the scaled features using \texttt{TruncatedSVD} to a reduced representation of dimension
-    \[
-    d \in \{4,6,8,10,12\}.
-    \]
-    \item \textbf{Angle mapping.} For the quantum pipeline, the reduced coordinates are linearly mapped to an angle range $[0,\pi]$ before being passed to the quantum feature maps.
-\end{enumerate}
-
-This shared preprocessing serves two purposes. First, it keeps the comparison fair by ensuring that classical and quantum kernels operate on the same reduced representation. Second, it makes representation size itself a controlled factor of the study, enabling both aggregated setting-level comparisons and dimension-level analyses. The dimensionality parameter $d$ is therefore not a tuning artifact hidden in preprocessing, but an explicit axis of the experimental grid.
-
-\subsection{Kernel families}
-
-\paragraph{Baseline classical kernels.}
-The customary reference set consists of two standard baselines:
-\begin{align}
-K_{\mathrm{lin}}(x,x') &= x^\top x',\\
-K_{\mathrm{rbf}}(x,x') &= \exp\left(-\gamma\|x-x'\|_2^2\right),
-\end{align}
-with the RBF kernel evaluated using the standard \texttt{scale} convention for $\gamma$ and the linear kernel cosine-normalized to unit diagonal. These are the baselines against which quantum kernels are most commonly compared, and they define our \emph{classical-original} family.
-
-\paragraph{Extended classical family.}
-Because an apparent quantum advantage over two baselines may say more about the baselines than about the quantum family, we additionally evaluate a broader \emph{classical-extended} family: polynomial kernels of degree 2 and 3 (cosine-normalized), the Laplacian kernel $K(x,x')=\exp(-\|x-x'\|_1/\ell_1)$, and Mat\'ern kernels with $\nu \in \{3/2, 5/2\}$, where all length scales $\ell$ are set by the median heuristic---the median pairwise distance on the training set, the standard choice in kernel two-sample testing \cite{gretton2012kernel}---so that every hyperparameter is determined from training data alone, without access to ID or OOD test information. These kernels were chosen deliberately to span a range of spectral behaviors: the Laplacian and low-$\nu$ Mat\'ern kernels are less smooth than the RBF and induce Gram matrices with substantially heavier eigenvalue tails, which, as the mechanistic analysis will show, is precisely the property at stake under shift.
-
-\paragraph{Bandwidth symmetry.}
-Kernel bandwidth is known to be a decisive hyperparameter for quantum kernels: rescaling the input encoding plays the same role for fidelity kernels that $\gamma$ plays for the RBF kernel, and can qualitatively change generalization \cite{shaydulin2022bandwidth,canatar2023bandwidth}. A comparison in which the classical family may tune its bandwidth while the quantum family is pinned to a fixed encoding scale (or vice versa) is therefore not protocol-fair. In the bandwidth-symmetric portion of the study, every kernel with a length scale is allowed to tune it: the RBF kernel is evaluated at $\gamma = f \cdot \gamma_{\mathrm{scale}}$ and the Laplacian and Mat\'ern kernels at length scales $\ell = f \cdot \ell_{\mathrm{median}}$ for $f \in \{0.1, 0.3, 1, 3, 10\}$, while every quantum feature map is evaluated at angle scalings $\{0.5, 1, 2\}$ of the canonical $[0,\pi]$ encoding. This is stricter than tuning the RBF alone: the heavy-tailed classical kernels that most resemble the fidelity maps' geometry are precisely the ones granted a length-scale sweep. Family-internal selection then operates over the enlarged candidate sets---115 classical against 60 quantum configurations---exactly as before.
-
-\paragraph{Quantum kernels.}
-Quantum kernels are defined through an implicit feature map $\phi_Q(\cdot)$ induced by a parameterized quantum circuit, with similarity measured through fidelity-like overlaps \cite{havlicek2019quantumenhanced,schuld2019featurehilbert,schuld2021kernelmethods}. For two inputs $x$ and $x'$, the corresponding kernel entry can be written abstractly as
-\[
-K_Q(x,x') = |\langle \phi_Q(x), \phi_Q(x') \rangle|^2,
-\]
-or equivalently through the overlap of states prepared by input-dependent quantum feature maps.
-
-In the experiments, we evaluate multiple commonly used fidelity-based feature-map families chosen to represent distinct inductive biases: ZZ-type maps, PauliXZ-type maps, and Z-map variants. Concretely, the candidate set includes two ZZ configurations with different repetition depths, one PauliXZ configuration, and one Z-map configuration. We emphasize that the study is not attempting to exhaust the quantum-kernel design space; rather, it compares a representative set of commonly used fidelity-based constructions under a tightly controlled protocol. This framing is consistent with recent work arguing that empirical conclusions in QML are often regime-dependent and highly sensitive to protocol choices \cite{schuld2021encoding,bowles2024betterthanclassical,schnabel2025scrutiny}.
-
-\subsection{Model selection and repeated-run protocol}
-
-A major source of ambiguity in robustness studies is the selection criterion, and a fair comparison must fix four things that optimistic evaluations leave loose: the regularization of each configuration, the data used to select the deployed configuration, the candidate budget of each family, and the way significance is assessed over correlated settings.
-
-\paragraph{Regularization tuned on training data alone.}
-For every one of the 23 classical and 12 quantum kernel geometries, the SVC regularization $C\in\{0.01,0.1,1,10,100\}$ is chosen by five-fold stratified cross-validation on the training Gram matrix only, selecting the value with the best mean validation balanced accuracy (ties broken toward smaller $C$). Regularization is thus tuned per configuration without touching any test split, and $C$ is \emph{not} a candidate in the family comparison---so it introduces no additional selection optimism. The GP classifier has no analogous free constant and is run at fixed hyperparameters, and therefore serves as a secondary robustness check rather than carrying the family-level claim.
-
-\paragraph{P1$'$, ID-validation deployment (primary).}
-We split each in-distribution test set, class-stratified and deterministically by a stable hash of the sample index, into an ID-validation half and a disjoint ID-test half. Within each run and family, the deployed configuration (at its cross-validated $C$) is the one with the best ID-\emph{validation} balanced accuracy; we then report its ID-test and OOD-test accuracy. No out-of-distribution label ever enters selection, and---unlike a rule that selects and reports on the same ID split---the reported ID-test number is out-of-sample. Two auxiliary protocols are reported for context only: P2, a cross-realization protocol that selects using OOD labels from other split seeds (hence \emph{not} label-free, and named accordingly), and P3, the Best-by-OOD oracle that selects and evaluates on the same OOD split, an upper bound.
-
-\paragraph{Matched candidate budgets.}
-The classical family offers 23 kernel geometries per dimension against the quantum family's 12; because best-of-family selection favours the larger pool, we compare the 12 quantum geometries both against the full classical pool and against random equal-size subsamples of it (5000 resamples, three sampling schemes), and report performance as a function of candidate budget.
-
-\paragraph{Inference by fixed case studies.}
-The eight scenario-groups share underlying data pools and are not exchangeable---on the EMBER sparsity construction the OOD split is identical across master seeds---so a pooled significance test over settings would understate dependence. We therefore treat each scenario-group as a fixed case study and summarize its quantum-minus-classical delta by the mean over its five split-seed clusters, with a conditional interval (a $t$-interval on the five cluster means, with a BCa bootstrap and leave-one-split-out jackknife as secondary) that quantifies pipeline-realization uncertainty conditional on the benchmark pools. Across case studies we report the dataset-equal-weighted mean, its leave-one-dataset-out range, and the heterogeneity of effects; we deliberately report \emph{no} population $p$-value, because the case studies are fixed and few.
-
-\paragraph{Finite-shot perturbation model.}
-To test how far the statevector-exact geometry transfers to finite measurement, each fidelity entry is optionally replaced by a binomial estimate from $s\in\{128,512,2048,8192\}$ shots; square (train) blocks are symmetrized, set unit-diagonal, clipped to $[0,1]$, and projected to the positive-semidefinite cone (reporting the deviation before and after projection), while rectangular test blocks receive sampling and clipping only. This is a statistical estimation model, not a device-noise or hardware simulation.
-
-\subsection{Evaluation metrics}
-
-Our primary metric is balanced accuracy, reported separately on ID and OOD test sets:
-\[
-\mathrm{BAcc}_{\mathrm{ID}}, \qquad \mathrm{BAcc}_{\mathrm{OOD}}.
-\]
-Balanced accuracy is preferred because it remains informative under moderate class imbalance and is straightforward to interpret in both settings.
-
-The ID-to-OOD degradation
-\[
-\mathrm{drop} = \mathrm{BAcc}_{\mathrm{ID}} - \mathrm{BAcc}_{\mathrm{OOD}}
-\]
-is recorded for every configuration and available in the artifact; because it conflates OOD behavior with the corresponding ID baseline, we treat OOD balanced accuracy as the primary inferential target and use drop only as a secondary descriptor.
-
-To compare families after selection, we compute family deltas:
-\begin{align}
-\Delta_{\mathrm{OOD}} &= \mathrm{BAcc}^{(Q)}_{\mathrm{OOD}} - \mathrm{BAcc}^{(C)}_{\mathrm{OOD}},\\
-\Delta_{\mathrm{ID}}  &= \mathrm{BAcc}^{(Q)}_{\mathrm{ID}}  - \mathrm{BAcc}^{(C)}_{\mathrm{ID}}.
-\end{align}
-Positive values indicate an advantage for the selected quantum model relative to the selected classical model.
-
-Because average gains can be misleading when variability is large, we also report an effect-size-to-variability proxy:
-\[
-\mathrm{effect} =
-\frac{\mu_Q - \mu_C}{\sqrt{\sigma_Q^2 + \sigma_C^2}},
-\]
-where $\mu_Q,\mu_C$ and $\sigma_Q,\sigma_C$ are the repeated-run means and standard deviations for the metric of interest. Values greater than 1 indicate that the observed mean gain exceeds the combined variability scale, which provides a simple and interpretable robustness check on whether an apparent gain is large relative to run-to-run noise.
-
-\paragraph{Probabilistic metrics.}
-For the Gaussian process classifier we additionally report, on both ID and OOD splits, the negative log-likelihood (log-loss), the Brier score, the expected calibration error \cite{guo2017calibration} (ECE, 15 equal-width bins), and the mean predictive entropy. These quantities characterize how the quality and honesty of predictive uncertainty change under shift: a well-behaved probabilistic model should become \emph{more} uncertain on drifted inputs (rising entropy) while its calibration degrades as little as possible (bounded ECE increase), the desideratum established by the benchmark of Ovadia et al.\ \cite{ovadia2019trust}.
-
-\subsection{Kernel-geometry descriptors}
-\label{sec:geometry_methods}
-
-To move from measuring outcomes to explaining them, we compute geometry descriptors of the Gram matrices that every kernel induces in every setting and dimension. All descriptors are computed from the very kernel matrices consumed by the classifiers (unit diagonal by construction), so the analysis describes exactly the objects the models see.
-
-\paragraph{Effective rank.}
-For the training Gram matrix $K_{\mathrm{tr}}$ with eigenvalues $\lambda_1 \ge \dots \ge \lambda_n \ge 0$ normalized to $p_i = \lambda_i / \sum_j \lambda_j$, the effective rank is $\exp(-\sum_i p_i \log p_i)$ \cite{roy2007effective}. It measures how many directions of feature space the kernel actually uses: a cosine-normalized linear kernel on low-dimensional embeddings is near rank one, while fidelity kernels can spread mass over many directions.
-
-\paragraph{Centered kernel-target alignment.}
-For a kernel block $K$ on a labeled split with labels $y \in \{-1,+1\}^n$, the centered kernel-target alignment (KTA) is $\langle K_c, yy^\top\rangle_F / (n\,\|K_c\|_F)$, where $K_c$ is the doubly centered kernel \cite{cristianini2001kta,cortes2012centeredalignment}. We evaluate KTA on the training, ID, and OOD splits separately; the ID-to-OOD change in alignment measures whether the label structure remains visible to the kernel's geometry after shift---the quantity we will call \emph{alignment survival}.
-
-\paragraph{Concentration and cross-split similarity.}
-We record the mean and standard deviation of off-diagonal kernel entries within the training block and of the cross blocks between each test split and the training set, together with the ratio of mean OOD-to-train and ID-to-train similarities, which measures how novel the OOD inputs look under each kernel's similarity notion; these cross-split means are the elementary statistics underlying kernel two-sample tests such as MMD \cite{gretton2012kernel}, used here descriptively rather than as hypothesis tests.
-
-\paragraph{Geometric difference.}
-Between each classical training kernel $K_C$ and each quantum training kernel $K_Q$ we compute the regularized geometric difference $g(K_C \rightarrow K_Q) = \Vert \sqrt{K_Q}\,(K_C + \lambda n I)^{-1} \sqrt{K_Q} \Vert_\infty^{1/2}$ of Huang et al.\ \cite{huang2021powerofdata}, over a sweep of relative regularizers $\lambda$. Large values indicate that the quantum geometry can deviate substantially from what the classical kernel expresses; the quantity bounds the \emph{potential} for a performance separation but not its sign.
-
-\paragraph{Mechanistic analyses.}
-These descriptors feed two complementary analyses. First, a diagnostic analysis at the setting level asks which descriptors of the Best-by-OOD-selected kernels separate classical-favorable from quantum-favorable settings (Mann--Whitney AUC over settings) and correlate with the observed OOD delta. Second, a within-setting analysis asks whether geometry predicts performance across \emph{all} kernel--dimension cells of a setting: for every setting, classifier, and q-split seed we compute the Spearman rank correlation between a descriptor (effective rank, OOD alignment) and OOD balanced accuracy over the 30--55 evaluated cells, and then examine the distribution of these correlations across settings and datasets. A descriptor that yields consistently positive within-setting correlations across datasets, drift mechanisms, and classifiers constitutes a dataset-general regularity rather than a benchmark artifact.
-
-\subsection{Experimental grid and reporting}
-
-The EMBER evaluation grid comprises 18 principal settings formed by the Cartesian product of:
-\begin{itemize}
-    \item two shift variants ($m1$, $m2$),
-    \item three master seeds,
-    \item and three training-size regimes.
-\end{itemize}
-The three size regimes are:
-\[
-(1000, 500, 500),\quad (2000, 1000, 1000),\quad (4000, 1800, 1800),
-\]
-corresponding to $(n_{\mathrm{train}}, n_{\mathrm{ID}}, n_{\mathrm{OOD}})$.
-
-The network-flow grid applies the same structure to the three scenarios (UNSW-DoS, UNSW-Reconnaissance, ToN-IoT-Scanning), each under two shift mechanisms (m2-centroid and held-out attack-campaign shift), three master seeds, and the same three size regimes, yielding six network scenario-groups. Together with the two EMBER scenario-groups the study comprises eight scenario-groups; each setting is evaluated across the dimension sweep and realized as fifteen pipeline realizations (five split seeds $\times$ three model seeds), for both classifiers.
-
-For clarity and reproducibility, Table~\ref{tab:protocol_summary} summarizes the main experimental protocol used throughout the paper, including the shift constructions, controlled seed structure, size regimes, dimensionality sweep, kernel families, classifiers, and repeated-run design.
-
-\begin{table}[t]
-\centering
-\caption{Compact summary of the controlled experimental protocol. The variability design combines five split seeds with three model seeds, yielding fifteen pipeline realizations per evaluated configuration under fixed setting definitions.}
-\label{tab:protocol_summary}
-\small
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{lp{7.6cm}}
-\toprule
-Component & Specification \\
-\midrule
-Datasets & EMBER; UNSW-NB15 (DoS, Reconnaissance); ToN-IoT (Scanning) \\
-Shift constructions & EMBER: $m1$, $m2$; network: m2-centroid, held-out attack-campaign shift \\
-Master seeds & 42, 123, 999 \\
-Split seeds & 42, 123, 999, 7, 2024 \\
-Model seeds & 42, 123, 999 \\
-Runs per configuration & $5 \times 3 = 15$ \\
-Size regimes $(n_{\mathrm{train}}, n_{\mathrm{ID}}, n_{\mathrm{OOD}})$ & (1000, 500, 500), (2000, 1000, 1000), (4000, 1800, 1800) \\
-Dimensions & $d \in \{4,6,8,10,12\}$ \\
-Classifiers & SVC (precomputed); Laplace-GP classifier (precomputed) \\
-Shared preprocessing & MaxAbsScaler + TruncatedSVD + angle mapping \\
-Classical-original family & Linear, RBF(scale) \\
-Classical-extended family & + poly(2,3), Laplacian, Mat\'ern(3/2, 5/2), median heuristic \\
-Quantum family & ZZ (1 rep), ZZ (2 reps), PauliXZ (1 rep), Z-map \\
-Length-scale sweep & RBF/Laplacian/Mat\'ern factors; quantum angle scales $\{0.5,1,2\}$ \\
-Regularization & SVC $C\in\{0.01,0.1,1,10,100\}$, 5-fold CV on train \\
-Selection & P1$'$ ID-validation (primary); P2, P3 for context; equal budgets \\
-Inference & Fixed case studies; conditional intervals; no population $p$-value \\
-Scenario-groups & EMBER 2; network 6; total 8 (each $\times$ master seed $\times$ size) \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Within each setting, we evaluate both kernel families across the shared preprocessing grid and the dimension sweep $d \in \{4,6,8,10,12\}$. This produces both a setting-level comparison, used for the honest-selection and oracle analyses, and a broader dimension-level view used to characterize how representation size interacts with kernel-family behavior.
-
-For reproducibility, split definitions are fixed within each setting, random seeds are controlled, and all key quantities are reported as mean $\pm$ standard deviation across repeated runs. Throughout the paper, we deliberately avoid claims of universal dominance or complexity-theoretic quantum advantage. The object of study is narrower and more empirical: under a fixed classifier and a fixed evaluation protocol, does changing only the kernel alter robustness under distribution shift in security-relevant tasks---and which property of the kernel is responsible?
-
 \section{Results}
 \label{sec:results}
 
 \subsection{Overview}
 
-We report results under the controlled kernel-swap protocol described in Section~\ref{sec:methods}. All comparisons share the same classifier, preprocessing pipeline, and ID/OOD split definitions within a scenario-group; the only varying component is the kernel, and every number below aggregates fifteen pipeline realizations per setting. The argument proceeds in three movements. First, under the test-peeking oracle selection and fixed regularization that dominate the optimistic literature, the fidelity kernels show an apparent OOD advantage over linear and RBF baselines (Section~\ref{sec:res_baselines}). Second, we subject that advantage to a fair test: we tune each configuration's regularization by cross-validation on training data alone, select configurations on an in-distribution validation split that never touches the test data, and give both families an equal budget of kernel geometries. Under this fair test the advantage disappears against both the weak baselines and a geometry-matched classical family, in seven of eight scenario-groups (Section~\ref{sec:res_honest}). Third, a geometry analysis shows that effective rank and OOD alignment are robustly associated with---but do not causally determine---performance, that the association is regime-dependent, and that it favours neither family (Section~\ref{sec:res_mechanism}); a finite-shot analysis then shows the geometry itself is a statevector-exact idealization (Section~\ref{sec:res_shots}). Throughout, we treat the eight scenario-groups as fixed case studies and report effect sizes with conditional intervals rather than a population $p$-value, because the settings within a benchmark share data pools and are not exchangeable (Section~\ref{sec:methods}).
+We report results under the controlled kernel-swap protocol described in Section~\ref{sec:methods}. All comparisons share the same classifier, preprocessing pipeline, and ID/OOD split definitions within a scenario-group; the only varying component is the kernel, and every number below aggregates fifteen pipeline realizations per setting. The argument proceeds in three movements. First, under test-peeking oracle selection and fixed regularization, the fidelity kernels show an apparent OOD advantage over linear and RBF baselines (Section~\ref{sec:res_baselines}). Second, we tune each configuration on training data alone, select on an in-distribution validation split disjoint from both test splits, and match the candidate budgets of the extended families. Under this controlled comparison no robust family-level advantage remains; the primary SVC comparison is classical-favoured or tied in seven of eight scenario-groups (Section~\ref{sec:res_honest}). Third, a geometry analysis shows that effective rank and OOD alignment are associated with---but do not causally determine---performance, that the association is regime-dependent, and that it favours neither family (Section~\ref{sec:res_mechanism}); a finite-shot analysis then shows the exact geometry does not transfer unchanged to finite measurement (Section~\ref{sec:res_shots}). Throughout, we treat the eight scenario-groups as fixed case studies and report effect sizes with conditional intervals rather than a population $p$-value, because the settings within a benchmark share data pools and are not exchangeable (Section~\ref{sec:methods}).
 
 \subsection{The apparent advantage under oracle selection}
 \label{sec:res_baselines}
 
-We begin with the comparison that dominates the literature: fidelity-based quantum kernels against linear and RBF baselines, with each family's representative chosen by Best-by-OOD selection---the configuration with the highest balanced accuracy on the OOD test split itself---and the classical kernels left at the default regularization $C=1$. Under these conventions, on EMBER, the quantum family shows a clear OOD advantage (Table~\ref{tab:family_ember}): $+0.037$ under SVC and $+0.028$ under the GP classifier against linear+RBF, shrinking to $+0.004$/$+0.002$ once the classical family is enlarged with heavier-tailed kernels. Best-by-ID selection gives the quantum family a comparable in-distribution edge.
+We begin with the comparison that dominates the literature: fidelity-based quantum kernels against linear and RBF baselines, with each family's representative chosen by Best-by-OOD selection---the configuration with the highest balanced accuracy on the OOD test split itself---and the classical kernels left at the default regularization $C=1$. Under these conventions, on EMBER, the quantum family shows an OOD advantage of $+0.037$ under SVC and $+0.028$ under the GP classifier against linear+RBF, shrinking to $+0.004$/$+0.002$ once the classical family is enlarged with heavier-tailed kernels. Supplementary Table~2 gives the complete oracle results.
 
-Two features of this comparison inflate the quantum numbers, and both are standard in the optimistic literature. Best-by-OOD is an \emph{oracle}: it selects each configuration using the very labels it then reports, which rewards the family with the noisier OOD ranking. And fixing $C=1$ leaves the classical kernels untuned, although their Gram spectra differ enough that the regularization operating point matters. Table~\ref{tab:family_ember} is therefore an upper bound on the quantum advantage, not a deployable estimate of it. The remainder of this section removes both distortions and finds that the advantage does not survive them.
+Two features favour this apparent quantum result. Best-by-OOD is an \emph{oracle}: it uses the labels it then reports. Fixing $C=1$ also leaves classical candidates at a potentially unsuitable regularization point. These values are therefore descriptive upper bounds, not deployable effects.
 
-% Oracle upper-bound table (Best-by-OOD / Best-by-ID, fixed C=1).
-\begin{table}[t]
+\subsection{A specification curve locates the reversal}
+\label{sec:res_specification}
+
+To separate the contribution of each evaluation choice from the choice of a preferred endpoint, we enumerated all ten logically valid, already-computed specifications fixed before this extension (Figure~\ref{fig:specification}). The specifications vary four axes in a prespecified order: same-test OOD-oracle versus ID-based selection, fixed versus train-cross-validated SVC regularization, customary linear/RBF versus extended classical references, and native versus equal candidate budgets. Every specification retains all eight security scenario-groups.
+
+The family-level conclusion spans both sides of zero. For SVC, the dataset-equal quantum-minus-classical mean ranges from $+0.047$ under legacy ID selection with fixed $C=1$ and the customary reference (S2) to $-0.006$ under ID-validation selection, train-only regularization, the extended reference, and equal budgets (S10). For the GP classifier, for which the regularization axis is not applicable, the corresponding range is $+0.042$ to $-0.003$. Expanding the classical reference contracts the positive effect before honest selection or budget matching is imposed; train-only SVC regularization and ID-validation selection then move the controlled estimates to zero or slightly negative. The path is not monotone in every intermediate specification, which is precisely why reporting only an oracle and a final controlled endpoint would be insufficient. The curve shows that the apparent advantage is conditional on a bundle of evaluation decisions rather than a stable property of quantum provenance.
+
+% Figure generated by scripts/analysis/specification_curve_v5.py
+\begin{figure*}[t]
 \centering
-\caption{EMBER oracle results (Best-by-OOD / Best-by-ID selection, fixed $C=1$; 18 EMBER settings). Selection peeks at the target split and the classical family is untuned; both choices favour the quantum family. These are upper bounds, superseded by the honest, budget-matched, regularization-tuned comparison of Table~\ref{tab:headline}. Within each classifier (GPC = Laplace Gaussian process classifier), family-internal selection compares the best quantum candidate against the best candidate of the stated classical reference set; $p$-values are two-sided paired Wilcoxon over settings, Holm-corrected.}
-\label{tab:family_ember}
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}llcccccc@{}}
-\toprule
-Selection & Classifier & Classical ref. & Q wins & Mean $\Delta$ & Median $\Delta$ & $p$ (Holm) & Eff.$>1$ \\
-\midrule
-\multirow{4}{*}{Best-by-OOD} & SVC & linear+RBF & 17/18 & $+0.0374$ & $+0.0426$ & $7.6\times 10^{-5}$ & 12 \\
- & SVC & extended & 15/18 & $+0.0044$ & $+0.0064$ & $0.03$ & 1 \\
- & GPC & linear+RBF & 15/18 & $+0.0283$ & $+0.0339$ & $2.1\times 10^{-4}$ & 11 \\
- & GPC & extended & 11/18 & $+0.0023$ & $+0.0029$ & $0.26$ & 0 \\
-\midrule
-\multirow{4}{*}{Best-by-ID} & SVC & linear+RBF & 18/18 & $+0.0775$ & $+0.0794$ & $3.1\times 10^{-5}$ & 18 \\
- & SVC & extended & 18/18 & $+0.0149$ & $+0.0152$ & $3.1\times 10^{-5}$ & 11 \\
- & GPC & linear+RBF & 18/18 & $+0.0649$ & $+0.0664$ & $3.1\times 10^{-5}$ & 18 \\
- & GPC & extended & 18/18 & $+0.0192$ & $+0.0166$ & $3.1\times 10^{-5}$ & 11 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\includegraphics[width=\textwidth]{fig_v5_specification.pdf}
+\caption{A frozen specification curve shows that evaluation choices reverse the apparent family effect. Grey points are the eight security scenario-groups; diamonds are dataset-equal means. Specifications are shown in their prespecified S1--S10 order, not sorted by effect. They vary target-label access, SVC regularization, classical reference strength, and candidate budget. Positive values favour the fidelity-kernel family. GPC has no $C$-regularization axis. No specification-level hypothesis test is performed.}
+\label{fig:specification}
+\end{figure*}
 
 \subsection{A fair comparison removes the advantage}
 \label{sec:res_honest}
 
-A deployable comparison must satisfy three requirements that Section~\ref{sec:res_baselines} violates. It must tune each configuration's regularization without looking at the test data; it must select the deployed configuration without out-of-distribution labels; and it must give both families the same number of candidate geometries. We implement all three (Section~\ref{sec:methods}). For every one of the 23 classical and 12 quantum kernel geometries, the SVC regularization $C$ is chosen by five-fold cross-validation on the training Gram matrix alone. The deployed configuration is then the one with the best balanced accuracy on an in-distribution \emph{validation} split, held out from the ID test split (protocol P1$'$); no OOD label is ever consulted in selection. And we compare the twelve quantum geometries both against the full classical pool and against equal-size random subsamples of it. We treat the eight scenario-groups as fixed case studies and report, per group, the quantum-minus-classical OOD delta with a conditional interval over the five split realizations, and no population $p$-value (Section~\ref{sec:methods}).
+A deployable comparison must tune each configuration's regularization without looking at the test data, select the deployed configuration without OOD labels, and compare families at the same candidate budget. We implement all three (Section~\ref{sec:methods}). For every kernel candidate, the SVC regularization $C$ is chosen by five-fold cross-validation on the training Gram matrix alone. The deployed configuration is then the one with the best balanced accuracy on an in-distribution \emph{validation} split, held out from the ID test split (protocol P1$'$); no OOD label is ever consulted in selection. The primary comparison uses the same candidate budget for both extended families (60 per family in full-coverage groups and 20 in reduced-coverage groups), with the full classical pool retained as a sensitivity. We treat the eight scenario-groups as fixed case studies and report, per group, the quantum-minus-classical OOD delta with a conditional interval over the five split realizations, and no population $p$-value (Section~\ref{sec:methods}).
 
-Table~\ref{tab:headline} and Figure~\ref{fig:honest} give the result: the advantage is gone against \emph{both} references. Against the extended classical family the deployment-protocol delta is classical-favoured or within noise of zero in seven of the eight scenario-groups under SVC, with a dataset-equal-weighted mean of $-0.004$ (leave-one-dataset-out range $[-0.004,-0.003]$); under the GP classifier the mean is likewise $-0.004$ ($[-0.005,-0.002]$). Against the customary linear+RBF baseline---the comparison that produced the $+0.037$ oracle advantage of Section~\ref{sec:res_baselines}---the honest delta is $-0.004$ under SVC and $+0.004$ under the GP classifier, straddling zero across scenario-groups. The single regime that retains a small quantum lean under both classifiers is UNSW-NB15 reconnaissance under held-out attack-campaign drift ($+0.005$ SVC, $+0.003$ GPC); even there the conditional interval includes zero. Matching the search budget to sixty geometries per family leaves the picture unchanged---the full-pool and budget-matched deltas coincide to within the resampling spread---so the result is not an artefact of the classical pool being larger.
+Table~\ref{tab:headline} and Figure~\ref{fig:honest} give the result: no robust advantage remains against either reference. Against the equal-budget extended classical family, the P1$'$ delta is classical-favoured or within the conditional uncertainty of zero in seven of the eight scenario-groups under the primary SVC comparison, with a dataset-equal-weighted mean of $-0.005$ (leave-one-dataset-out range $[-0.006,-0.004]$); under the GP classifier the mean is $-0.002$ ($[-0.003,+0.000]$). Against the customary linear+RBF baseline---the comparison that produced the $+0.037$ oracle result of Section~\ref{sec:res_baselines}---the no-OOD-label delta is $-0.004$ under SVC and $+0.004$ under the GP classifier, with heterogeneous signs across scenario-groups. The single regime that retains a small quantum lean under both equal-budget comparisons is UNSW-NB15 reconnaissance under held-out attack-campaign shift ($+0.005$ for both classifiers); both conditional intervals include zero. The full-pool extended-family sensitivity is similar in direction and scale (dataset-equal means $-0.004$ for both classifiers), so the conclusion does not depend on giving the classical family its larger pool.
 
 % Headline honest-selection table; rows from scripts/reporting/make_v4_tables.py
 % (results/v4/tables/table_headline.tex)
 \begin{table*}[t]
 \centering
-\caption{Honest budget-matched results (eight scenario-groups, fifteen pipeline realizations each). Quantum-minus-classical OOD balanced-accuracy delta under the deployment protocol P1$'$ (select on ID-validation, per-configuration $C$ tuned on train, evaluate on OOD test), against linear+RBF and against the extended classical family; the interval is the conditional pipeline-realization range over the five split seeds. The final column is the ID-test delta versus the extended family. No population $p$-value is reported (the scenario-groups are fixed case studies whose settings share data pools; see Section~\ref{sec:methods}).}
+\caption{No-OOD-label selection results (eight scenario-groups, fifteen pipeline realizations per setting). Quantum-minus-classical OOD balanced-accuracy delta under P1$'$ (select on ID-validation, tune per-configuration $C$ on train, evaluate on OOD test). The extended-family comparison is the frozen equal-budget analysis: 60 candidates per family in full-coverage groups and 20 in reduced-coverage groups. Its interval is conditional pipeline-realization uncertainty over the five split seeds. The customary linear+RBF comparison is contextual rather than an equal-budget endpoint; the full-pool extended-family sensitivity remains in the machine-readable artifact. No population $p$-value is reported.}
 \label{tab:headline}
-\footnotesize
-\setlength{\tabcolsep}{5pt}
-\begin{tabular}{@{}llccc c@{}}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llccc@{}}
 \toprule
-Scenario & Clf. & $\Delta_{\mathrm{OOD}}$ vs lin+RBF & $\Delta_{\mathrm{OOD}}$ vs ext. & interval (vs ext.) & $\Delta_{\mathrm{ID}}$ vs ext. \\
+Scenario & Clf. & vs lin./RBF & vs ext. (equal $B$) & conditional interval \\
 \midrule
-\multirow{2}{*}{EMBER $m1$} & SVC & $-0.0095$ & $-0.0024$ & $[-0.0364, +0.0316]$ & $-0.0030$ \\
- & GPC & $-0.0050$ & $-0.0003$ & $[-0.0067, +0.0062]$ & $+0.0015$ \\
+\multirow{2}{*}{EMBER $m1$} & SVC & $-0.0095$ & $-0.0058$ & $[-0.0340, +0.0223]$ \\
+ & GPC & $-0.0050$ & $-0.0009$ & $[-0.0101, +0.0083]$ \\
 \addlinespace
-\multirow{2}{*}{EMBER $m2$} & SVC & $+0.0139$ & $-0.0053$ & $[-0.0104, -0.0002]$ & $-0.0072$ \\
- & GPC & $+0.0149$ & $+0.0000$ & $[-0.0056, +0.0056]$ & $-0.0059$ \\
+\multirow{2}{*}{EMBER $m2$} & SVC & $+0.0139$ & $-0.0064$ & $[-0.0137, +0.0009]$ \\
+ & GPC & $+0.0149$ & $+0.0027$ & $[-0.0027, +0.0081]$ \\
 \addlinespace
-\multirow{2}{*}{UNSW-DoS (drift)} & SVC & $-0.0043$ & $-0.0041$ & $[-0.0186, +0.0105]$ & $-0.0035$ \\
- & GPC & $+0.0041$ & $-0.0079$ & $[-0.0162, +0.0004]$ & $-0.0057$ \\
+\multirow{2}{*}{UNSW-DoS (campaign)} & SVC & $-0.0043$ & $-0.0033$ & $[-0.0139, +0.0073]$ \\
+ & GPC & $+0.0041$ & $-0.0057$ & $[-0.0120, +0.0005]$ \\
 \addlinespace
-\multirow{2}{*}{UNSW-Recon (drift)} & SVC & $+0.0004$ & $+0.0053$ & $[-0.0067, +0.0173]$ & $-0.0004$ \\
- & GPC & $+0.0074$ & $+0.0029$ & $[-0.0068, +0.0126]$ & $-0.0036$ \\
+\multirow{2}{*}{UNSW-DoS (constructed)} & SVC & $-0.0085$ & $-0.0044$ & $[-0.0119, +0.0031]$ \\
+ & GPC & $-0.0056$ & $-0.0108$ & $[-0.0177, -0.0039]$ \\
 \addlinespace
-\multirow{2}{*}{ToN-IoT (drift)} & SVC & $-0.0172$ & $-0.0090$ & $[-0.0252, +0.0073]$ & $-0.0009$ \\
- & GPC & $-0.0046$ & $-0.0098$ & $[-0.0200, +0.0004]$ & $+0.0019$ \\
+\multirow{2}{*}{UNSW-Recon (campaign)} & SVC & $+0.0004$ & $+0.0050$ & $[-0.0058, +0.0157]$ \\
+ & GPC & $+0.0074$ & $+0.0052$ & $[-0.0019, +0.0123]$ \\
+\addlinespace
+\multirow{2}{*}{UNSW-Recon (constructed)} & SVC & $-0.0076$ & $-0.0089$ & $[-0.0146, -0.0031]$ \\
+ & GPC & $-0.0083$ & $-0.0075$ & $[-0.0208, +0.0059]$ \\
+\addlinespace
+\multirow{2}{*}{ToN-IoT (campaign)} & SVC & $-0.0172$ & $-0.0148$ & $[-0.0268, -0.0029]$ \\
+ & GPC & $-0.0046$ & $-0.0090$ & $[-0.0190, +0.0010]$ \\
+\addlinespace
+\multirow{2}{*}{ToN-IoT (constructed)} & SVC & $-0.0016$ & $-0.0011$ & $[-0.0049, +0.0028]$ \\
+ & GPC & $+0.0313$ & $+0.0109$ & $[+0.0017, +0.0202]$ \\
 \midrule
-\multicolumn{2}{@{}l}{Dataset-equal mean, SVC} & $-0.0043$ & $-0.0035$ & $[-0.0040, -0.0029]$ & $-0.0029$ \\
-\multicolumn{2}{@{}l}{Dataset-equal mean, GPC} & $+0.0043$ & $-0.0040$ & $[-0.0053, -0.0017]$ & $-0.0021$ \\
+\multicolumn{2}{@{}l}{Dataset-equal mean, SVC} & $-0.0043$ & $-0.0050$ & $[-0.0060, -0.0040]$ \\
+\multicolumn{2}{@{}l}{Dataset-equal mean, GPC} & $+0.0043$ & $-0.0019$ & $[-0.0028, +0.0003]$ \\
 \bottomrule
 \end{tabular}
 \end{table*}
@@ -514,11 +261,11 @@ Scenario & Clf. & $\Delta_{\mathrm{OOD}}$ vs lin+RBF & $\Delta_{\mathrm{OOD}}$ v
 \begin{figure*}[t]
 \centering
 \includegraphics[width=\textwidth]{fig_v4_honest.pdf}
-\caption{No robust quantum advantage under honest, budget-matched selection. Per-scenario-group deployment-protocol (P1$'$) OOD deltas (quantum minus classical), for SVC (left) and the GP classifier (right); filled circles compare against the extended classical family with the conditional pipeline-realization interval, open diamonds against linear+RBF. The deltas sit at or below zero in the large majority of groups against both references. Only the constructed-shift regimes are omitted from the ordering for readability; the full eight-group table is Table~\ref{tab:headline}.}
+\caption{No robust quantum advantage under no-OOD-label selection. Per-scenario-group P1$'$ OOD deltas (quantum minus classical), for SVC (left) and the GP classifier (right). Filled circles compare against the equal-budget extended classical family with conditional pipeline-realization intervals; open diamonds compare against the customary linear+RBF reference. All eight scenario-groups are shown.}
 \label{fig:honest}
 \end{figure*}
 
-\paragraph{At matched geometry the families are indistinguishable.} The cleanest test of whether quantumness contributes anything beyond geometry pairs each quantum configuration with the classical configuration of nearest training effective rank, within the same run and dimension, and compares their OOD accuracy. Figure~\ref{fig:rankmatched} reports the outcome: in all eight scenario-groups the median rank-matched delta is negative (quantum minus classical, between $-0.001$ and $-0.009$), and the quantum configuration is the more accurate of the pair in only 22--37\% of matches. At equal effective rank the classical kernels are therefore at least as accurate everywhere---the family label carries no residual advantage once geometry is held fixed.
+\paragraph{Rank matching does not reveal a residual quantum advantage.} We pair each quantum configuration with the classical configuration of nearest training effective rank, within the same run and dimension, and compare their OOD accuracy. Figure~\ref{fig:rankmatched} reports the outcome: in all eight scenario-groups the median rank-matched delta is negative (quantum minus classical, between $-0.001$ and $-0.009$), and the quantum configuration is the more accurate of the pair in only 22--37\% of matches. Within the overlap covered by this observational matching, classical kernels are therefore at least as accurate at comparable effective rank.
 
 % Figure generated by scripts/reporting/make_v4_figures.py
 \begin{figure}[t]
@@ -527,6 +274,22 @@ Scenario & Clf. & $\Delta_{\mathrm{OOD}}$ vs lin+RBF & $\Delta_{\mathrm{OOD}}$ v
 \caption{At matched effective rank, classical kernels are at least as accurate. For each quantum configuration we find the classical configuration of nearest training effective rank (within run and dimension) and take the OOD balanced-accuracy difference; bars are per-scenario-group medians, annotated with the fraction of matched pairs in which the quantum configuration is the more accurate.}
 \label{fig:rankmatched}
 \end{figure}
+
+\subsection{Protocol sensitivity replicates on real-world domain shifts}
+\label{sec:res_external}
+
+We next applied the prospectively frozen protocol to College Scorecard, diabetes readmission, and ACS income, preserving the published TableShift domain splits and withholding all OOD labels from the controlled selector. The complete external grid contains 30 task--size--seed units and 37,800 split-level results; every prespecified unit passed the independent audit. Figure~\ref{fig:external} shows all task--size effects and conditional seed-cluster intervals.
+
+The primary SVC result satisfies the frozen criterion for \emph{replicated protocol sensitivity}. The task-equal controlled effect is $-0.0119$ (conditional 95\% interval $[-0.0205,-0.0033]$), whereas the weak-reference, fixed-$C$, same-test-oracle effect is $+0.0089$ ($[+0.0047,+0.0137]$). Their contraction is $+0.0208$ ($[+0.0113,+0.0307]$), with a leave-one-task-out range of $[+0.0116,+0.0260]$. No task has a positive controlled SVC effect whose interval excludes zero in both sizes. Size-equal controlled effects are $-0.0160$ for College Scorecard, $-0.0066$ for diabetes readmission, and $-0.0131$ for ACS income.
+
+The secondary GP classifier shows a larger contraction of $+0.0324$ ($[+0.0223,+0.0427]$), but its task-equal controlled effect is $+0.0077$ with an interval spanning zero ($[-0.0015,+0.0183]$). College Scorecard leans quantum under this classifier, diabetes leans classical, and ACS is slightly positive. This classifier dependence limits the conclusion appropriately: the external study replicates the sensitivity of the family verdict to evaluation design, not universal classical dominance.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{fig_v5_external.pdf}
+\caption{External domain shifts separate optimistic and deployable conclusions. Effects are quantum minus classical OOD balanced accuracy for the weak-reference fixed-regularization same-test oracle, the equal-budget train-tuned same-test oracle, and the primary equal-budget train-tuned validation selector. Rows show both nested sizes for all three fixed tasks plus the task-equal mean. Intervals are conditional on the five seed clusters; no population $p$-value is reported.}
+\label{fig:external}
+\end{figure*}
 
 \subsection{Geometry is associated with, but does not determine, robustness}
 \label{sec:res_mechanism}
@@ -542,31 +305,7 @@ The two families are close because both reach similar kernel geometry, and geome
 \end{figure*}
 
 \paragraph{The geometry--OOD link is a regime-dependent association, not a law.}
-Two descriptors of the training and OOD Gram matrices carry information about which kernels generalize: the effective rank of the training kernel and the centered kernel-target alignment on the OOD split. But their association with OOD accuracy is regime-dependent, not a single mechanism. Within scenario-groups (Table~\ref{tab:mechanism} and Figure~\ref{fig:mechanism}), the median Spearman correlation between effective rank and OOD accuracy ranges from $+0.80$ (EMBER $m2$) down to $-0.15$ (UNSW-NB15 reconnaissance under the constructed shift); partial correlations that control for family label and length scale track the raw values closely, so the association is not an artefact of the quantum/classical split. OOD alignment is more consistently positive ($+0.22$ to $+0.64$) but likewise varies by regime. A geometry model fit on three datasets and used to rank the held-out dataset's kernels by predicted OOD accuracy achieves only a modest Spearman $0.23$--$0.40$---real cross-dataset signal, but far from a deployable predictor. We therefore describe the relationship as a robust \emph{association} rather than a causal mechanism; earlier accounts that read it as ``a single geometric axis governs robustness'' overstated a genuine but partial regularity.
-
-% Table generated by scripts/reporting/make_v4_tables.py from
-% results/v4/mechanism/{summary_by_group,rank_matched_summary}.csv
-\begin{table}[t]
-\centering
-\caption{Geometry--OOD association per scenario-group (SVC, all kernels). ``$\rho$ eff.\ rank'' and ``partial'' are the median within-unit Spearman correlation of training effective rank with OOD accuracy, raw and after controlling for family and length scale; ``$\rho$ KTA'' the same for OOD alignment. ``Matched $\Delta$'' is the median OOD delta between quantum and nearest-effective-rank classical configurations, and ``Q better'' the fraction of matched pairs the quantum side wins. The association is regime-dependent, and at matched rank the classical side is at least as accurate everywhere.}
-\label{tab:mechanism}
-\footnotesize
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}lccccc@{}}
-\toprule
-Scenario & $\rho$ eff.\ rank & partial & $\rho$ KTA & Matched $\Delta$ & Q better \\
-\midrule
-EMBER $m1$ & $+0.32$ & $+0.36$ & $+0.30$ & $-0.0094$ & 33\% \\
-EMBER $m2$ & $+0.80$ & $+0.82$ & $+0.63$ & $-0.0089$ & 22\% \\
-UNSW-DoS (drift) & $+0.44$ & $+0.41$ & $+0.64$ & $-0.0089$ & 27\% \\
-UNSW-DoS ($m2$) & $-0.14$ & $-0.08$ & $+0.39$ & $-0.0057$ & 29\% \\
-UNSW-Recon (drift) & $+0.06$ & $+0.06$ & $+0.22$ & $-0.0047$ & 37\% \\
-UNSW-Recon ($m2$) & $-0.15$ & $-0.08$ & $+0.37$ & $-0.0061$ & 30\% \\
-ToN-IoT (drift) & $+0.25$ & $+0.27$ & $+0.46$ & $-0.0060$ & 24\% \\
-ToN-IoT ($m2$) & $+0.65$ & $+0.63$ & $+0.59$ & $-0.0013$ & 35\% \\
-\bottomrule
-\end{tabular}
-\end{table}
+Two descriptors of the training and OOD Gram matrices carry information about which kernels generalize: the effective rank of the training kernel and the centered kernel-target alignment on the OOD split. But their association with OOD accuracy is regime-dependent, not a single mechanism. Within scenario-groups (Figure~\ref{fig:mechanism} and Supplementary Table~3), the median Spearman correlation between effective rank and OOD accuracy ranges from $+0.80$ (EMBER $m2$) down to $-0.15$ (UNSW-NB15 reconnaissance under the constructed shift); partial correlations that control for family label and length scale track the raw values closely. OOD alignment is more consistently positive ($+0.22$ to $+0.64$) but likewise varies by regime. A geometry model fit on three datasets and used to rank the held-out dataset's kernels achieves only Spearman $0.23$--$0.40$. We therefore describe a genuine but partial association, not a causal mechanism or deployable predictor.
 
 \subsection{Finite-shot estimation: the geometry is a statevector idealization}
 \label{sec:res_shots}
@@ -595,30 +334,18 @@ Shots & OOD acc.\ dev. & KTA dev. & rank ratio & sel.\ agree & regret \\
 \subsection{Predictive uncertainty under shift}
 \label{sec:res_uncertainty}
 
-% Figure generated by scripts/reporting/make_v3_figures.py
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{fig_v4_uncertainty.pdf}
-\caption{Predictive uncertainty under shift, GP classifier. Mean ID-to-OOD change in predictive entropy (left) and expected calibration error (right) for the P1$'$-selected configuration of each family, averaged over settings per dataset. Entropy rises under shift for both families; calibration error changes moderately and comparably. Neither family holds an accuracy advantage under the honest protocol, so the observation is that fidelity kernels bring no calibration benefit the classical kernels lack.}
-\label{fig:uncertainty}
-\end{figure*}
-
-The GP classifier's Laplace-approximation probabilities add a complementary lens (Figure~\ref{fig:uncertainty}). The GP classifier is a Laplace approximation, so its probabilities are approximate rather than calibrated in any guaranteed sense; we assess their behaviour under shift rather than assert it. For the honestly selected configuration of each family, predictive entropy rises from ID to OOD for every family and scenario-group---the qualitative behaviour one wants from a probabilistic detector facing drift---and calibration, measured by expected calibration error, degrades moderately and comparably across families. Since neither family holds an accuracy advantage under the honest protocol, the relevant observation is a negative one: the fidelity kernels bring no calibration benefit that the classical kernels lack. A rising entropy alone is not evidence of good calibration, and we do not read it as such.
+The Laplace GP probabilities provide a secondary uncertainty check (Supplementary Figure~1). For the honestly selected candidate, predictive entropy rises from ID to OOD for both families in every scenario-group, while expected calibration error changes moderately and comparably. Because neither family has an accuracy advantage, the fidelity kernels show no calibration benefit unavailable to classical kernels. We do not interpret rising entropy alone as evidence of calibration.
 
 \section{Discussion}
 \label{sec:discussion}
 
-\subsection{What is, and is not, a quantum advantage here}
-
-The study's central interpretive move is to replace the question ``do quantum kernels beat classical kernels under shift?'' with ``which property of a kernel governs its behaviour under shift, and does either family have exclusive access to it?''. Read through that lens, the results are clear and negative. The apparent advantage over linear and RBF baselines is entirely an artefact of two evaluation choices---oracle selection on the test split and a fixed regularization constant that leaves the classical baselines untuned---and it disappears once both are corrected. Against a geometry-matched classical family it never existed at fixed budget, and it does not appear at matched budget either; at matched effective rank the classical kernels are at least as accurate in every scenario-group. The property that carries information about behaviour under shift is kernel geometry, but it carries that information as a regime-dependent association rather than a governing law, and it is shared: a well-tuned heavy-tailed classical kernel occupies the same geometric regime as the fidelity maps. On present evidence there is no robust out-of-distribution advantage for fidelity kernels under distribution shift, and the only residual---a modest in-distribution separability edge under the probabilistic classifier---is small, classifier-dependent, and itself shrinks under honest selection.
+The study's central interpretive move is to replace the question ``do quantum kernels beat classical kernels under shift?'' with ``which properties of a kernel are associated with its behaviour under shift, and does either family have exclusive access to them?''. Read through that lens, the results are clear and negative. The apparent advantage over linear and RBF baselines does not survive the combined correction of oracle selection, fixed regularization, and unequal candidate families. It does not reappear against the equal-budget extended family or at matched effective rank. The geometry descriptors carry information as regime-dependent associations rather than a governing law, and they are shared: a well-tuned heavy-tailed classical kernel occupies the same observed geometric regime as the fidelity maps. On present evidence there is no robust out-of-distribution advantage for fidelity kernels in the low-qubit settings studied, and the only residual---a modest in-distribution separability edge under the probabilistic classifier---is small, classifier-dependent, and itself shrinks under no-OOD-label selection.
 
 From the perspective of the distribution-shift literature, this reinforces a general lesson: conclusions about robustness are only as credible as the protocol used to obtain them \cite{quinonero-candela2008datasetshift,gulrajani2021domainbed,koh2021wilds,yao2022wildtime}. Our results add a QML-specific corollary. The strength of the classical baseline, whether its regularization is tuned, whether model selection may consult the target labels, and the size of each family's candidate budget are not implementation details: each can move the quantum-versus-classical verdict, and together they turn an apparent $+0.037$ advantage into a null. A demonstration that fixes any of them in the quantum family's favour, reported alone, would mislead---and much of the optimistic quantum-kernel literature fixes several at once.
 
-\subsection{The ID--OOD dissociation is informative}
+The external validation shows that this is not only a peculiarity of constructed security shifts. Under a protocol frozen before result inspection, three education, health, and socioeconomic tasks reproduce a positive protocol contraction and a negative controlled SVC effect. The result is stable to omitting any one task, yet heterogeneous by task and classifier: the GP endpoint retains a small positive task-equal lean whose interval crosses zero. The strongest defensible conclusion is therefore about evaluation sensitivity, not the universal ordering of kernel families.
 
 In-distribution separability is the one axis on which the fidelity kernels retain any edge, and even it must be stated carefully. Under the oracle that selects and evaluates on the same in-distribution split, the quantum family separates the classes slightly better than linear+RBF in every EMBER setting; but under honest selection---choosing on a validation split and reporting on a disjoint test split---the edge falls to $+0.003$ under SVC (mixed in sign across groups) and $+0.012$ under the probabilistic classifier, and it does not translate into any out-of-distribution benefit. This ID--OOD dissociation is real but modest, and it cuts against, not for, an operational recommendation: a family that is marginally more separable in-distribution yet no more robust under shift offers nothing to a deployment whose whole difficulty is the shift. The pattern is consistent with the ``accuracy on the line'' literature \cite{miller2021accuracy}, in which ID and OOD accuracy usually move together; here they decouple weakly, and geometry---shared by both families---rather than quantumness marks the axis along which they do.
-
-\subsection{The mechanism in context}
 
 The geometry association connects several strands of literature. That length scale is decisive for kernel behaviour is known for both families \cite{shaydulin2022bandwidth,canatar2023bandwidth}; our contribution is the comparative consequence---once length scale is tuned symmetrically and regularization is tuned at all, the classical family reaches the same geometric regime, so asymmetric tuning does not merely bias quantum-versus-classical comparisons, it manufactures the apparent advantage. The geometric difference of Huang et al.\ \cite{huang2021powerofdata} does not predict which family wins a scenario, consistent with its definition as a bound on the \emph{potential} for a separation rather than its sign; a large geometric difference is compatible with equal or worse OOD accuracy, as we observe. That effective rank and OOD alignment are associated with performance is a statement about kernels in general, not about quantum kernels---which is precisely why the fidelity maps hold no privileged position: they are one costly route into a geometric regime that a short-length-scale classical kernel reaches directly.
 
@@ -626,9 +353,7 @@ The high-rank finding must also be reconciled with two spectral results that sup
 
 We emphasize what the geometry analysis does not deliver. It is a post-hoc association, not a deployable selection rule: choosing a configuration by training-set geometry alone does not reliably identify the better kernel, and OOD alignment requires OOD labels. Because the two families are statistically indistinguishable under honest selection, the more useful open problem is no longer ``which family wins'' but whether any label-free, train-only signal can select a robust kernel at all---a question that concerns classical and quantum kernels equally.
 
-\subsection{Implications for security machine learning practice}
-
-From a practical perspective, the paper suggests three takeaways for security ML. The first is substantive: on the evidence here, fidelity-based quantum kernels do not offer a robustness advantage under distribution shift over well-tuned classical kernels, and the computational cost of estimating them---quadratic in the sample count, and, as the finite-shot analysis shows, demanding in shots even to reproduce their idealized geometry---is not repaid by out-of-distribution accuracy. A median-heuristic Laplacian kernel, especially one with a shortened length scale and its regularization tuned, is a strong and cheap robustness baseline, and it matches the fidelity maps under honest selection on both modalities. Practitioners weighing a quantum-kernel pipeline for OOD-sensitive security detection should, on this evidence, prefer a tuned classical kernel unless a specific regime demonstrably favours the quantum construction.
+From a practical perspective, the paper suggests three takeaways for security ML. The first is substantive: on the evidence here, fidelity-based quantum kernels do not offer a robustness advantage under distribution shift over well-tuned classical kernels, while their pairwise overlap estimation introduces circuit and shot costs absent from direct evaluation of the classical baselines. A median-heuristic Laplacian kernel, especially one with a shortened length scale and its regularization tuned, is a strong and inexpensive robustness baseline, and it matches the fidelity maps under no-OOD-label selection on both modalities. Practitioners weighing a quantum-kernel pipeline for OOD-sensitive security detection should, on this evidence, prefer a tuned classical kernel unless a specific regime demonstrably favours the quantum construction after the same controls.
 
 The second is methodological. Independently of the preferred kernel family, the protocol used here provides a reusable blueprint for robust evaluation in security settings:
 \begin{enumerate}
@@ -642,78 +367,110 @@ Security ML frequently suffers from comparisons in which model class, tuning eff
 
 The third concerns diagnostics: the geometry descriptors are cheap to compute from Gram matrices that the pipeline already builds, and the alignment-survival analysis can be run post hoc on any deployed kernel system with a labeled drift sample. Practitioners should nonetheless resist reading these results as a blanket recommendation to replace classical kernels; the responsible recommendation is to test the candidate families under the expected shift regime, using exactly the kind of protocol described here.
 
-\subsection{Limitations and threats to validity}
-
 Several limitations define the scope of our conclusions.
 
-\paragraph{Shift operationalization.}
-Our OOD splits cover three reproducible mechanisms---within-class sparsity-tail extremes, train-geometry-tail extremes, and a held-out attack-campaign shift on network traffic (an unseen attack campaign plus a capture-partition change, not a timestamped temporal split)---but not the full space of real-world drift processes. Explicit temporal splits on timestamped malware, family-based drift, and adversarially induced shift remain outside the study's scope, and our conclusions should be re-tested under them rather than assumed.
+Our shift operationalization covers three reproducible mechanisms---within-class sparsity-tail extremes, train-geometry-tail extremes, and a held-out attack-campaign shift on network traffic (an unseen attack campaign plus a capture-partition change, not a timestamped temporal split)---but not the full space of real-world drift processes. Explicit temporal splits on timestamped malware, family-based drift, and adversarially induced shift remain outside the study's scope, and our conclusions should be re-tested under them rather than assumed.
 
-\paragraph{Kernel and encoding coverage.}
-The classical family now spans seven kernels plus a bandwidth sweep, and both families receive symmetric tuning freedom, but neither candidate set is exhaustive: the quantum side is restricted to four commonly used fidelity feature maps at low qubit counts, and trained or task-adapted encodings, projected kernels, and deeper maps are not evaluated. The mechanism gives a concrete prediction for such extensions---what should matter is their Gram-matrix geometry, not their provenance---which future work can falsify. At substantially larger qubit counts, exponential kernel concentration \cite{thanasilp2024concentration} would erode the alignment-preserving rank the mechanism rewards, so our conclusions should not be extrapolated beyond the low-qubit regime studied here.
+Kernel and encoding coverage also remains finite. The classical family now spans seven kernels plus a bandwidth sweep, and both families receive symmetric tuning freedom, but neither candidate set is exhaustive: the quantum side is restricted to four commonly used fidelity feature maps at low qubit counts, and trained or task-adapted encodings, projected kernels, and deeper maps are not evaluated. The mechanism gives a concrete prediction for such extensions---what should matter is their Gram-matrix geometry, not their provenance---which future work can falsify. At substantially larger qubit counts, exponential kernel concentration \cite{thanasilp2024concentration} would erode the alignment-preserving rank the mechanism rewards, so our conclusions should not be extrapolated beyond the low-qubit regime studied here.
 
-\paragraph{Selection over candidate sets.}
-The honest protocols (P1 deployment, P2 cross-seed), the oracle (P3), and Best-by-ID are selection procedures over finite candidate sets, applied identically to both families and evaluated on run means with formal testing. Residual sensitivity to the candidate space and search granularity nonetheless remains, and fully nested cross-validated selection would strengthen the analysis further.
+Selection is necessarily over finite candidate sets. P1$'$ (ID-validation selection), P2 (cross-realization OOD-supervised selection), and P3 (same-test OOD oracle) are selection procedures over finite candidate sets. The primary comparison matches candidate budgets, and the full-pool and budget curves provide sensitivities, but residual dependence on candidate definitions and search granularity remains. Fully nested selection over additional independent benchmark pools would strengthen the analysis further.
 
-\paragraph{Simulation, not hardware.}
-All quantum kernels are computed by exact statevector simulation. The study therefore characterizes the geometry of fidelity kernels, not the behavior of noisy devices: finite sampling of kernel entries, hardware noise, and error mitigation would all perturb the Gram matrices \cite{wang2021nisq}, and exponential concentration implies that with polynomially many shots the very spectral richness our mechanism rewards becomes expensive to resolve at larger scales \cite{thanasilp2024concentration}; the effect of either on alignment survival is unknown and worth measuring. We make no claim about hardware feasibility, resource advantage, or quantum speedup---the only rigorously established quantum-classical learning separation concerns a specifically constructed problem, not natural data \cite{liu2021rigorous}. At the dimensions studied, the fidelity kernels are also classically simulable \cite{schreiber2023surrogates,jerbi2024shadows}, which is precisely what makes them available as practical kernel constructions today.
+The quantum kernels are simulated rather than executed on hardware. The study therefore characterizes the geometry of fidelity kernels, not the behavior of noisy devices: finite sampling of kernel entries, hardware noise, and error mitigation would all perturb the Gram matrices \cite{wang2021nisq}, and exponential concentration implies that with polynomially many shots the very spectral richness our mechanism rewards becomes expensive to resolve at larger scales \cite{thanasilp2024concentration}; the effect of either on alignment survival is unknown and worth measuring. We make no claim about hardware feasibility, resource advantage, or quantum speedup---the only rigorously established quantum-classical learning separation concerns a specifically constructed problem, not natural data \cite{liu2021rigorous}. At the dimensions studied, the fidelity kernels are also classically simulable \cite{schreiber2023surrogates,jerbi2024shadows}, which is precisely what makes them available as practical kernel constructions today.
 
-\paragraph{Dataset scope and feature caveats.}
-Four benchmark scenarios across two modalities is a substantial widening relative to single-dataset studies, but security is broader still: dynamic malware analysis, encrypted traffic, and non-security modalities remain untested. Within the network scenarios, the feature sets inherited from the public benchmarks retain port numbers and protocol indicators, which are legitimate but known shortcut-prone features in NIDS benchmarks \cite{engelen2021troubleshooting}; because every kernel receives identical features, this affects absolute accuracies, not the family comparisons. Finally, the mechanism's effective-rank component is itself regime-dependent (strong on EMBER and ToN-IoT, weak on UNSW-Reconnaissance), a gradation we report rather than smooth over.
+Dataset scope and feature caveats provide a final boundary. Four benchmark scenarios across two modalities is a substantial widening relative to single-dataset studies, but security is broader still: dynamic malware analysis and encrypted traffic remain untested. Within the network scenarios, the feature sets inherited from the public benchmarks retain port numbers and protocol indicators, which are legitimate but known shortcut-prone features in NIDS benchmarks \cite{engelen2021troubleshooting}; because every kernel receives identical features, this affects absolute accuracies, not the family comparisons. Finally, the mechanism's effective-rank component is itself regime-dependent (strong on EMBER and ToN-IoT, weak on UNSW-Reconnaissance), a gradation we report rather than smooth over.
 
-\subsection{Conservative interpretation}
-
-In light of these limitations, the appropriate interpretation of the paper is deliberately conservative. We do not claim universal superiority, complexity-theoretic quantum advantage, or hardware relevance---nor do we claim to have refuted quantum kernels in general. We claim three narrower things, supported by conditional effect estimates rather than a population $p$-value: that the apparent out-of-distribution advantage of fidelity kernels over customary baselines is an artefact of oracle selection and untuned regularization, and disappears once both are corrected; that under a fair, budget-matched, honestly selected comparison no robust family-level advantage remains against either a weak or a geometry-matched classical baseline, across eight scenario-groups and two classifiers; and that the geometric properties associated with out-of-distribution behaviour are shared by both families and favour neither, so that a well-tuned classical kernel is the pragmatic choice. This view is consistent with recent calls for careful benchmarking in QML \cite{bowles2024betterthanclassical,schnabel2025scrutiny} and, we believe, is scientifically more useful than either an unqualified advantage claim or an unqualified dismissal: it says exactly which evaluation choices manufacture the apparent advantage and how to remove them.
+In light of these limitations, the appropriate interpretation of the paper is deliberately conservative. We do not claim universal superiority, complexity-theoretic quantum advantage, or hardware relevance---nor do we claim to have refuted quantum kernels in general. We claim three narrower things, supported by conditional effect estimates rather than a population $p$-value: that the apparent out-of-distribution advantage of fidelity kernels over customary baselines disappears when same-test oracle selection and untuned regularization are removed; that under equal candidate budgets and no-OOD-label selection no robust family-level advantage remains against either the customary or the extended classical reference, across eight fixed scenario-groups and two classifiers; and that the geometric descriptors associated with out-of-distribution behaviour occur in both families and do not identify kernel provenance as the source of robustness. This view is consistent with recent calls for careful benchmarking in QML \cite{bowles2024betterthanclassical,schnabel2025scrutiny,kakavand2026benchmarking} and is more informative than either an unqualified advantage claim or an unqualified dismissal: it identifies the evaluation choices that generate the optimistic result and shows how the conclusion changes when they are controlled.
 
 
-\section{Conclusion}
-\label{sec:conclusion}
+This paper asked why kernel families behave differently under distribution shift, using the quantum-versus-classical comparison as both motivation and stress test. A controlled kernel-swap protocol---classifier, preprocessing, splits, selection logic, and tuning freedom held fixed while only the kernel varies---was instantiated on four security scenarios spanning two modalities and three shift mechanisms, two classifier families including a probabilistic one, and 72 principal settings with fifteen pipeline realizations. Effects are reported as fixed-case summaries with conditional pipeline-realization intervals, not as population significance tests.
 
-This paper asked why kernel families behave differently under distribution shift, using the quantum-versus-classical comparison as both motivation and stress test. A controlled kernel-swap protocol---classifier, preprocessing, splits, selection logic, and tuning freedom held fixed while only the kernel varies---was instantiated on four security benchmarks spanning two modalities and three drift mechanisms, two classifier families including a probabilistic one, and 72 principal settings with fifteen pipeline realizations and formal paired testing.
-
-The empirical arc has three movements. Under the test-peeking oracle selection and fixed regularization that dominate the optimistic literature, fidelity-based quantum kernels appear to beat the customary linear and RBF baselines under shift. That advantage does not survive a fair test: once each configuration's regularization is tuned on training data alone, selection uses no out-of-distribution labels, and both families search an equal budget of kernel geometries, the out-of-distribution difference collapses to near zero against both the weak baselines and a geometry-matched classical family, in seven of eight scenario-groups. At matched effective rank the classical kernels are at least as accurate everywhere. The geometric properties that carry information about behaviour under shift---effective rank and out-of-distribution alignment---are associated with performance in a regime-dependent way, are shared by both families, and, a finite-shot analysis shows, are in the case of effective rank a statevector-exact idealization that finite estimation does not preserve.
+The empirical arc has three movements. Under same-test oracle selection and fixed regularization, fidelity-based quantum kernels appear to beat the customary linear and RBF baselines under shift. That result does not survive the controlled comparison: once each configuration is tuned on training data, selection uses no OOD labels, and both extended families search an equal budget of kernel geometries, the dataset-equal-weighted OOD difference is $-0.005$ under the primary SVC analysis and $-0.002$ under the GP classifier. The primary comparison is classical-favoured or tied in seven of eight scenario-groups. At matched effective rank the classical kernels are at least as accurate everywhere. Effective rank and OOD alignment are associated with performance in a regime-dependent way, are shared by both families, and, a finite-shot analysis shows, do not transfer unchanged from exact statevectors to finite measurement.
 
 The contribution is therefore threefold. Empirically, the study provides a controlled, variability-aware comparison of quantum and classical kernels under shift whose central finding is a clean negative obtained under fair conditions: no robust family-level advantage survives budget matching, regularization tuning, and honest selection. Methodologically, it isolates the specific evaluation choices---oracle selection, fixed regularization, mismatched budgets, and pooled significance testing over correlated settings---that manufacture apparent quantum-kernel advantages, and it leaves behind a reproducible protocol that removes each. Analytically, it shows that the geometric quantities often invoked to explain such advantages describe both families equally and do not transfer unchanged to finite-shot estimation.
 
 The most useful open problem this leaves is not ``which family wins'' but whether any label-free, train-only signal can select a robust kernel under shift at all; the security community's label-free drift detectors \cite{yang2021cade} and the theory of task--model alignment \cite{bordelon2020spectrum,canatar2021taskmodel,ma2023covariate} are natural starting points. It is a question about kernels in general, and answering it would benefit classical and quantum methods alike---which is, in the end, the point: the productive question is not whether one family dominates, but which similarity geometry aligns with the shift regime one actually faces, and how to find it without peeking.
 
-\begin{appendices}
+\section{Methods}
+\label{sec:methods}
 
-\section{Additional Results}
-\label{app:additional_results}
+\subsection{Problem setting}
 
-Per-scenario-group results appear in Table~\ref{tab:headline} (honest, budget-matched, deployment protocol) and Table~\ref{tab:mechanism} (geometry association and rank matching). The complete per-setting numbers under all protocols (P1$'$, the cross-realization protocol P2, and the Best-by-OOD oracle P3), for every one of the eight scenario-groups, all sizes, and both classifiers, together with the frozen input hashes, the analysis specification, and the scripts that regenerate every table and figure, are provided in the public artifact (Section~``Declarations''). We omit the full per-setting tables from the manuscript for length; the oracle upper bounds of Section~\ref{sec:res_baselines} indicate the scale of the selection optimism they would otherwise document.
+We study binary security classification---malware versus benign software, and attack versus benign traffic---under distribution shift. Let $D_{\mathrm{ID}}$ denote the in-distribution data-generating process and $D_{\mathrm{OOD}}$ an out-of-distribution process induced by a constructed stress test or a held-out attack campaign. Given training data $T\sim D_{\mathrm{ID}}$, we evaluate on an ID test set $S_{\mathrm{ID}}$ and an OOD test set $S_{\mathrm{OOD}}$.
 
-\end{appendices}
+To isolate the kernel, classifier, preprocessing, optimization protocol, and split design are fixed. Classical and quantum Gram matrices are therefore consumed by the same downstream learner on the same samples.
+
+\subsection{Datasets and split construction}
+
+The four scenarios span static malware (EMBER) \cite{anderson2018ember} and network flows: UNSW-NB15 DoS, UNSW-NB15 Reconnaissance \cite{moustafa2015unsw}, and ToN-IoT Scanning \cite{alsaedi2020toniot}. Every setting has shared $T$, $S_{\mathrm{ID}}$, and $S_{\mathrm{OOD}}$ samples with identical class balance across kernel families.
+
+EMBER uses two label-conditional tail stress tests. The $m1$ split holds out within-class extremes of feature-block sparsity; $m2$ holds out within-class extremes of distance to train-fitted class centroids. Network scenarios use an analogous train-centroid construction and a held-out attack-campaign regime. In the latter, training and ID pools contain benign traffic plus non-target attacks, whereas OOD contains benign traffic plus the target campaign; UNSW pools additionally differ in capture partition. These are reproducible stress tests, not timestamped temporal splits or certified covariate shifts. Exact algorithms, feature exclusions, leakage checks, and pool definitions are in the Supplementary Note ``Dataset and shift construction.''
+
+\subsection{Controlled kernel-swap protocol}
+
+Figure~\ref{fig:protocol} summarizes the controlled pipeline. Both SVC and a binary Gaussian-process classifier with a logistic-link Laplace approximation consume unit-diagonal precomputed Gram matrices \cite{cortes1995svm,rasmussen2006gpml}. Comparisons are always within a classifier. The GP classifier supplies approximate probabilities for uncertainty diagnostics; no post-hoc calibration is applied.
+
+Training-fitted MaxAbs scaling and TruncatedSVD produce shared representations at $d\in\{4,6,8,10,12\}$. Quantum inputs are then mapped linearly to $[0,\pi]$. Dimension is an explicit candidate axis.
+
+\subsection{Kernel families}
+
+The customary classical reference contains linear and RBF kernels. The extended reference adds degree-2 and degree-3 polynomial, Laplacian, and Mat\'ern-$3/2$ and $5/2$ kernels. RBF, Laplacian, and Mat\'ern bandwidths sweep factors $\{0.1,0.3,1,3,10\}$ around training-only scale or median-distance heuristics. The quantum family uses fidelity
+\[
+K_Q(x,x')=|\langle\phi_Q(x),\phi_Q(x')\rangle|^2
+\]
+for two ZZ depths, PauliXZ, and Z feature maps \cite{havlicek2019quantumenhanced,schuld2019featurehilbert}. Every map sweeps angle scales $\{0.5,1,2\}$. Classical bandwidth and quantum angle-scale freedom are symmetric in purpose \cite{shaydulin2022bandwidth,canatar2023bandwidth}. Exact formulas and grids appear in the Supplementary Note ``Controlled kernel-swap protocol.''
+
+\subsection{Selection, candidate budgets, and inference}
+
+For each geometry, SVC regularization $C\in\{0.01,0.1,1,10,100\}$ is selected by five-fold stratified cross-validation on the training Gram matrix. The primary P1$'$ protocol divides the ID holdout into disjoint validation and test halves. Within each family, the candidate with the highest ID-validation balanced accuracy is deployed on ID-test and OOD-test; OOD labels never enter this choice. Same-test OOD-oracle and cross-realization OOD-supervised protocols are descriptive sensitivities.
+
+Best-of-family selection favours a larger pool. The primary extended-family endpoint therefore uses 60 candidates per family where coverage is complete and 20 where it is reduced, generated by 5,000 classical-pool subsamples under three schemes. The full 115-candidate classical pool is secondary.
+
+Every configuration has fifteen pipeline realizations (five split seeds by three model seeds). Two EMBER and six network scenario-groups are crossed with three master seeds and $(n_{\mathrm{train}},n_{\mathrm{ID}},n_{\mathrm{OOD}})$ regimes $(1000,500,500)$, $(2000,1000,1000)$, and $(4000,1800,1800)$. Because scenario-groups share source pools and are not exchangeable, they are fixed case studies. Per group we average over the five split-seed clusters and report a conditional interval; across groups we use dataset-equal means and leave-one-dataset-out ranges. We attach no population $p$-value to eight fixed, correlated cases. The complete grid is in Supplementary Table~1 and resampling details in the Supplementary Note ``Controlled kernel-swap protocol.''
+
+\subsection{Specification curve}
+
+The specification curve is a descriptive multiverse over every logically valid endpoint for which the frozen legacy and v4 artifacts contain complete paired data. Its ten specifications cross, where available, legacy or v4 generation; same-test OOD-oracle, legacy ID-based, or disjoint ID-validation selection; fixed $C=1$ or five-fold train-CV regularization for SVC; customary linear/RBF or extended classical references; and native or equal candidate budgets. The order S1--S10 was fixed before aggregation and is never sorted by effect size. Within each specification, pipeline realizations are first averaged within setting and then within scenario-group; groups are averaged within source dataset before the three datasets receive equal weight. All eight group effects are displayed, and no specification-level hypothesis test is performed. Exact definitions and machine-readable group- and dataset-level values are provided in the Supplementary Information and versioned result artifact.
+
+\subsection{Prospectively frozen external validation}
+
+Before acquiring or inspecting any external quantum--classical result, we froze the tasks, sampling, preprocessing, candidate pools, estimands, uncertainty procedure, and interpretation rule in a version-controlled protocol. The external source is TableShift, a benchmark of real-world distribution shifts in tabular binary classification \cite{gardner2023tableshift}. We fixed three public tasks from distinct domains and with distinct published split variables: College Scorecard (institution type), diabetes readmission (admission source), and ACS income (geographic region). TableShift's predefined \texttt{train}, \texttt{validation}, \texttt{id\_test}, and \texttt{ood\_test} roles are preserved; its \texttt{ood\_validation} split is excluded from preprocessing, tuning, selection, and reporting.
+
+Each task has two nested sample-size strata: $(n_{\mathrm{train}},n_{\mathrm{val}},n_{\mathrm{ID}},n_{\mathrm{OOD}})=(1000,250,250,500)$ and $(2000,500,500,1000)$. Five label-blind deterministic subsampling seeds form the conditional resampling clusters. Training-only column filtering, numeric median and categorical mode imputation, one-hot encoding, MaxAbs scaling, TruncatedSVD, standardization, and range mapping produce the same dimensions and kernel pools as in the security study. The primary deployed configuration is selected on \texttt{validation}; \texttt{ood\_test} is touched only for final evaluation. The same-test OOD oracle is retained as a non-deployable diagnostic.
+
+For each task, size, seed, and classifier, the 60-candidate quantum pool is compared with 5,000 equal-size, whole-kernel-block subsamples of the 115-candidate classical pool. The external primary effect is the selected quantum OOD accuracy minus the expected selected classical OOD accuracy over these budget-matched subsamples. The protocol-contraction diagnostic subtracts this controlled effect from the weak-reference, fixed-$C$, same-test-oracle effect. We average seeds within task and size, give the two nested sizes equal weight within task, and give the three fixed tasks equal weight. Conditional 95\% intervals use 9,999 resamples of seed clusters within task; no population $p$-value is attached to the three deliberately selected tasks. Full acquisition provenance, integrity gates, and the frozen outcome-classification rule are reported in the Supplementary Information.
+
+\subsection{Metrics and geometry analysis}
+
+OOD balanced accuracy is primary. Family effects are quantum minus classical after selection. ID balanced accuracy and ID-to-OOD degradation are secondary. For the GP classifier we also record log loss, Brier score, 15-bin expected calibration error \cite{guo2017calibration}, and predictive entropy.
+
+From the classifier Gram matrices we compute effective rank \cite{roy2007effective}, centered kernel-target alignment \cite{cristianini2001kta,cortes2012centeredalignment}, entry concentration, cross-split similarity, and regularized geometric difference \cite{huang2021powerofdata}. We relate geometry to OOD accuracy within scenario-groups, use partial association to control family and length scale, test portability by leaving one dataset out, and pair quantum candidates with nearest-effective-rank classical candidates within run and dimension. These analyses are associational. Formulas and diagnostic definitions appear in the Supplementary Note ``Metrics and geometry descriptors.''
+
+\subsection{Finite-shot perturbation}
+
+Exact fidelity entries are replaced by binomial estimates at $s\in\{128,512,2048,8192\}$ shots. Training blocks are symmetrized, clipped, set to unit diagonal, and projected to the positive-semidefinite cone. The model isolates sampling error, not device noise. Projection diagnostics and interpretation are in the Supplementary Note ``Finite-shot fidelity-estimation model.''
+
+\subsection{Use of generative AI}
+
+OpenAI Codex was used during manuscript revision to assist with language editing, code inspection, and consistency checking. The authors reviewed and take responsibility for all analyses, claims, citations, and text; the system is not an author.
 
 \backmatter
 
 \section*{Declarations}
 
-\bmhead{Availability of data and materials}
-This study is based on the public EMBER \cite{anderson2018ember}, UNSW-NB15 \cite{moustafa2015unsw}, and ToN-IoT \cite{alsaedi2020toniot} benchmark datasets. The datasets supporting the conclusions of this article---derived split definitions, shift constructions, experiment manifests, aggregated results, and summary tables---are available in the Zenodo repository, \url{https://doi.org/10.5281/zenodo.19147649}. All code used to generate the splits, run the classical and quantum kernel experiments, and reproduce every table and figure in this article is part of the same artifact:
-\begin{itemize}
-    \item Project name: Controlled Kernel Evaluation under Distribution Shift
-    \item Project home page: \url{https://github.com/roberto-fernandez-barrios/kernel_shift_framework}
-    \item Archived version: \url{https://doi.org/10.5281/zenodo.19147649}
-    \item Operating system(s): platform independent
-    \item Programming language: Python (3.12)
-    \item Other requirements: pinned environment provided (\texttt{environment.lock.yml}); qiskit 2.3.1
-    \item License: BSD-3-Clause
-    \item Any restrictions to use by non-academics: none
-\end{itemize}
+\bmhead{Data availability}
+This study uses the public EMBER \cite{anderson2018ember}, UNSW-NB15 \cite{moustafa2015unsw}, ToN-IoT \cite{alsaedi2020toniot}, and TableShift \cite{gardner2023tableshift} benchmarks, which remain subject to their original access conditions. Raw TableShift records are not redistributed. Derived split definitions, deterministic row-position hashes, shift constructions, experiment manifests, aggregated results, and summary tables are available in the Zenodo repository at \url{https://doi.org/10.5281/zenodo.19147649}.
+
+\bmhead{Code availability}
+Code for constructing the splits, running the kernel experiments, reproducing the confirmatory analysis, and regenerating every table and figure is available at \url{https://github.com/roberto-fernandez-barrios/kernel_shift_framework} and in the versioned Zenodo archive above. The platform-independent Python 3.12 environment is pinned in \texttt{environment.lock.yml}; the code is released under BSD-3-Clause with no restriction on non-academic use.
 
 \bmhead{Competing interests}
 The authors declare that they have no competing interests.
-
-\bmhead{Funding}
-The authors received no specific funding for the submitted work.
 
 \bmhead{Authors' contributions}
 RFB: conceptualization, methodology, software, data curation, formal analysis, visualization, investigation, writing---original draft, writing---review and editing. IPL: supervision, validation, writing---review and editing. AGS: validation, project administration, writing---review and editing. PGB: supervision, resources, writing---review and editing. All authors read and approved the final manuscript.
 
 \bmhead{Acknowledgements}
-Not applicable.
+The authors received no specific funding for the submitted work.
 
 
 

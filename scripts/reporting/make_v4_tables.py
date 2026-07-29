@@ -16,9 +16,9 @@ OUT = Path("results/v4/tables")
 MODEL = {"svc": "SVC", "gpc": "GPC"}
 GLAB = {
     "ember_m1": "EMBER $m1$", "ember_m2": "EMBER $m2$",
-    "unsw_dos_natural_cur": "UNSW-DoS (drift)", "unsw_dos_m2_centroid": "UNSW-DoS ($m2$)",
-    "unsw_recon_natural_cur": "UNSW-Recon (drift)", "unsw_recon_m2_centroid": "UNSW-Recon ($m2$)",
-    "toniot_scanning_natural_cur": "ToN-IoT (drift)", "toniot_scanning_m2_centroid": "ToN-IoT ($m2$)",
+    "unsw_dos_natural_cur": "UNSW-DoS (campaign)", "unsw_dos_m2_centroid": "UNSW-DoS (constructed)",
+    "unsw_recon_natural_cur": "UNSW-Recon (campaign)", "unsw_recon_m2_centroid": "UNSW-Recon (constructed)",
+    "toniot_scanning_natural_cur": "ToN-IoT (campaign)", "toniot_scanning_m2_centroid": "ToN-IoT (constructed)",
 }
 ORDER = ["ember_m1", "ember_m2", "unsw_dos_natural_cur", "unsw_dos_m2_centroid",
          "unsw_recon_natural_cur", "unsw_recon_m2_centroid",
@@ -30,39 +30,61 @@ def _sci(x: float) -> str:
 
 
 def headline_table() -> str:
-    """Per-group honest P1' OOD delta vs both references, both classifiers,
-    with the conditional interval from the GATE 2 estimator."""
+    """Per-group P1' OOD deltas under no-OOD-label selection.
+
+    The primary extended-family comparison comes from the frozen equal-budget
+    analysis (``budget60`` means B=60 in the full-coverage groups and B=20 in
+    the reduced-coverage groups).  The full-pool extended comparison remains
+    in the machine-readable results as a secondary sensitivity.  Keeping
+    these inputs separate prevents the full-pool 115-vs-60 result from being
+    mislabeled as budget matched.
+    """
     g = pd.read_csv("results/v4/family_comparison/group_summary.csv").set_index(["group", "model"])
-    hier = pd.read_csv("results/v4/family_comparison/inference/hierarchical_effects.csv")
-    hier = hier[(hier.stratum == "all")].set_index(["variant", "model", "scope"])
+    budget = pd.read_csv("results/v4/inference_confirmatory/hierarchical_effects.csv")
+    budget = budget[
+        (budget.variant == "budget60") & (budget.stratum == "all")
+    ].set_index(["model", "scope"])
     lines = []
-    for grp in ORDER:
+    for group_index, grp in enumerate(ORDER):
         first = True
         for model in ("svc", "gpc"):
             if (grp, model) not in g.index:
                 continue
             r = g.loc[(grp, model)]
             try:
-                ci = hier.loc[("vs_classical_ext", model, grp)]
-                ci_s = f"$[{ci.ci_lo:+.4f}, {ci.ci_hi:+.4f}]$"
+                primary = budget.loc[(model, grp)]
+                primary_delta = _sci(primary.effect)
+                ci_s = f"$[{primary.ci_lo:+.4f}, {primary.ci_hi:+.4f}]$"
             except KeyError:
+                primary_delta = "--"
                 ci_s = "--"
             gcell = f"\\multirow{{2}}{{*}}{{{GLAB[grp]}}}" if first else ""
             first = False
             lines.append(
                 f"{gcell} & {MODEL[model]} & "
                 f"{_sci(r.p1_ood_delta_vs_classical_orig)} & "
-                f"{_sci(r.p1_ood_delta_vs_classical_ext)} & {ci_s} & "
-                f"{_sci(r.p1_idtest_delta_vs_classical_ext)} \\\\")
-        lines.append("\\addlinespace")
+                f"{primary_delta} & {ci_s} \\\\")
+        if group_index < len(ORDER) - 1:
+            lines.append("\\addlinespace")
     return "\n".join(l for l in lines if l)
 
 
 def summary_row() -> str:
     """Dataset-equal-weighted descriptive means + LODO for the abstract/text."""
+    b = pd.read_csv("results/v4/inference_confirmatory/hierarchical_effects.csv")
+    b = b[
+        (b.variant == "budget60")
+        & (b.scope == "dataset_equal_mean")
+        & (b.stratum == "all")
+    ]
     h = pd.read_csv("results/v4/family_comparison/inference/hierarchical_effects.csv")
     h = h[(h.scope == "dataset_equal_mean") & (h.stratum == "all")]
     lines = []
+    for _, r in b.iterrows():
+        lines.append(
+            f"extended (equal budget) & {MODEL[r.model]} & {_sci(r.effect)} & "
+            f"$[{r.jackknife_min:+.4f}, {r.jackknife_max:+.4f}]$ \\\\"
+        )
     for _, r in h.iterrows():
         ref = r.variant.replace("vs_classical_", "").replace("orig", "linear+RBF").replace("ext", "extended")
         lines.append(f"{ref} & {MODEL[r.model]} & {_sci(r.effect)} & "
