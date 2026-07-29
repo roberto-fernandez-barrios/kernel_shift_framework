@@ -23,6 +23,29 @@ EXPECTED_GROUPS = {
     "toniot_scanning_m2_centroid",
 }
 EXPECTED_NETWORK_GROUPS = EXPECTED_GROUPS - {"ember_m1", "ember_m2"}
+EXPECTED_SHORTCUT_FEATURES = {
+    39: {
+        "ct_src_dport_ltm",
+        "ct_dst_sport_ltm",
+        "is_sm_ips_ports",
+    },
+    88: {
+        "src_port",
+        "dst_port",
+        "proto_icmp",
+        "proto_tcp",
+        "proto_udp",
+        "service",
+        "service_dce_rpc",
+        "service_dns",
+        "service_ftp",
+        "service_gssapi",
+        "service_http",
+        "service_smb",
+        "service_smb_gssapi",
+        "service_ssl",
+    },
+}
 
 
 def discover_outputs(
@@ -112,17 +135,66 @@ def validate_campaign_outputs(roots: tuple[Path, ...]) -> None:
             raise ValueError(f"{path}: expected 1,050 rows, found {len(frame)}")
         if set(frame.regularization) != {"fixed_c1", "train_cv"}:
             raise ValueError(f"{path}: shortcut regularization coverage mismatch")
+        if not (
+            frame.groupby("regularization", observed=True).size() == 525
+        ).all():
+            raise ValueError(f"{path}: shortcut rows are unbalanced by regularization")
+        shortcut_keys = ["family", "model", "cfg", "kernel", "split"]
+        key_counts = frame.groupby(shortcut_keys, observed=True).size()
+        if len(key_counts) != 525 or not (key_counts == 2).all():
+            raise ValueError(
+                f"{path}: shortcut candidate/split keys are not paired"
+            )
+        if set(frame.id_split_hash_salt) != {"ksf-v4-idsplit::"}:
+            raise ValueError(f"{path}: shortcut ID split hash salt mismatch")
+        if set(frame.feature_policy) != {
+            "port_protocol_service_ablation"
+        }:
+            raise ValueError(f"{path}: shortcut feature policy mismatch")
+        fixed_c = frame[frame.regularization == "fixed_c1"]
+        if not np.allclose(fixed_c.c_selected, 1.0):
+            raise ValueError(f"{path}: shortcut fixed-C rows do not use C=1")
+        train_cv = frame[frame.regularization == "train_cv"]
+        if not set(train_cv.c_selected).issubset({0.01, 0.1, 1, 10, 100}):
+            raise ValueError(f"{path}: shortcut train-CV C is outside the grid")
         audit = json.loads(path.with_name("audit_v8shortcut.json").read_text())
         if audit["mode"] != "v8shortcut":
             raise ValueError(f"{path}: shortcut audit mode mismatch")
         input_count = int(audit["n_input_features"])
         removed_count = int(audit["n_removed_features"])
-        if input_count == 39 and removed_count != 3:
-            raise ValueError(f"{path}: UNSW removal count must be 3")
-        if input_count == 88 and removed_count != 14:
-            raise ValueError(f"{path}: ToN-IoT removal count must be 14")
-        if input_count not in {39, 88}:
+        if input_count not in EXPECTED_SHORTCUT_FEATURES:
             raise ValueError(f"{path}: unexpected network feature inventory")
+        expected_removed = EXPECTED_SHORTCUT_FEATURES[input_count]
+        if (
+            removed_count != len(expected_removed)
+            or set(audit["removed_features"]) != expected_removed
+        ):
+            raise ValueError(f"{path}: frozen shortcut feature list mismatch")
+        reported_removed = {
+            item
+            for value in frame.removed_features.unique()
+            for item in str(value).split("|")
+            if item
+        }
+        if reported_removed != expected_removed:
+            raise ValueError(f"{path}: row-level shortcut feature list mismatch")
+        v4_audit_path = path.with_name("idsplit_audit_v4.csv")
+        if not v4_audit_path.is_file():
+            raise FileNotFoundError(v4_audit_path)
+        v4_audit = pd.read_csv(v4_audit_path).iloc[0]
+        for field in (
+            "n_id",
+            "n_val",
+            "n_test",
+            "pos_rate_val",
+            "pos_rate_test",
+            "overlap",
+            "class_balance_gap",
+        ):
+            if not np.isclose(float(audit[field]), float(v4_audit[field])):
+                raise ValueError(
+                    f"{path}: shortcut ID-split audit differs on {field}"
+                )
 
 
 def _read(root: Path, filename: str) -> pd.DataFrame:
