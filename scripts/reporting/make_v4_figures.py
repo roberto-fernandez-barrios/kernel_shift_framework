@@ -76,7 +76,7 @@ def fig_honest() -> None:
     axes[0].set_yticklabels([SHORT[g_] for g_ in ORDER])
     axes[0].set_ylim(len(ORDER) - 0.5, -0.5)   # top-to-bottom = ORDER, once (shared)
     axes[0].legend(frameon=False, loc="lower left", fontsize=7)
-    fig.suptitle("No robust quantum advantage under no-OOD-label selection",
+    fig.suptitle("Controlled family effects under no-OOD-label selection",
                  fontsize=9, y=1.01)
     fig.tight_layout()
     fig.savefig(OUT / "fig_v4_honest.pdf", bbox_inches="tight")

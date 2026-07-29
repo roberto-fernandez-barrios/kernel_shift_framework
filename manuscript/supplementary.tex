@@ -39,7 +39,7 @@ inference, external acquisition, geometry calculations, and finite-shot
 procedures are reported in the main manuscript Methods. Machine-readable
 values and frozen input hashes are included in the immutable release artifact.
 
-\section*{Supplementary Results: Frozen specification curve}
+\section*{Supplementary Results: Cross-generation sensitivity map}
 \label{supp:specification}
 
 The ten rows remain in their prespecified S1--S10 order rather than being
@@ -47,11 +47,13 @@ ranked by outcome. Every row includes all eight fixed security
 scenario-groups. Scenario-groups are averaged within EMBER, UNSW-NB15, and
 ToN-IoT before the three source datasets receive equal weight. The corrected
 S10 values in Table~\ref{supp:tab_specification} are identical to the
-confirmatory endpoint in the main article.
+confirmatory endpoint in the main article. This display compares complete
+analysis specifications across two result generations; it is not a factorial
+decomposition of their individual choices.
 
 \begin{table}[ht]
 \centering
-\caption{Frozen specification definitions and source-dataset-equal
+\caption{Prespecified cross-generation definitions and source-dataset-equal
 quantum-minus-classical OOD balanced-accuracy effects. ``Oracle'' selects and
 evaluates on the same OOD test labels; ``ID-val'' uses a disjoint
 in-distribution validation split. SVC regularization is fixed at $C=1$ or
@@ -261,20 +263,25 @@ Selection & Classifier & Classical reference & Q wins & Mean $\Delta$ & Median $
 \section*{Supplementary Results: Small-cluster interval sensitivity}
 \label{supp:intervals}
 
-Table~\ref{supp:tab_intervals} compares the primary conditional cluster-$t$
-interval with the prespecified BCa and leave-one-q-split diagnostics. The
-effective replication unit is five q-split clusters in every row. Differences
+Table~\ref{supp:tab_intervals} compares the primary pointwise conditional
+cluster-$t$ interval with the prespecified BCa and leave-one-q-split
+diagnostics. The effective replication unit is five q-split clusters in every
+row. These intervals are not simultaneous and are not used as a
+familywise-error-controlled classification of the eight cases. Differences
 between interval constructions do not change the qualitative fixed-case
-message, and an interval containing zero is not interpreted as equivalence.
+description, and an interval containing zero is not interpreted as
+equivalence. With only five clusters, the BCa interval is retained as a
+fragile sensitivity rather than treated as additional confirmatory evidence.
 
 \begin{table}[ht]
 \centering
-\caption{Conditional uncertainty sensitivity for all primary equal-budget
+\caption{Pointwise conditional uncertainty sensitivity for all primary equal-budget
 group--classifier cells. $\Delta$ is quantum minus classical OOD balanced
 accuracy. The cluster-$t$ and 9,999-draw BCa columns are intervals over the
 same five q-split cluster means ($n=5$); LOO is the range after leaving out
 one q-split cluster. All are conditional on the fixed benchmark pools and
-design, not intervals over a dataset population.}
+design, not intervals over a dataset population. They are not simultaneous
+intervals, and the BCa column is fragile at this effective sample size.}
 \label{supp:tab_intervals}
 \scriptsize
 \setlength{\tabcolsep}{3.0pt}
@@ -330,10 +337,10 @@ sensitivity, not a universal family ordering.
 
 Predictive entropy rises from ID to OOD for both honestly selected families
 in every scenario-group. Expected calibration error changes moderately and
-comparably (Figure~\ref{supp:fig_uncertainty}). Because the selected fidelity
-kernels have no accuracy advantage, these diagnostics show no calibration
-benefit unavailable to the classical family. Entropy increase alone is not
-evidence of good calibration.
+comparably (Figure~\ref{supp:fig_uncertainty}). Together with the controlled
+accuracy results, these diagnostics provide no consistent evidence in the
+fixed cases of a calibration benefit unique to the selected fidelity kernels.
+Entropy increase alone is not evidence of good calibration.
 
 \begin{figure}[ht]
 \centering

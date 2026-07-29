@@ -233,7 +233,7 @@ def plot_curve(summary: pd.DataFrame, by_group: pd.DataFrame, output: Path) -> N
     axes[0].set_yticklabels(
         [f"{sid}  {SPEC_LABELS[sid]}" for sid in order], fontsize=7.5
     )
-    fig.suptitle("Specification curve: protocol choices reverse the apparent effect",
+    fig.suptitle("Cross-generation sensitivity map (associational)",
                  fontsize=9.5)
     fig.tight_layout()
     output.parent.mkdir(parents=True, exist_ok=True)
