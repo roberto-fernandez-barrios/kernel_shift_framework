@@ -165,7 +165,7 @@ algebraically for 128, 512, 2,048, and 8,192 shots. Tables distinguish:
 - logical circuit templates;
 - circuit invocations per kernel configuration and measurement replicate;
 - shots per replicate;
-- projected totals for the ten-case, 30-replicate sensitivity;
+- projected totals for the eight-case, 30-replicate sensitivity;
 - costs not modelled: routing, calibration, mitigation, queueing, and device
   noise.
 
