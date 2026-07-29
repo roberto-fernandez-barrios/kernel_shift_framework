@@ -34,9 +34,14 @@ jobs:
         run: |
           python -m pytest tests/ -q
 
-      - name: Validate v0.7.0 reviewer-revision artifacts
+      - name: Validate v0.7.0 historical reviewer-revision artifacts
         run: |
           python scripts/analysis/validate_v6_artifacts.py
+
+      - name: Validate v0.8.0 circuit-aware reviewer-revision artifacts
+        run: |
+          python scripts/analysis/validate_v8_artifacts.py
+          python scripts/analysis/validate_manuscript_v8.py
 
       - name: Guard against withdrawn terminology in public artifacts
         run: |
