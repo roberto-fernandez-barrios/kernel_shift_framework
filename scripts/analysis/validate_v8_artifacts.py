@@ -217,7 +217,7 @@ def validate_analysis_outputs(root: Path) -> None:
     shortcut_changes = _read(root, "shortcut_ablation_change_clusters.csv")
     if (
         len(shortcut_runs) != 270
-        or len(shortcut_clusters) != 6 * 5
+        or len(shortcut_clusters) != 2 * 6 * 5
         or len(shortcut_changes) != 6 * 5
     ):
         raise ValueError("shortcut-ablation run/cluster coverage mismatch")
@@ -244,7 +244,18 @@ def validate_analysis_outputs(root: Path) -> None:
     )
     _require_finite(
         shortcut,
-        ["effect", "ci_lo", "ci_hi", "ablation_change"],
+        [
+            "effect",
+            "ci_lo",
+            "ci_hi",
+            "original_effect",
+            "original_ci_lo",
+            "original_ci_hi",
+            "ablated_effect",
+            "ablated_ci_lo",
+            "ablated_ci_hi",
+            "ablation_change",
+        ],
         "shortcut ablation",
     )
 

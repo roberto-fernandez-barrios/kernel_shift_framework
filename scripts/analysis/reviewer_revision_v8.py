@@ -547,6 +547,23 @@ def make_shortcut_outputs(
         "delta",
     ]]
     groups, clusters = aggregate_fixed_groups(effect_input, [])
+    original_input = paired[keys + [
+        "ms",
+        "size",
+        "dataset",
+        "delta_original",
+    ]].rename(columns={"delta_original": "delta"})
+    original_groups, original_clusters = aggregate_fixed_groups(
+        original_input,
+        [],
+    )
+    original_groups = original_groups.rename(
+        columns={
+            "effect": "original_effect",
+            "ci_lo": "original_ci_lo",
+            "ci_hi": "original_ci_hi",
+        }
+    )
     change_input = paired[keys + [
         "ms",
         "size",
@@ -562,6 +579,16 @@ def make_shortcut_outputs(
         }
     )
     groups = groups.merge(
+        original_groups[[
+            "group",
+            "original_effect",
+            "original_ci_lo",
+            "original_ci_hi",
+        ]],
+        on="group",
+        validate="one_to_one",
+    )
+    groups = groups.merge(
         change_groups[[
             "group",
             "ablation_change",
@@ -571,9 +598,18 @@ def make_shortcut_outputs(
         on="group",
         validate="one_to_one",
     )
+    groups["ablated_effect"] = groups["effect"]
+    groups["ablated_ci_lo"] = groups["ci_lo"]
+    groups["ablated_ci_hi"] = groups["ci_hi"]
     paired.to_csv(output_dir / "shortcut_ablation_run_effects.csv", index=False)
     groups.to_csv(output_dir / "shortcut_ablation_group_effects.csv", index=False)
-    clusters.assign(endpoint="ablated_effect").to_csv(
+    pd.concat(
+        [
+            original_clusters.assign(endpoint="original_effect"),
+            clusters.assign(endpoint="ablated_effect"),
+        ],
+        ignore_index=True,
+    ).to_csv(
         output_dir / "shortcut_ablation_cluster_effects.csv", index=False
     )
     change_clusters.assign(endpoint="ablation_change").to_csv(

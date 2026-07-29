@@ -143,8 +143,8 @@ def _panel_shortcut(axis: plt.Axes, groups: pd.DataFrame) -> None:
     y = np.arange(len(NETWORK_ORDER))
     for position, group in zip(y, NETWORK_ORDER):
         row = subset.loc[group]
-        original = row.effect - row.ablation_change
-        ablated = row.effect
+        original = row.original_effect
+        ablated = row.ablated_effect
         axis.plot(
             [original, ablated],
             [position, position],
