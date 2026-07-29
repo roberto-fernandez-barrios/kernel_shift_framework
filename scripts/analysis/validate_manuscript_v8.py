@@ -53,6 +53,13 @@ def validate_main(text: str) -> None:
         raise ValueError(f"title has {len(title_words)} words, limit is 15")
     if re.search(r"[:;,.!?]", title):
         raise ValueError("article title contains prohibited punctuation")
+    pdf_title = extract_one(
+        r"pdftitle=\{([^{}]+)\}",
+        active,
+        "PDF metadata title",
+    )
+    if pdf_title != title:
+        raise ValueError("PDF metadata title differs from article title")
 
     abstract = extract_one(
         r"\\abstract\{(.*?)\}\s*\\keywords",
