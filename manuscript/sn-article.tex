@@ -232,7 +232,7 @@ Table~\ref{tab:headline} and Figure~\ref{fig:honest} show no consistent evidence
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}llccc@{}}
 \toprule
-Scenario & Clf. & vs lin./RBF & vs ext. (equal $B$) & conditional interval \\
+Scenario & Clf. & vs lin./RBF & vs ext. (equal $B$) & interval / LODO range \\
 \midrule
 \multirow{2}{*}{EMBER $m1$} & SVC & $-0.0095$ & $-0.0058$ & $[-0.0340, +0.0223]$ \\
  & GPC & $-0.0050$ & $-0.0009$ & $[-0.0101, +0.0083]$ \\
@@ -285,6 +285,31 @@ The primary \texttt{kernel\_blocked} scheme samples 12 whole classical kernel-sh
 \label{fig:rankmatched}
 \end{figure}
 
+\subsection{The quantum pool mixes entangling and product kernels}
+\label{sec:res_circuits}
+
+Circuit decomposition changes the interpretation of the aggregate family. The two ZZFeatureMap variants contain all-to-all two-qubit Pauli interactions, whereas the Pauli-X/Z and ZFeatureMap variants contain only one-qubit Pauli strings. For the latter pair, the prepared state and its fidelity kernel factorize over coordinates (Methods). Thus two of the four map families are quantum-generated implementations of product kernels and cannot supply evidence that entanglement is responsible for their behaviour.
+
+Table~\ref{tab:circuits} reports logical, unrouted resource counts. At 12 qubits, one ZZFeatureMap state preparation requires 132 CX gates for one repetition and 264 for two; the corresponding compute--uncompute fidelity templates require 264 and 528 CX gates. Both product-map templates require zero CX gates at every studied dimension. Under P1$'$ selection, product maps supply 594/1,080 (55.0\%) of the selected quantum SVC configurations and 348/1,080 (32.2\%) of the GP selections. The composition alone does not compare predictive quality; the matched stratum analysis below does so at 30 candidates per stratum.
+
+\begin{table*}[t]
+\centering
+\caption{Logical circuit audit for the four quantum feature maps. Depth and CX columns give the values at 4 and 12 qubits after Qiskit 2.3.1 decomposition to \texttt{rz}, \texttt{sx}, \texttt{x}, and \texttt{cx}, optimization level 0, without device routing. ``Fidelity CX'' counts the compute--uncompute template for one kernel entry. Complete values at all five dimensions and one-qubit gate counts are provided in Supplementary Table~7 and the machine-readable artifact. These logical counts are not hardware-execution estimates.}
+\label{tab:circuits}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llllccc@{}}
+\toprule
+Map & Pauli strings & Stratum & Product factorization & map depth (4/12) & map CX (4/12) & fidelity CX (4/12) \\
+\midrule
+ZZ, 1 rep. & Z, ZZ & entangling ZZ & no  & 19/67  & 12/132 & 24/264 \\
+ZZ, 2 reps. & Z, ZZ & entangling ZZ & no  & 35/107 & 24/264 & 48/528 \\
+Pauli-X/Z, 1 rep. & X, Z & separable product & yes & 11/11 & 0/0 & 0/0 \\
+Z, 2 reps. & Z & separable product & yes & 8/8 & 0/0 & 0/0 \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
 \subsection{Protocol sensitivity is prospectively corroborated on external domain shifts}
 \label{sec:res_external}
 
@@ -322,6 +347,8 @@ Two descriptors of the training and OOD Gram matrices carry information about wh
 
 All quantum kernels above are computed by exact statevector simulation, which isolates kernel geometry but is not what a device would return. We therefore froze a post-confirmatory Monte Carlo sensitivity before computing its outcomes, then froze a reviewer-motivated out-of-sample correction before computing that extension. The subset contains one $q1000$ run per scenario-group, all at master, q-split, and model seed 42; within each run, the exact P1$'$-selected quantum SVC configuration is fixed. For each of four shot counts, 30 independent measurement replicates replace every fidelity entry by a binomial estimate and reselect $C$ from training data under three conditions: no PSD correction, independent projection of square train and OOD matrices with rectangular blocks unchanged, and a coherent train-eigenspace Nyström extension (Methods). Stable SHA-256 seeds are distinct by run, configuration, shot count, replicate, and matrix block.
 
+One case--replicate samples 1,624,250 distinct input-pair fidelities: 499,500 train-triangle entries, 250,000 validation--train, 250,000 ID-test--train, 500,000 OOD--train, and 124,750 OOD-triangle entries. This corresponds to 207,904,000 shots at 128 shots per fidelity and 13,305,856,000 at 8,192. Across eight cases and 30 replicates, one shot level entails 389,820,000 distinct circuit parameterizations; the complete four-level sensitivity projects 4.24 trillion shots. The three PSD conditions reuse the same sampled measurements. These are algebraic resource projections before device routing, calibration, mitigation, and repeated job overhead, not executed hardware costs.
+
 Table~\ref{tab:shots} summarizes the eight conditional Monte Carlo distributions. Sampling does not induce a uniform accuracy direction. Under the original independent-square heuristic, the median across the eight fixed scenario-group medians is $-0.0005$ at 128 shots (group range $[-0.0252,+0.0131]$), $-0.0051$ at 512, $-0.0052$ at 2,048, and $0.0000$ at 8,192 shots. The coherent Nyström values are $-0.0010$, $-0.0026$, $0.0000$, and $0.0000$; the unprojected values are $-0.0044$, $-0.0009$, $-0.0005$, and $0.0000$. PSD handling is therefore part of the estimand rather than an innocuous cleanup step, but no condition produces a uniform accuracy direction. Central 95\% Monte Carlo intervals for all runs are shown in Supplementary Figure~2.
 
 Effective rank is measurement-sensitive: the median perturbed-to-exact ratio falls from $1.93$ at 128 shots to $1.13$ at 8,192. Median absolute OOD-accuracy deviations are $0.0065$--$0.0069$ under the Nyström extension and $0.0070$--$0.0084$ under the independent-square heuristic; non-monotonicity is expected because each perturbed training matrix reselects a discrete $C$. OOD-KTA changes under Nyström are not directly comparable to those from the independently sampled OOD square because Nyström derives that square from OOD--train features; we report them as estimator-dependent diagnostics in the artifact. These distributions quantify measurement-sampling variability conditional on eight fixed exact Gram matrices. They do not model a device, circuit compilation, gate or readout noise, mitigation, or hardware feasibility.
@@ -356,7 +383,7 @@ Shots & Condition & median $\Delta_{\mathrm{OOD}}$ [group range] & median $|\Del
 \subsection{Predictive uncertainty under shift}
 \label{sec:res_uncertainty}
 
-The Laplace GP probabilities provide a secondary uncertainty check (Supplementary Figure~1). For the target-label-free selected candidate, predictive entropy rises from ID to OOD for both families in every scenario-group, while expected calibration error changes moderately and comparably. Because neither family has an accuracy advantage, the fidelity kernels show no calibration benefit unavailable to classical kernels. We do not interpret rising entropy alone as evidence of calibration.
+The Laplace GP probabilities provide a secondary uncertainty check (Supplementary Figure~1). For the target-label-free selected candidate, predictive entropy rises from ID to OOD for both families in every scenario-group, while expected calibration error changes moderately and comparably. Together with the controlled accuracy results, these diagnostics provide no consistent evidence in the fixed cases of a calibration benefit unique to the selected fidelity kernels. We do not interpret rising entropy alone as evidence of calibration.
 
 \section{Discussion}
 \label{sec:discussion}

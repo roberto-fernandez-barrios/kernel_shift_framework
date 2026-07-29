@@ -317,6 +317,55 @@ Scenario & Clf. & $\Delta$ & 95\% cluster-$t$ & 95\% BCa & LOO range \\
 \end{tabular}
 \end{table}
 
+\section*{Supplementary Results: Circuit resources}
+\label{supp:circuits}
+
+\begin{table}[p]
+\centering
+\caption{Complete logical circuit audit. Counts follow Qiskit 2.3.1
+decomposition to \texttt{rz}, \texttt{sx}, \texttt{x}, and \texttt{cx} at
+optimization level 0 without device routing. ``Map'' is one feature-map state
+preparation; ``fidelity'' is its compute--uncompute template for one pair of
+inputs. One-qubit counts exclude barriers and measurements. These
+compiler-conditional logical counts are not device costs.}
+\label{supp:tab_circuits}
+\scriptsize
+\setlength{\tabcolsep}{3.4pt}
+\begin{tabular}{llrrrrrr}
+\toprule
+Map & Qubits & Map depth & Map 1q & Map CX & Fidelity depth & Fidelity 1q & Fidelity CX \\
+\midrule
+\multirow{5}{*}{ZZ, 1 rep.}
+ & 4  & 19 & 22  & 12  & 38  & 44  & 24 \\
+ & 6  & 31 & 39  & 30  & 62  & 78  & 60 \\
+ & 8  & 43 & 60  & 56  & 86  & 120 & 112 \\
+ & 10 & 55 & 85  & 90  & 110 & 170 & 180 \\
+ & 12 & 67 & 114 & 132 & 134 & 228 & 264 \\
+\addlinespace
+\multirow{5}{*}{ZZ, 2 reps.}
+ & 4  & 35  & 44  & 24  & 70  & 88  & 48 \\
+ & 6  & 53  & 78  & 60  & 106 & 156 & 120 \\
+ & 8  & 71  & 120 & 112 & 142 & 240 & 224 \\
+ & 10 & 89  & 170 & 180 & 178 & 340 & 360 \\
+ & 12 & 107 & 228 & 264 & 214 & 456 & 528 \\
+\addlinespace
+\multirow{5}{*}{Pauli-X/Z, 1 rep.}
+ & 4  & 11 & 44  & 0 & 22 & 88  & 0 \\
+ & 6  & 11 & 66  & 0 & 22 & 132 & 0 \\
+ & 8  & 11 & 88  & 0 & 22 & 176 & 0 \\
+ & 10 & 11 & 110 & 0 & 22 & 220 & 0 \\
+ & 12 & 11 & 132 & 0 & 22 & 264 & 0 \\
+\addlinespace
+\multirow{5}{*}{Z, 2 reps.}
+ & 4  & 8 & 32 & 0 & 16 & 64  & 0 \\
+ & 6  & 8 & 48 & 0 & 16 & 96  & 0 \\
+ & 8  & 8 & 64 & 0 & 16 & 128 & 0 \\
+ & 10 & 8 & 80 & 0 & 16 & 160 & 0 \\
+ & 12 & 8 & 96 & 0 & 16 & 192 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section*{Supplementary Results: External fixed tasks}
 \label{supp:external}
 
@@ -387,6 +436,31 @@ as a mechanism or compared directly with the other KTA estimators. Retained
 rank, eigenvalue tolerance, blockwise Frobenius changes, negative-spectrum
 fractions, selected $C$, and every replicate endpoint are provided in
 \texttt{results/v6/shots\_mc/}.
+
+\begin{table}[ht]
+\centering
+\caption{Projected sampling resources for the repeated finite-shot
+sensitivity. One case--replicate contains 1,624,250 distinct fidelity
+parameterizations. ``Full sensitivity'' multiplies one shot level by eight
+fixed cases and 30 measurement replicates. The three PSD conditions reuse
+these measurements. Counts exclude device routing, calibration, mitigation,
+queueing, and repeated-job overhead; no hardware execution was performed.}
+\label{supp:tab_shot_resources}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{rrrr}
+\toprule
+Shots/fidelity & Shots/case--replicate & Parameterizations/full sensitivity & Shots/full sensitivity \\
+\midrule
+128   & 207,904,000    & 389,820,000 & 49,896,960,000 \\
+512   & 831,616,000    & 389,820,000 & 199,587,840,000 \\
+2,048 & 3,326,464,000  & 389,820,000 & 798,351,360,000 \\
+8,192 & 13,305,856,000 & 389,820,000 & 3,193,405,440,000 \\
+\midrule
+All four & 17,671,840,000 & 1,559,280,000 & 4,241,241,600,000 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section*{Supplementary Results: Machine-readable result map}
 \label{supp:artifact}

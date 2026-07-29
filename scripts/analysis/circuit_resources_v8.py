@@ -145,11 +145,11 @@ def shot_resource_table() -> pd.DataFrame:
             "shots_per_fidelity": shots,
             **block_counts,
             "distinct_fidelity_estimates_per_case_replicate": estimates,
-            "circuit_invocations_per_case_replicate": estimates,
+            "distinct_circuit_parameterizations_per_case_replicate": estimates,
             "total_shots_per_case_replicate": estimates * shots,
             "n_fixed_cases": N_FIXED_CASES,
             "n_measurement_replicates": N_MEASUREMENT_REPLICATES,
-            "projected_circuit_invocations_full_sensitivity": (
+            "projected_distinct_circuit_parameterizations_full_sensitivity": (
                 estimates * N_FIXED_CASES * N_MEASUREMENT_REPLICATES
             ),
             "projected_shots_full_sensitivity": (
@@ -168,11 +168,13 @@ def shot_resource_table() -> pd.DataFrame:
         "distinct_fidelity_estimates_per_case_replicate": (
             estimates * len(SHOTS)
         ),
-        "circuit_invocations_per_case_replicate": estimates * len(SHOTS),
+        "distinct_circuit_parameterizations_per_case_replicate": (
+            estimates * len(SHOTS)
+        ),
         "total_shots_per_case_replicate": estimates * sum(SHOTS),
         "n_fixed_cases": N_FIXED_CASES,
         "n_measurement_replicates": N_MEASUREMENT_REPLICATES,
-        "projected_circuit_invocations_full_sensitivity": (
+        "projected_distinct_circuit_parameterizations_full_sensitivity": (
             estimates
             * len(SHOTS)
             * N_FIXED_CASES
