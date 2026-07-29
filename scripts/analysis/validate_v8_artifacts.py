@@ -88,6 +88,23 @@ def validate_campaign_outputs(roots: tuple[Path, ...]) -> None:
             or audit["n_removed_features"] != 0
         ):
             raise ValueError(f"{path}: fixed-C audit mismatch")
+        v4_audit_path = path.with_name("idsplit_audit_v4.csv")
+        if not v4_audit_path.is_file():
+            raise FileNotFoundError(v4_audit_path)
+        v4_audit = pd.read_csv(v4_audit_path).iloc[0]
+        for field in (
+            "n_id",
+            "n_val",
+            "n_test",
+            "pos_rate_val",
+            "pos_rate_test",
+            "overlap",
+            "class_balance_gap",
+        ):
+            if not np.isclose(float(audit[field]), float(v4_audit[field])):
+                raise ValueError(
+                    f"{path}: fixed-C ID-split audit differs on {field}"
+                )
 
     for path in shortcut:
         frame = pd.read_csv(path)
