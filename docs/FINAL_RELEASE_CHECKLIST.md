@@ -82,19 +82,31 @@ Check the logs:
   `10.5281/zenodo.21672470` resolves and the historical tag is immutable.
 - [x] Reserve DOI `10.5281/zenodo.21676563` for a new Zenodo v0.7.0 version derived from
   the public v0.6.0 record.
-- [ ] Commit and push the exact tested v0.7 source and generated PDFs.
-- [ ] Tag the exact v0.7 release commit; do not move or overwrite historical
+- [x] Commit and push the exact tested v0.7 source and generated PDFs.
+- [x] Tag merge commit `77ab11a1938b4fc4cd5021ec4d93d04cf603b8a9`
+  as `v0.7.0`; do not move or overwrite historical
   tags.
-- [ ] Create the GitHub v0.7.0 release from that tag.
-- [ ] Publish and inspect the Zenodo v0.7.0 file list.
-- [ ] Confirm that the manuscript DOI resolves to the exact submitted v0.7
+- [x] Create the GitHub v0.7.0 release from that tag:
+  <https://github.com/roberto-fernandez-barrios/kernel_shift_framework/releases/tag/v0.7.0>.
+- [x] Publish and inspect the Zenodo v0.7.0 file list:
+  <https://zenodo.org/records/21676563>.
+- [x] Confirm that DOI `10.5281/zenodo.21676563` resolves, is DataCite
+  `findable`, and identifies the exact submitted v0.7
   release.
-- [ ] Record SHA-256 checksums for the tagged source archive and both submitted
+- [x] Record SHA-256 checksums for the tagged source archive and both submitted
   PDFs.
 
-The corresponding author has explicitly approved pushing, tagging, creating,
-and publishing the required v0.7 release. Publication still requires the
-final artifact-identity check.
+Final SHA-256 identity:
+
+- main PDF: `a855ab2bbd52af6115ef1bead84501887dd3048894e09cf84e0ce02ead67fc63`;
+- Supplementary PDF:
+  `74d9c94eb949dcea7c365bcbcbf19deaa4ac972fc3f585eb064a3e9ce1661521`;
+- tagged source ZIP:
+  `c02c4a9309dddef5b1095daf879be0c3d91251ff22781c4e1d3f1aaddd927023`.
+
+The corresponding author explicitly approved pushing, tagging, creating, and
+publishing the v0.7 release. The final artifact-identity check passed on
+29 July 2026.
 
 ## Journal submission
 

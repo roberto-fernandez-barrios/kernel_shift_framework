@@ -152,10 +152,12 @@ Current status:
   inspected page by page;
 - authors approve the target, claims, and required releases.
 
-The immutable v0.6.0 DOI `10.5281/zenodo.21672470` is public and resolves to
-the tagged v0.6.0 artifact. Zenodo DOI `10.5281/zenodo.21676563` is reserved
-for the corrective v0.7.0 version derived from that record and is inserted in
-the final manuscript and release metadata.
+The immutable v0.6.0 DOI `10.5281/zenodo.21672470` remains public and resolves
+to the historical tagged artifact. Corrective release v0.7.0 is public at
+<https://github.com/roberto-fernandez-barrios/kernel_shift_framework/releases/tag/v0.7.0>
+and <https://doi.org/10.5281/zenodo.21676563>; the DOI resolves, is DataCite
+`findable`, and identifies the tagged source plus the inspected main and
+Supplementary PDFs.
 
 ## Submission stop/go
 
