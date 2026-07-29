@@ -1,4 +1,4 @@
-"""Regression tests for the v0.6.0 reviewer-driven corrections."""
+"""Regression tests for the v0.7.0 reviewer-driven corrections."""
 from __future__ import annotations
 
 import hashlib
@@ -18,6 +18,7 @@ from scripts.analysis.mechanism_robustness_v4 import (  # noqa: E402
 )
 from scripts.experiments.run_shots_mc_v6 import (  # noqa: E402
     matches_frozen_text_sha256,
+    nystrom_psd_extension,
     select_p1_winner,
     stable_measurement_seed,
 )
@@ -155,6 +156,32 @@ def test_p1_tie_break_matches_lexicographic_candidate_order():
     assert select_p1_winner(candidates).cfg == "pauli__svc__d12"
 
 
+def test_nystrom_extension_is_one_coherent_feature_map():
+    sampled = {
+        "train": np.array([[1.0, 1.2], [1.2, 1.0]]),
+        "id_val": np.array([[0.8, 0.3]]),
+        "id_test": np.array([[0.2, 0.7]]),
+        "ood_test": np.array([[0.9, 0.1], [0.4, 0.6]]),
+        "ood_square": np.array([[1.0, 0.2], [0.2, 1.0]]),
+    }
+    extended, audit = nystrom_psd_extension(sampled)
+    train_eigenvalues = np.linalg.eigvalsh(extended["train"])
+    ood_eigenvalues = np.linalg.eigvalsh(extended["ood_square"])
+    assert train_eigenvalues.min() >= -1e-12
+    assert ood_eigenvalues.min() >= -1e-12
+    assert audit["retained_rank"] == 1
+
+    values, vectors = np.linalg.eigh((sampled["train"] + sampled["train"].T) / 2)
+    keep = values > audit["eigenvalue_tolerance"]
+    train_features = vectors[:, keep] * np.sqrt(values[keep])
+    ood_features = (sampled["ood_test"] @ vectors[:, keep]) / np.sqrt(values[keep])
+    assert extended["train"] == pytest.approx(train_features @ train_features.T)
+    assert extended["ood_test"] == pytest.approx(
+        ood_features @ train_features.T
+    )
+    assert extended["ood_square"] == pytest.approx(ood_features @ ood_features.T)
+
+
 def test_corrected_confirmatory_endpoint_equals_specification_s10():
     root = Path(__file__).resolve().parents[1] / "results/v6"
     hierarchical = pd.read_csv(root / "inference/hierarchical_effects.csv")
@@ -178,3 +205,21 @@ def test_v6_reproduction_uses_confirmatory_budget_inputs():
     primary_command = REPRODUCE_V6_STAGES["analysis"][0]
     assert "results/v4/budget_confirmatory" in primary_command
     assert "results/v4/budget" not in primary_command
+
+
+def test_confirmatory_budget_is_60_in_all_16_cells():
+    root = Path(__file__).resolve().parents[1]
+    coverage = pd.read_csv(
+        root / "results/v4/budget_confirmatory/coverage.csv"
+    )
+    assert len(coverage) == 16
+    assert set(coverage.model) == {"svc", "gpc"}
+    assert coverage.groupby(["group", "model"]).size().eq(1).all()
+    assert (coverage.n_classical == 115).all()
+    assert (coverage.n_quantum == 60).all()
+    assert (coverage.budget == 60).all()
+
+
+def test_provisional_incomplete_budget_directory_is_absent():
+    root = Path(__file__).resolve().parents[1]
+    assert not (root / "results/v4/budget").exists()

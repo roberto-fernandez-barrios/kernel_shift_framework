@@ -13,7 +13,7 @@
 \renewcommand{\tablename}{Supplementary Table}
 \renewcommand{\figurename}{Supplementary Figure}
 \hypersetup{
-  pdftitle={Supplementary Information: Evaluation Choices Determine Apparent Quantum Kernel Robustness under Distribution Shift},
+  pdftitle={Supplementary Information: Evaluation Choices Shape Apparent Quantum Kernel Robustness under Distribution Shift},
   pdfauthor={Roberto Fernandez-Barrios, Iker Pastor-Lopez, Asier Gonzalez-Santocildes, Pablo Garcia Bringas},
   pdfsubject={Supplementary Information submitted to npj Quantum Information},
   pdfkeywords={quantum machine learning, quantum kernels, distribution shift, robustness},
@@ -21,7 +21,7 @@
 }
 
 \title{\textbf{Supplementary Information}\\[0.5em]
-Evaluation Choices Determine Apparent Quantum Kernel Robustness under Distribution Shift}
+Evaluation Choices Shape Apparent Quantum Kernel Robustness under Distribution Shift}
 \author{Roberto Fern\'andez-Barrios, Iker Pastor-L\'opez,\\
 Asier Gonz\'alez-Santocildes, and Pablo Garc\'ia Bringas\\[0.4em]
 \small Faculty of Engineering, University of Deusto, Bilbao, Spain}
@@ -56,7 +56,9 @@ quantum-minus-classical OOD balanced-accuracy effects. ``Oracle'' selects and
 evaluates on the same OOD test labels; ``ID-val'' uses a disjoint
 in-distribution validation split. SVC regularization is fixed at $C=1$ or
 selected by training-only cross-validation; this axis is not applicable to
-GPC. Values are descriptive fixed-case summaries.}
+GPC. S1--S4 use the legacy generation and S5--S10 use v4, so their boundary
+does not isolate the effect of regularization. Values are descriptive
+fixed-case summaries, not per-axis causal effects.}
 \label{supp:tab_specification}
 \scriptsize
 \setlength{\tabcolsep}{3pt}
@@ -256,6 +258,58 @@ Selection & Classifier & Classical reference & Q wins & Mean $\Delta$ & Median $
 \end{tabular}
 \end{table}
 
+\section*{Supplementary Results: Small-cluster interval sensitivity}
+\label{supp:intervals}
+
+Table~\ref{supp:tab_intervals} compares the primary conditional cluster-$t$
+interval with the prespecified BCa and leave-one-q-split diagnostics. The
+effective replication unit is five q-split clusters in every row. Differences
+between interval constructions do not change the qualitative fixed-case
+message, and an interval containing zero is not interpreted as equivalence.
+
+\begin{table}[ht]
+\centering
+\caption{Conditional uncertainty sensitivity for all primary equal-budget
+group--classifier cells. $\Delta$ is quantum minus classical OOD balanced
+accuracy. The cluster-$t$ and 9,999-draw BCa columns are intervals over the
+same five q-split cluster means ($n=5$); LOO is the range after leaving out
+one q-split cluster. All are conditional on the fixed benchmark pools and
+design, not intervals over a dataset population.}
+\label{supp:tab_intervals}
+\scriptsize
+\setlength{\tabcolsep}{3.0pt}
+\begin{tabular}{llrrrr}
+\toprule
+Scenario & Clf. & $\Delta$ & 95\% cluster-$t$ & 95\% BCa & LOO range \\
+\midrule
+\multirow{2}{*}{EMBER $m1$}
+ & GPC & $-0.0009$ & $[-0.0101,+0.0083]$ & $[-0.0062,+0.0054]$ & $[-0.0035,+0.0015]$ \\
+ & SVC & $-0.0058$ & $[-0.0340,+0.0223]$ & $[-0.0226,+0.0110]$ & $[-0.0120,+0.0014]$ \\
+\multirow{2}{*}{EMBER $m2$}
+ & GPC & $+0.0027$ & $[-0.0027,+0.0081]$ & $[-0.0015,+0.0053]$ & $[+0.0017,+0.0043]$ \\
+ & SVC & $-0.0064$ & $[-0.0137,+0.0009]$ & $[-0.0107,-0.0018]$ & $[-0.0081,-0.0049]$ \\
+\multirow{2}{*}{UNSW-DoS (campaign)}
+ & GPC & $-0.0057$ & $[-0.0120,+0.0005]$ & $[-0.0084,+0.0004]$ & $[-0.0078,-0.0046]$ \\
+ & SVC & $-0.0033$ & $[-0.0139,+0.0073]$ & $[-0.0101,+0.0029]$ & $[-0.0058,-0.0008]$ \\
+\multirow{2}{*}{UNSW-DoS (constructed)}
+ & GPC & $-0.0108$ & $[-0.0177,-0.0039]$ & $[-0.0141,-0.0054]$ & $[-0.0131,-0.0095]$ \\
+ & SVC & $-0.0044$ & $[-0.0119,+0.0031]$ & $[-0.0087,+0.0005]$ & $[-0.0067,-0.0026]$ \\
+\multirow{2}{*}{UNSW-Recon (campaign)}
+ & GPC & $+0.0052$ & $[-0.0019,+0.0123]$ & $[-0.0001,+0.0089]$ & $[+0.0038,+0.0072]$ \\
+ & SVC & $+0.0050$ & $[-0.0058,+0.0157]$ & $[+0.0006,+0.0131]$ & $[+0.0011,+0.0065]$ \\
+\multirow{2}{*}{UNSW-Recon (constructed)}
+ & GPC & $-0.0075$ & $[-0.0208,+0.0059]$ & $[-0.0162,+0.0006]$ & $[-0.0106,-0.0040]$ \\
+ & SVC & $-0.0089$ & $[-0.0146,-0.0031]$ & $[-0.0123,-0.0053]$ & $[-0.0102,-0.0076]$ \\
+\multirow{2}{*}{ToN-IoT (campaign)}
+ & GPC & $-0.0090$ & $[-0.0190,+0.0010]$ & $[-0.0166,-0.0034]$ & $[-0.0106,-0.0060]$ \\
+ & SVC & $-0.0148$ & $[-0.0268,-0.0029]$ & $[-0.0218,-0.0068]$ & $[-0.0180,-0.0129]$ \\
+\multirow{2}{*}{ToN-IoT (constructed)}
+ & GPC & $+0.0109$ & $[+0.0017,+0.0202]$ & $[+0.0060,+0.0178]$ & $[+0.0082,+0.0129]$ \\
+ & SVC & $-0.0011$ & $[-0.0049,+0.0028]$ & $[-0.0033,+0.0013]$ & $[-0.0019,-0.0003]$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section*{Supplementary Results: External fixed tasks}
 \label{supp:external}
 
@@ -294,14 +348,15 @@ descriptive; no population interval is implied.}
 \section*{Supplementary Results: Repeated finite-shot sensitivity}
 \label{supp:shots}
 
-Figure~\ref{supp:fig_shots} displays all 1,920 finite-shot evaluations:
+Figure~\ref{supp:fig_shots} displays all 2,880 finite-shot evaluations:
 eight fixed exact Gram matrices, four shot counts, 30 measurement replicates,
-and pre-/post-PSD conditions. The bands make the conditional Monte Carlo
+and three PSD-handling conditions. The bands make the conditional Monte Carlo
 spread visible rather than treating diversity across data configurations as
-measurement replication. PSD projection often narrows or shifts the
-distribution but does not impose a uniform direction. Exact-statevector OOD
-accuracy is approached unevenly because each sampled training matrix
-reselects a discrete SVC $C$.
+measurement replication. The independent-square heuristic and coherent
+train-based Nystr{\"o}m extension often narrow or shift the distribution but
+do not impose a uniform direction. Exact-statevector OOD accuracy is
+approached unevenly because each sampled training matrix reselects a discrete
+SVC $C$.
 
 \begin{figure}[ht]
 \centering
@@ -310,22 +365,26 @@ reselects a discrete SVC $C$.
 endpoint. Panels show one fixed scenario-group Gram matrix. Lines are medians
 over 30 independently seeded measurement replicates and shaded regions are
 central 95\% Monte Carlo intervals ($n=30$) conditional on that matrix.
-Orange squares use the sampled indefinite matrix; blue circles use its PSD
-projection. The model includes fidelity sampling only, not device noise.}
+Orange squares use the sampled indefinite matrix; blue circles use independent
+PSD projections of train and OOD squares while leaving rectangular blocks
+unchanged; green triangles use the coherent train-eigenspace Nystr{\"o}m
+extension. The model includes fidelity sampling only, not device noise.}
 \label{supp:fig_shots}
 \end{figure}
 
 Across the eight group medians, the perturbed/exact effective-rank ratio
-declines from 1.93 at 128 shots to 1.13 at 8,192 shots. The across-group median
-OOD-alignment change remains within 0.0007 of zero. Separate train and
-OOD-square Frobenius changes due to sampling and projection, negative-spectrum
+declines from 1.93 at 128 shots to 1.13 at 8,192 shots. OOD-KTA under the
+Nystr{\"o}m extension is estimator-dependent because its OOD square is derived
+from OOD--train features rather than independently sampled; it is not treated
+as a mechanism or compared directly with the other KTA estimators. Retained
+rank, eigenvalue tolerance, blockwise Frobenius changes, negative-spectrum
 fractions, selected $C$, and every replicate endpoint are provided in
 \texttt{results/v6/shots\_mc/}.
 
 \section*{Supplementary Results: Machine-readable result map}
 \label{supp:artifact}
 
-The canonical v0.6.0 release gates are
+The canonical v0.7.0 release gates are
 \begin{verbatim}
 python scripts/analysis/validate_v6_artifacts.py
 pytest tests -q
@@ -335,8 +394,8 @@ finite-shot outputs are under \texttt{results/v6/}; frozen legacy/v4/v5
 artifacts remain unchanged. The development repository is
 \url{https://github.com/roberto-fernandez-barrios/kernel_shift_framework},
 and the concept archive is
-\url{https://doi.org/10.5281/zenodo.19147649}. The exact v0.6.0 submission
-artifact is identified by the reserved immutable version DOI
-\url{https://doi.org/10.5281/zenodo.21672470}.
+\url{https://doi.org/10.5281/zenodo.19147649}. The exact v0.7.0 submission
+artifact is identified by the immutable version DOI
+\url{https://doi.org/10.5281/zenodo.21676563}.
 
 \end{document}

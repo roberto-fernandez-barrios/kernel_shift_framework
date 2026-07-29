@@ -33,11 +33,10 @@ def headline_table() -> str:
     """Per-group P1' OOD deltas under no-OOD-label selection.
 
     The primary extended-family comparison comes from the frozen equal-budget
-    analysis (``budget60`` means B=60 in the full-coverage groups and B=20 in
-    the reduced-coverage groups).  The full-pool extended comparison remains
-    in the machine-readable results as a secondary sensitivity.  Keeping
-    these inputs separate prevents the full-pool 115-vs-60 result from being
-    mislabeled as budget matched.
+    analysis (``budget60`` means B=60 in every group--classifier cell). The
+    full-pool extended comparison remains in the machine-readable results as
+    a secondary sensitivity. Keeping these inputs separate prevents the
+    full-pool 115-vs-60 result from being mislabeled as budget matched.
     """
     g = pd.read_csv("results/v4/family_comparison/group_summary.csv").set_index(["group", "model"])
     budget = pd.read_csv("results/v4/inference_confirmatory/hierarchical_effects.csv")

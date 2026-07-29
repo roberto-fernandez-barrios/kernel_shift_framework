@@ -100,7 +100,11 @@ def bca_ci(T: np.ndarray, rng: np.random.Generator,
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--p1-dir", type=Path, default=Path("results/v4/budget"))
+    ap.add_argument(
+        "--p1-dir",
+        type=Path,
+        default=Path("results/v4/budget_confirmatory"),
+    )
     ap.add_argument("--variants", nargs="+", default=["full", "matched60", "budget60"])
     ap.add_argument("--out-dir", type=Path, default=Path("results/v4/inference"))
     ap.add_argument("--seed", type=int, default=BCA_SEED)

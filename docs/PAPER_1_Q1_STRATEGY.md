@@ -1,6 +1,6 @@
 # Paper 1: Q1 completion and submission strategy
 
-Status: npj-first major revision implemented and validated, 29 July 2026.
+Status: npj-first v0.7 reviewer revision in progress, 29 July 2026.
 
 ## Target and positioning
 
@@ -75,9 +75,16 @@ one source dataset, not independent datasets.
   with-replacement reuse, rank discrepancy, alternative calipers, and
   one-to-one matching. Its interpretation is observational.
 - Finite-shot analysis uses 30 independent measurement seeds for each of eight
-  fixed exact Gram matrices, four shot counts, and both pre- and post-PSD
-  conditions (1,920 evaluations). It remains conditional and does not simulate
-  hardware.
+  fixed exact Gram matrices and four shot counts under three conditions:
+  unprojected, independent-square PSD, and a coherent train-eigenspace
+  Nyström extension (2,880 evaluations). It remains conditional and does not
+  simulate hardware.
+- The primary matched budget is 60 candidates per family in all eight
+  scenario-groups and both classifiers; the obsolete incomplete-coverage
+  output has been removed from the submission artifact.
+- The specification curve is explicitly descriptive. Its S4--S5 boundary is
+  generation-confounded and is not used to attribute an isolated causal
+  effect to regularization.
 - External College Scorecard, diabetes readmission, and ACS income shifts
   corroborate protocol sensitivity under a prospectively frozen design.
 - All reproducibility-critical Methods are in the main manuscript;
@@ -95,8 +102,8 @@ estimand:
 > prospective external corroboration.
 
 The paper should never rely on “quantum kernels lose” as its novelty claim.
-Its contribution is showing which evaluation choices manufacture, contract,
-or reverse an apparent advantage and providing a reproducible audit design.
+Its contribution is showing how the apparent advantage changes across
+evaluation bundles and providing a reproducible audit design.
 
 ## Claims to avoid
 
@@ -112,12 +119,13 @@ or reverse an apparent advantage and providing a reproducible audit design.
 
 ## Current submission package
 
-- Main Article PDF: 41 referee-format pages, 10-word title, 135-word abstract.
-- Supplementary Information PDF: 5 pages, with no Supplementary Methods.
+- Main Article source: 10-word title and an abstract within the 150-word
+  Article limit.
+- Supplementary Information contains no Supplementary Methods.
 - Concise collection-specific cover letter with the exact v0.5.0 prior-artifact
   identifier and overlap statement.
-- Sequential numeric bibliography with the published EPJ Quantum Technology
-  reference and concurrent 2026 benchmark.
+- Sequential numeric `sn-nature` bibliography with the published EPJ Quantum
+  Technology reference and concurrent 2026 benchmark.
 - Public code, frozen manifests, complete aggregated results, tests, and
   deterministic reporting scripts.
 - Data, code, competing-interest, author-contribution, funding, and
@@ -137,20 +145,17 @@ python -m pytest tests -q
 
 Current status:
 
-- 66/66 local tests pass;
-- all v0.6.0 artifact gates pass;
-- CI passes on Python 3.11 and 3.12;
-- main and Supplementary PDFs contain no overfull boxes, unresolved
-  references, or unresolved citations;
-- every page has been rendered and visually inspected;
+- the full v0.7 reproduction and artifact gates pass;
+- the complete test suite passes (69/69);
+- the final main (43 pages) and Supplementary (6 pages) PDFs compile without
+  undefined citations, undefined references, or overfull boxes and have been
+  inspected page by page;
 - authors approve the target, claims, and required releases.
 
-The immutable v0.6.0 DOI `10.5281/zenodo.21672470` is reserved in a manual
-new-version Zenodo draft derived from v0.5.0 and inserted consistently in the
-manuscript, Supplementary Information, README, `CITATION.cff`, and cover
-letter. The remaining release gate is to rebuild, repeat the complete visual
-and automated checks, tag the exact commit, and verify the deposited files
-before publishing the draft.
+The immutable v0.6.0 DOI `10.5281/zenodo.21672470` is public and resolves to
+the tagged v0.6.0 artifact. Zenodo DOI `10.5281/zenodo.21676563` is reserved
+for the corrective v0.7.0 version derived from that record and is inserted in
+the final manuscript and release metadata.
 
 ## Submission stop/go
 
@@ -158,7 +163,7 @@ Submit only when:
 
 1. the reserved DOI resolves to the exact tagged source and submitted PDFs;
 2. GitHub, Zenodo, citation metadata, manuscript, and Supplementary
-   Information identify v0.6.0 consistently;
+   Information identify v0.7.0 consistently;
 3. the Collection and Article type are selected in the portal;
 4. the current APC route or institutional agreement is confirmed;
 5. suggested reviewers and conflicts are checked by the authors;
