@@ -72,7 +72,7 @@ Check the logs:
 - [x] Confirm the code and artifact rights holder and approval of the
   BSD-3-Clause licence; see `docs/LEGAL_RELEASE_NOTE.md`.
 - [x] Confirm third-party dataset redistribution boundaries.
-- [ ] Insert the reserved immutable v0.6.0 DOI in `CITATION.cff`, README, the
+- [x] Insert the reserved immutable v0.6.0 DOI in `CITATION.cff`, README, the
   main manuscript, Supplementary Information, and cover letter.
 
 ## Archive and public repository

@@ -145,10 +145,12 @@ Current status:
 - every page has been rendered and visually inspected;
 - authors approve the target, claims, and required releases.
 
-The remaining release gate is the immutable v0.6.0 DOI. Reserve it in a manual
-new-version Zenodo draft derived from v0.5.0, insert it consistently in the
+The immutable v0.6.0 DOI `10.5281/zenodo.21672470` is reserved in a manual
+new-version Zenodo draft derived from v0.5.0 and inserted consistently in the
 manuscript, Supplementary Information, README, `CITATION.cff`, and cover
-letter, then rebuild and repeat the complete visual and automated checks.
+letter. The remaining release gate is to rebuild, repeat the complete visual
+and automated checks, tag the exact commit, and verify the deposited files
+before publishing the draft.
 
 ## Submission stop/go
 

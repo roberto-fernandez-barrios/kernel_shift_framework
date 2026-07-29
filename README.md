@@ -78,7 +78,7 @@ The reproduction commands deliberately do not rerun the expensive experiment gri
 
 ## Manuscript and citation
 
-The main manuscript and Supplementary Information live in [`manuscript/`](manuscript/) (Springer Nature-compatible main source plus a standalone Supplementary file). If you use this software, please cite it via [`CITATION.cff`](CITATION.cff) (Zenodo DOI: [10.5281/zenodo.19147649](https://doi.org/10.5281/zenodo.19147649)).
+The main manuscript and Supplementary Information live in [`manuscript/`](manuscript/) (Springer Nature-compatible main source plus a standalone Supplementary file). If you use this software, please cite it via [`CITATION.cff`](CITATION.cff) (immutable v0.6.0 DOI: [10.5281/zenodo.21672470](https://doi.org/10.5281/zenodo.21672470); all-version concept DOI: [10.5281/zenodo.19147649](https://doi.org/10.5281/zenodo.19147649)).
 
 ## License
 
