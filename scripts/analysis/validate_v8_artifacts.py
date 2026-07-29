@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import itertools
 import json
 import re
 from pathlib import Path
@@ -155,6 +156,32 @@ def validate_analysis_outputs(root: Path) -> None:
         "budget_mode",
     }:
         raise ValueError("factorial mean axis contrasts are incomplete")
+
+    interactions = _read(root, "factorial_pairwise_interactions.csv")
+    interaction_means = interactions[
+        interactions.interaction_scope
+        == "mean_over_remaining_factorial_axes"
+    ]
+    if len(interactions) != 30 or len(interaction_means) != 6:
+        raise ValueError("factorial pairwise-interaction coverage mismatch")
+    observed_pairs = {
+        frozenset((row.axis_a, row.axis_b))
+        for row in interaction_means.itertuples()
+    }
+    expected_pairs = {
+        frozenset(pair)
+        for pair in itertools.combinations(
+            (
+                "regularization",
+                "selection",
+                "reference",
+                "budget_mode",
+            ),
+            2,
+        )
+    }
+    if observed_pairs != expected_pairs:
+        raise ValueError("factorial pairwise interactions are incomplete")
 
     shortcut = _read(root, "shortcut_ablation_group_effects.csv")
     if len(shortcut) != 6 or set(shortcut.group) != EXPECTED_NETWORK_GROUPS:

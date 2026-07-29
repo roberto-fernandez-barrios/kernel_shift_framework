@@ -19,6 +19,7 @@ from scripts.analysis.circuit_resources_v8 import (  # noqa: E402
 )
 from scripts.analysis.reviewer_revision_v8 import (  # noqa: E402
     factorial_axis_contrasts,
+    factorial_pairwise_interactions,
     stable_rng,
 )
 from src.experiments.ember.extended.run_classical_extensions import (  # noqa: E402
@@ -199,3 +200,39 @@ def test_factorial_contrasts_are_paired_over_other_axes():
     assert means.loc["reference", "paired_change"] == pytest.approx(4)
     assert means.loc["budget_mode", "paired_change"] == pytest.approx(8)
 
+
+def test_factorial_pairwise_interaction_recovers_known_term():
+    rows = []
+    for regularization in ("fixed_c1", "train_cv"):
+        for selection in ("ood_test", "id_val"):
+            for reference in ("customary", "extended"):
+                for budget_mode in ("native", "equal_count"):
+                    regularized = regularization == "train_cv"
+                    id_selected = selection == "id_val"
+                    effect = (
+                        int(regularized)
+                        + 2 * int(id_selected)
+                        + 4 * int(reference == "extended")
+                        + 8 * int(budget_mode == "equal_count")
+                        + 3 * int(regularized and id_selected)
+                    )
+                    rows.append({
+                        "regularization": regularization,
+                        "selection": selection,
+                        "reference": reference,
+                        "budget_mode": budget_mode,
+                        "dataset_equal_effect": effect,
+                    })
+    interactions = factorial_pairwise_interactions(pd.DataFrame(rows))
+    means = interactions[
+        interactions.interaction_scope
+        == "mean_over_remaining_factorial_axes"
+    ]
+    by_pair = {
+        frozenset((row.axis_a, row.axis_b)): row.difference_in_differences
+        for row in means.itertuples()
+    }
+    assert by_pair[frozenset(("regularization", "selection"))] == pytest.approx(3)
+    for pair, value in by_pair.items():
+        if pair != frozenset(("regularization", "selection")):
+            assert value == pytest.approx(0)

@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import itertools
 import re
 import sys
 from pathlib import Path
@@ -392,6 +393,62 @@ def factorial_axis_contrasts(summary: pd.DataFrame) -> pd.DataFrame:
     return pd.concat([output, means], ignore_index=True, sort=False)
 
 
+def factorial_pairwise_interactions(summary: pd.DataFrame) -> pd.DataFrame:
+    axes = {
+        "regularization": ("fixed_c1", "train_cv"),
+        "selection": ("ood_test", "id_val"),
+        "reference": ("customary", "extended"),
+        "budget_mode": ("native", "equal_count"),
+    }
+    rows = []
+    for axis_a, axis_b in itertools.combinations(axes, 2):
+        a_from, a_to = axes[axis_a]
+        b_from, b_to = axes[axis_b]
+        other = [
+            column for column in axes if column not in {axis_a, axis_b}
+        ]
+        wide = summary.pivot_table(
+            index=other,
+            columns=[axis_a, axis_b],
+            values="dataset_equal_effect",
+        ).reset_index()
+        for _, row in wide.iterrows():
+            interaction = (
+                row[(a_to, b_to)]
+                - row[(a_from, b_to)]
+                - row[(a_to, b_from)]
+                + row[(a_from, b_from)]
+            )
+            rows.append({
+                "axis_a": axis_a,
+                "axis_a_from": a_from,
+                "axis_a_to": a_to,
+                "axis_b": axis_b,
+                "axis_b_from": b_from,
+                "axis_b_to": b_to,
+                **{column: row[column] for column in other},
+                "difference_in_differences": interaction,
+                "interaction_scope": "individual_paired_cell",
+            })
+    output = pd.DataFrame(rows)
+    means = (
+        output.groupby(
+            [
+                "axis_a",
+                "axis_a_from",
+                "axis_a_to",
+                "axis_b",
+                "axis_b_from",
+                "axis_b_to",
+            ],
+            as_index=False,
+        )
+        .difference_in_differences.mean()
+    )
+    means["interaction_scope"] = "mean_over_remaining_factorial_axes"
+    return pd.concat([output, means], ignore_index=True, sort=False)
+
+
 def make_factorial_outputs(
     v4: pd.DataFrame,
     fixed: pd.DataFrame,
@@ -424,11 +481,16 @@ def make_factorial_outputs(
     groups, clusters = aggregate_fixed_groups(runs, identifiers)
     summary = dataset_equal_summary(groups, identifiers)
     contrasts = factorial_axis_contrasts(summary)
+    interactions = factorial_pairwise_interactions(summary)
     runs.to_csv(output_dir / "factorial_run_effects.csv", index=False)
     groups.to_csv(output_dir / "factorial_group_effects.csv", index=False)
     clusters.to_csv(output_dir / "factorial_cluster_effects.csv", index=False)
     summary.to_csv(output_dir / "factorial_summary.csv", index=False)
     contrasts.to_csv(output_dir / "factorial_axis_contrasts.csv", index=False)
+    interactions.to_csv(
+        output_dir / "factorial_pairwise_interactions.csv",
+        index=False,
+    )
 
 
 def primary_endpoints_for_runs(
