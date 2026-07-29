@@ -288,7 +288,7 @@ The primary \texttt{kernel\_blocked} scheme samples 12 whole classical kernel-sh
 \subsection{The quantum pool mixes entangling and product kernels}
 \label{sec:res_circuits}
 
-Circuit decomposition changes the interpretation of the aggregate family. The two ZZFeatureMap variants contain all-to-all two-qubit Pauli interactions, whereas the Pauli-X/Z and ZFeatureMap variants contain only one-qubit Pauli strings. For the latter pair, the prepared state and its fidelity kernel factorize over coordinates (Methods). Thus two of the four map families are quantum-generated implementations of product kernels and cannot supply evidence that entanglement is responsible for their behaviour.
+Circuit decomposition changes the interpretation of the aggregate family. The two ZZFeatureMap variants contain all-to-all two-qubit Pauli interactions, whereas the Pauli-X/Z and ZFeatureMap variants contain only one-qubit Pauli strings. For the latter pair, the prepared state and its fidelity kernel factorize over coordinates (Methods), permitting direct classical evaluation as a product of one-qubit overlaps. Thus two of the four map families cannot supply evidence that entanglement or hard quantum kernel estimation is responsible for their behaviour.
 
 Table~\ref{tab:circuits} reports logical, unrouted resource counts. At 12 qubits, one ZZFeatureMap state preparation requires 132 CX gates for one repetition and 264 for two; the corresponding compute--uncompute fidelity templates require 264 and 528 CX gates. Both product-map templates require zero CX gates at every studied dimension. Under P1$'$ selection, product maps supply 594/1,080 (55.0\%) of the selected quantum SVC configurations and 348/1,080 (32.2\%) of the GP selections. The composition alone does not compare predictive quality; the matched stratum analysis below does so at 30 candidates per stratum.
 
@@ -479,7 +479,7 @@ U(x)=\bigotimes_{j=1}^{d}U_j(x_j),\qquad
 K_Q(x,x')=\prod_{j=1}^{d}
 \left|\langle\phi_j(x_j)\mid\phi_j(x'_j)\rangle\right|^2,
 \]
-so the constructor argument \texttt{entanglement="full"} stored for the Pauli-X/Z map has no effect without a multiqubit Pauli string. We call these the entangling-ZZ and separable-product strata. Each map uses angle scales $\{0.5,1,2\}$ and all five dimensions, giving 60 candidates (30 per stratum) at 4--12 simulated qubits. Classical bandwidth and quantum angle-scale freedom both control locality \cite{shaydulin2022bandwidth,canatar2023bandwidth}; no circuit is trained.
+so the constructor argument \texttt{entanglement="full"} stored for the Pauli-X/Z map has no effect without a multiqubit Pauli string. The product can be evaluated classically in $O(d)$ one-qubit-overlap calculations. We call these the entangling-ZZ and separable-product strata. Each map uses angle scales $\{0.5,1,2\}$ and all five dimensions, giving 60 candidates (30 per stratum) at 4--12 simulated qubits. Classical bandwidth and quantum angle-scale freedom both control locality \cite{shaydulin2022bandwidth,canatar2023bandwidth}; no circuit is trained.
 
 \subsection{Circuit and sampling-resource audit}
 
