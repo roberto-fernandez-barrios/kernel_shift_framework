@@ -1,9 +1,10 @@
-"""Run the frozen v0.6.0 repeated finite-shot sensitivity.
+"""Run the frozen repeated finite-shot sensitivity and v0.7 PSD extension.
 
 One exact P1'-selected quantum SVC configuration is fixed for each of the
 eight security scenario-groups. Each fidelity block is independently sampled
 at four shot counts for 30 stable SHA-256-derived measurement replicates.
-Both the sampled indefinite Gram matrix and its PSD projection are evaluated.
+The sampled indefinite Gram, the v0.6 independent-square PSD heuristic, and a
+v0.7 train-eigenspace Nyström extension are evaluated.
 
 This is a conditional measurement-sampling Monte Carlo experiment, not a
 hardware or device-noise simulation.
@@ -44,7 +45,11 @@ from src.experiments.ember.quantum.run_ember_quantum_kernel_sparsity_shift_qspli
 
 SHOTS = (128, 512, 2048, 8192)
 N_REPLICATES = 30
-PROJECTION_CONDITIONS = ("pre_psd", "post_psd")
+PROJECTION_CONDITIONS = (
+    "pre_psd",
+    "independent_square_psd",
+    "nystrom_psd",
+)
 
 
 @dataclass(frozen=True)
@@ -167,6 +172,70 @@ def centered_kta_fast(K: np.ndarray, y: np.ndarray) -> float:
     numerator = float(labels @ centered @ labels)
     denominator = float(len(labels) * np.linalg.norm(centered, "fro"))
     return numerator / max(denominator, 1e-12)
+
+
+def nystrom_psd_extension(
+    sampled_blocks: dict[str, np.ndarray],
+) -> tuple[dict[str, np.ndarray], dict[str, float]]:
+    """Extend the positive train eigenspace coherently out of sample.
+
+    The independently sampled train Gram defines a finite-dimensional feature
+    map. Rectangular evaluation-vs-train blocks are projected through that
+    map, and the OOD square Gram is reconstructed from the same OOD features.
+    """
+    train = np.asarray(sampled_blocks["train"], dtype=np.float64)
+    train = (train + train.T) / 2.0
+    eigenvalues, eigenvectors = np.linalg.eigh(train)
+    scale = max(1.0, float(np.max(np.abs(eigenvalues))))
+    tolerance = max(
+        1e-12,
+        float(np.finfo(np.float64).eps * train.shape[0] * scale),
+    )
+    retained = eigenvalues > tolerance
+    if not np.any(retained):
+        raise ValueError("sampled train Gram has no positive Nyström eigenspace")
+
+    values = eigenvalues[retained]
+    vectors = eigenvectors[:, retained]
+    train_features = vectors * np.sqrt(values)
+    projected_train = train_features @ train_features.T
+    projected_train = (projected_train + projected_train.T) / 2.0
+
+    output: dict[str, np.ndarray] = {"train": projected_train}
+    feature_blocks: dict[str, np.ndarray] = {}
+    inverse_sqrt = 1.0 / np.sqrt(values)
+    for split in ("id_val", "id_test", "ood_test"):
+        cross = np.asarray(sampled_blocks[split], dtype=np.float64)
+        features = (cross @ vectors) * inverse_sqrt
+        feature_blocks[split] = features
+        output[split] = features @ train_features.T
+
+    ood_features = feature_blocks["ood_test"]
+    output["ood_square"] = ood_features @ ood_features.T
+    output["ood_square"] = (output["ood_square"] + output["ood_square"].T) / 2.0
+
+    audit = {
+        "eigenvalue_tolerance": tolerance,
+        "retained_rank": int(retained.sum()),
+        "train_fro_change_from_sampled": float(
+            np.linalg.norm(output["train"] - sampled_blocks["train"], "fro")
+        ),
+        "id_val_fro_change_from_sampled": float(
+            np.linalg.norm(output["id_val"] - sampled_blocks["id_val"], "fro")
+        ),
+        "id_test_fro_change_from_sampled": float(
+            np.linalg.norm(output["id_test"] - sampled_blocks["id_test"], "fro")
+        ),
+        "ood_test_fro_change_from_sampled": float(
+            np.linalg.norm(output["ood_test"] - sampled_blocks["ood_test"], "fro")
+        ),
+        "ood_square_fro_change_from_sampled": float(
+            np.linalg.norm(
+                output["ood_square"] - sampled_blocks["ood_square"], "fro"
+            )
+        ),
+    }
+    return output, audit
 
 
 def evaluate_svc(
@@ -351,9 +420,11 @@ def run_one(fixed: FixedRun, result_dir: Path, out_dir: Path, force: bool) -> Pa
                 )
                 sampled[block], projected[block], audits[block] = pre, post, audit
 
+            nystrom, nystrom_audit = nystrom_psd_extension(sampled)
             for condition, condition_blocks in (
                 ("pre_psd", sampled),
-                ("post_psd", projected),
+                ("independent_square_psd", projected),
+                ("nystrom_psd", nystrom),
             ):
                 selected_c, cv_score, scores = evaluate_svc(
                     condition_blocks["train"],
@@ -433,6 +504,51 @@ def run_one(fixed: FixedRun, result_dir: Path, out_dir: Path, force: bool) -> Pa
                     "ood_fro_change_projection": audits["ood_square"][
                         "fro_change_projection"
                     ],
+                    "condition_train_fro_change_from_sampled": (
+                        0.0
+                        if condition == "pre_psd"
+                        else (
+                            audits["train"]["fro_change_projection"]
+                            if condition == "independent_square_psd"
+                            else nystrom_audit["train_fro_change_from_sampled"]
+                        )
+                    ),
+                    "condition_id_val_fro_change_from_sampled": (
+                        0.0
+                        if condition != "nystrom_psd"
+                        else nystrom_audit["id_val_fro_change_from_sampled"]
+                    ),
+                    "condition_id_test_fro_change_from_sampled": (
+                        0.0
+                        if condition != "nystrom_psd"
+                        else nystrom_audit["id_test_fro_change_from_sampled"]
+                    ),
+                    "condition_ood_test_fro_change_from_sampled": (
+                        0.0
+                        if condition != "nystrom_psd"
+                        else nystrom_audit["ood_test_fro_change_from_sampled"]
+                    ),
+                    "condition_ood_square_fro_change_from_sampled": (
+                        0.0
+                        if condition == "pre_psd"
+                        else (
+                            audits["ood_square"]["fro_change_projection"]
+                            if condition == "independent_square_psd"
+                            else nystrom_audit[
+                                "ood_square_fro_change_from_sampled"
+                            ]
+                        )
+                    ),
+                    "nystrom_retained_rank": (
+                        nystrom_audit["retained_rank"]
+                        if condition == "nystrom_psd"
+                        else np.nan
+                    ),
+                    "nystrom_eigenvalue_tolerance": (
+                        nystrom_audit["eigenvalue_tolerance"]
+                        if condition == "nystrom_psd"
+                        else np.nan
+                    ),
                     "stable_seed_train": stable_measurement_seed(
                         fixed.run,
                         fixed.kernel,
