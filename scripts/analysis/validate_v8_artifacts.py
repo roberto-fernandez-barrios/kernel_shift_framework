@@ -370,6 +370,20 @@ def validate_resource_outputs(root: Path) -> None:
         raise ValueError("finite-shot fidelity count mismatch")
     if levels.hardware_executed.astype(bool).any():
         raise ValueError("resource sensitivity must not claim hardware execution")
+    if (
+        not (levels.n_entangling_fixed_cases == 4).all()
+        or not (levels.n_product_fixed_cases == 4).all()
+    ):
+        raise ValueError("finite-shot circuit strata must contain four cases each")
+    if not levels.product_factorization_can_bypass_circuit_sampling.astype(
+        bool
+    ).all():
+        raise ValueError("product-map classical bypass is not documented")
+    if not np.allclose(
+        levels.projected_shots_entangling_cases_only,
+        levels.projected_shots_full_sensitivity / 2,
+    ):
+        raise ValueError("entangling-only shot projection mismatch")
 
 
 def main() -> None:

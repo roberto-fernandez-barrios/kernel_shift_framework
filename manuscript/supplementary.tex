@@ -528,23 +528,26 @@ fractions, selected $C$, and every replicate endpoint are provided in
 \centering
 \caption{Projected sampling resources for the repeated finite-shot
 sensitivity. One case--replicate contains 1,624,250 distinct fidelity
-parameterizations. ``Full sensitivity'' multiplies one shot level by eight
-fixed cases and 30 measurement replicates. The three PSD conditions reuse
-these measurements. Counts exclude device routing, calibration, mitigation,
-queueing, and repeated-job overhead; no hardware execution was performed.}
+parameterizations. ``All eight'' multiplies one shot level by eight fixed
+cases and 30 measurement replicates; ``entangling four'' retains only the four
+selected ZZ cases. The other four selected configurations are
+separable-product maps whose direct classical factorization can bypass circuit
+sampling. The three PSD conditions reuse these measurements. Counts exclude
+device routing, calibration, mitigation, queueing, and repeated-job overhead;
+no hardware execution was performed.}
 \label{supp:tab_shot_resources}
 \scriptsize
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{rrrr}
+\begin{tabular}{rrrrr}
 \toprule
-Shots/fidelity & Shots/case--replicate & Parameterizations/full sensitivity & Shots/full sensitivity \\
+Shots/fidelity & Shots/case--replicate & Parameters/all eight & Shots/all eight & Shots/entangling four \\
 \midrule
-128   & 207,904,000    & 389,820,000 & 49,896,960,000 \\
-512   & 831,616,000    & 389,820,000 & 199,587,840,000 \\
-2,048 & 3,326,464,000  & 389,820,000 & 798,351,360,000 \\
-8,192 & 13,305,856,000 & 389,820,000 & 3,193,405,440,000 \\
+128   & 207,904,000    & 389,820,000 & 49,896,960,000 & 24,948,480,000 \\
+512   & 831,616,000    & 389,820,000 & 199,587,840,000 & 99,793,920,000 \\
+2,048 & 3,326,464,000  & 389,820,000 & 798,351,360,000 & 399,175,680,000 \\
+8,192 & 13,305,856,000 & 389,820,000 & 3,193,405,440,000 & 1,596,702,720,000 \\
 \midrule
-All four & 17,671,840,000 & 1,559,280,000 & 4,241,241,600,000 \\
+All four & 17,671,840,000 & 1,559,280,000 & 4,241,241,600,000 & 2,120,620,800,000 \\
 \bottomrule
 \end{tabular}
 \end{table}

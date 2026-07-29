@@ -18,6 +18,7 @@ BASIS = ("rz", "sx", "x", "cx")
 OPTIMIZATION_LEVEL = 0
 N_MEASUREMENT_REPLICATES = 30
 N_FIXED_CASES = 8
+N_ENTANGLING_FIXED_CASES = 4
 
 
 def feature_maps(dimension: int):
@@ -146,6 +147,10 @@ def shot_resource_table() -> pd.DataFrame:
             "distinct_circuit_parameterizations_per_case_replicate": estimates,
             "total_shots_per_case_replicate": estimates * shots,
             "n_fixed_cases": N_FIXED_CASES,
+            "n_entangling_fixed_cases": N_ENTANGLING_FIXED_CASES,
+            "n_product_fixed_cases": (
+                N_FIXED_CASES - N_ENTANGLING_FIXED_CASES
+            ),
             "n_measurement_replicates": N_MEASUREMENT_REPLICATES,
             "projected_distinct_circuit_parameterizations_full_sensitivity": (
                 estimates * N_FIXED_CASES * N_MEASUREMENT_REPLICATES
@@ -156,6 +161,13 @@ def shot_resource_table() -> pd.DataFrame:
                 * N_FIXED_CASES
                 * N_MEASUREMENT_REPLICATES
             ),
+            "projected_shots_entangling_cases_only": (
+                estimates
+                * shots
+                * N_ENTANGLING_FIXED_CASES
+                * N_MEASUREMENT_REPLICATES
+            ),
+            "product_factorization_can_bypass_circuit_sampling": True,
             "projection_conditions_reuse_same_measurements": True,
             "hardware_executed": False,
         })
@@ -171,6 +183,10 @@ def shot_resource_table() -> pd.DataFrame:
         ),
         "total_shots_per_case_replicate": estimates * sum(SHOTS),
         "n_fixed_cases": N_FIXED_CASES,
+        "n_entangling_fixed_cases": N_ENTANGLING_FIXED_CASES,
+        "n_product_fixed_cases": (
+            N_FIXED_CASES - N_ENTANGLING_FIXED_CASES
+        ),
         "n_measurement_replicates": N_MEASUREMENT_REPLICATES,
         "projected_distinct_circuit_parameterizations_full_sensitivity": (
             estimates
@@ -184,6 +200,13 @@ def shot_resource_table() -> pd.DataFrame:
             * N_FIXED_CASES
             * N_MEASUREMENT_REPLICATES
         ),
+        "projected_shots_entangling_cases_only": (
+            estimates
+            * sum(SHOTS)
+            * N_ENTANGLING_FIXED_CASES
+            * N_MEASUREMENT_REPLICATES
+        ),
+        "product_factorization_can_bypass_circuit_sampling": True,
         "projection_conditions_reuse_same_measurements": True,
         "hardware_executed": False,
     }
