@@ -226,6 +226,26 @@ def validate_analysis_outputs(root: Path) -> None:
         or int(shortcut_summary.iloc[0].n_source_datasets) != 2
     ):
         raise ValueError("shortcut-ablation summary mismatch")
+    shortcut_row = shortcut_summary.iloc[0]
+    for column in (
+        "original_effect",
+        "ablated_effect",
+        "ablation_change",
+    ):
+        if not np.isclose(
+            shortcut_row[column],
+            shortcut_datasets[column].mean(),
+            atol=1e-12,
+        ):
+            raise ValueError(
+                f"shortcut-ablation source-equal {column} mismatch"
+            )
+    if not np.isclose(
+        shortcut_row.ablated_effect - shortcut_row.original_effect,
+        shortcut_row.ablation_change,
+        atol=1e-12,
+    ):
+        raise ValueError("shortcut-ablation paired change is inconsistent")
     shortcut_runs = _read(root, "shortcut_ablation_run_effects.csv")
     shortcut_clusters = _read(root, "shortcut_ablation_cluster_effects.csv")
     shortcut_changes = _read(root, "shortcut_ablation_change_clusters.csv")
