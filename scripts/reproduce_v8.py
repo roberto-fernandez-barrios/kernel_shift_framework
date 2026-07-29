@@ -32,6 +32,7 @@ STAGES = {
     ],
     "report": [
         ["-m", "scripts.reporting.make_v8_figures"],
+        ["-m", "scripts.reporting.make_v8_tables"],
     ],
     "audit": [
         ["-m", "scripts.analysis.validate_v6_artifacts"],
