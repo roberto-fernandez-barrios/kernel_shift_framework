@@ -82,6 +82,9 @@ def test_finite_shot_resource_count_matches_sampled_blocks():
     table = shot_resource_table()
     first = table.iloc[0]
     assert first.distinct_fidelity_estimates_per_case_replicate == 1_624_250
+    assert first.id_holdout_to_train == 500_000
+    assert "id_validation_to_train" not in table.columns
+    assert "id_test_to_train" not in table.columns
     assert first.total_shots_per_case_replicate == 1_624_250 * 128
     assert first.n_fixed_cases == 8
     assert first.n_measurement_replicates == 30
