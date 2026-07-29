@@ -2,6 +2,14 @@
 
 **Status: FROZEN before execution of any v0.8 outcome analysis.**
 
+**Post-freeze clerical correction (2026-07-29):** Section 3.3 originally
+said "83 kernel blocks per dimension". The frozen inventory specified
+elsewhere in this document is 23 extended-classical plus 12 quantum
+map/angle-scale blocks, hence 35 blocks per dimension and 175 candidates
+across five dimensions. The runner and its 525-row (175 candidates times
+three splits) output contract always used this inventory; the estimand and
+executed campaign are unchanged.
+
 This document was committed on 2026-07-29 before generating any of the
 `summary_v8_*` files or any result under `results/v8/`. The reviewer had
 already reported that two feature maps were separable and disclosed aggregate
@@ -116,7 +124,7 @@ as "the contribution of an axis" remains prohibited.
 
 The only new model outcomes needed for the factorial are fixed-`C=1` SVC
 predictions on the v4 `id_val`, `id_test`, and `ood_test` roles. They will be
-generated for all 83 kernel blocks per dimension in the q1000 stratum and
+generated for all 35 kernel blocks per dimension in the q1000 stratum and
 stored as `summary_v8_fixedc.csv`. Preprocessing, rows, embedding, feature maps,
 kernel definitions, and tie-breaking remain identical to v4.
 
