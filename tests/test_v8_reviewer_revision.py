@@ -18,6 +18,7 @@ from scripts.analysis.circuit_resources_v8 import (  # noqa: E402
     shot_resource_table,
 )
 from scripts.analysis.reviewer_revision_v8 import (  # noqa: E402
+    dataset_equal_summary,
     factorial_axis_contrasts,
     factorial_pairwise_interactions,
     stable_rng,
@@ -239,3 +240,22 @@ def test_factorial_pairwise_interaction_recovers_known_term():
     for pair, value in by_pair.items():
         if pair != frozenset(("regularization", "selection")):
             assert value == pytest.approx(0)
+
+
+def test_dataset_equal_summary_does_not_weight_groups_equally():
+    groups = pd.DataFrame(
+        {
+            "group": [
+                "unsw_dos_natural_cur",
+                "unsw_dos_m2_centroid",
+                "unsw_recon_natural_cur",
+                "unsw_recon_m2_centroid",
+                "toniot_scanning_natural_cur",
+                "toniot_scanning_m2_centroid",
+            ],
+            "effect": [0.0, 0.0, 0.0, 0.0, 1.0, 1.0],
+        }
+    )
+    summary = dataset_equal_summary(groups, [])
+    assert summary.loc[0, "dataset_equal_effect"] == pytest.approx(0.5)
+    assert summary.loc[0, "n_source_datasets"] == 2

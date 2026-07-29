@@ -212,6 +212,20 @@ def validate_analysis_outputs(root: Path) -> None:
     shortcut = _read(root, "shortcut_ablation_group_effects.csv")
     if len(shortcut) != 6 or set(shortcut.group) != EXPECTED_NETWORK_GROUPS:
         raise ValueError("shortcut-ablation group coverage mismatch")
+    shortcut_datasets = _read(root, "shortcut_ablation_dataset_effects.csv")
+    if (
+        len(shortcut_datasets) != 2
+        or set(shortcut_datasets.dataset) != {"UNSW-NB15", "ToN-IoT"}
+        or int(shortcut_datasets.n_groups.sum()) != 6
+    ):
+        raise ValueError("shortcut-ablation source-dataset coverage mismatch")
+    shortcut_summary = _read(root, "shortcut_ablation_summary.csv")
+    if (
+        len(shortcut_summary) != 1
+        or shortcut_summary.iloc[0].aggregation != "source_dataset_equal"
+        or int(shortcut_summary.iloc[0].n_source_datasets) != 2
+    ):
+        raise ValueError("shortcut-ablation summary mismatch")
     shortcut_runs = _read(root, "shortcut_ablation_run_effects.csv")
     shortcut_clusters = _read(root, "shortcut_ablation_cluster_effects.csv")
     shortcut_changes = _read(root, "shortcut_ablation_change_clusters.csv")
@@ -257,6 +271,17 @@ def validate_analysis_outputs(root: Path) -> None:
             "ablation_change",
         ],
         "shortcut ablation",
+    )
+    _require_finite(
+        shortcut_summary,
+        [
+            "original_effect",
+            "ablated_effect",
+            "ablation_change",
+            "min_dataset_change",
+            "max_dataset_change",
+        ],
+        "shortcut-ablation source-dataset summary",
     )
 
 

@@ -221,6 +221,17 @@ def dataset_equal_summary(
         frame.groupby(id_columns + ["dataset"], as_index=False, observed=True)
         .effect.mean()
     )
+    if not id_columns:
+        return pd.DataFrame(
+            [
+                {
+                    "dataset_equal_effect": float(per_dataset.effect.mean()),
+                    "min_dataset_effect": float(per_dataset.effect.min()),
+                    "max_dataset_effect": float(per_dataset.effect.max()),
+                    "n_source_datasets": int(per_dataset.dataset.nunique()),
+                }
+            ]
+        )
     return (
         per_dataset.groupby(id_columns, as_index=False, observed=True)
         .agg(
@@ -601,8 +612,41 @@ def make_shortcut_outputs(
     groups["ablated_effect"] = groups["effect"]
     groups["ablated_ci_lo"] = groups["ci_lo"]
     groups["ablated_ci_hi"] = groups["ci_hi"]
+    groups["dataset"] = groups.group.map(source_dataset_for_group)
+    per_dataset = (
+        groups.groupby("dataset", as_index=False, observed=True)
+        .agg(
+            original_effect=("original_effect", "mean"),
+            ablated_effect=("ablated_effect", "mean"),
+            ablation_change=("ablation_change", "mean"),
+            n_groups=("group", "nunique"),
+        )
+    )
+    summary = pd.DataFrame(
+        [
+            {
+                "aggregation": "source_dataset_equal",
+                "n_source_datasets": int(per_dataset.dataset.nunique()),
+                "original_effect": float(per_dataset.original_effect.mean()),
+                "ablated_effect": float(per_dataset.ablated_effect.mean()),
+                "ablation_change": float(per_dataset.ablation_change.mean()),
+                "min_dataset_change": float(
+                    per_dataset.ablation_change.min()
+                ),
+                "max_dataset_change": float(
+                    per_dataset.ablation_change.max()
+                ),
+            }
+        ]
+    )
     paired.to_csv(output_dir / "shortcut_ablation_run_effects.csv", index=False)
     groups.to_csv(output_dir / "shortcut_ablation_group_effects.csv", index=False)
+    per_dataset.to_csv(
+        output_dir / "shortcut_ablation_dataset_effects.csv", index=False
+    )
+    summary.to_csv(
+        output_dir / "shortcut_ablation_summary.csv", index=False
+    )
     pd.concat(
         [
             original_clusters.assign(endpoint="original_effect"),
