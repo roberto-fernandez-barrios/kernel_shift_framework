@@ -46,6 +46,22 @@ GROUP_LABELS = {
     "toniot_scanning_natural_cur": "ToN-IoT (campaign)",
     "toniot_scanning_m2_centroid": "ToN-IoT (constructed)",
 }
+MAP_ORDER = (
+    "zz_r1_full",
+    "zz_r2_full",
+    "pauli_xz_r1_full",
+    "zmap_r2",
+)
+MAP_LABELS = {
+    "zz_r1_full": "ZZ, 1 rep.",
+    "zz_r2_full": "ZZ, 2 reps.",
+    "pauli_xz_r1_full": "Pauli-X/Z, 1 rep.",
+    "zmap_r2": "Z, 2 reps.",
+}
+STRATUM_LABELS = {
+    "entangling_zz": "entangling ZZ",
+    "separable_product": "separable product",
+}
 
 
 def signed(value: float, digits: int = 4) -> str:
@@ -168,6 +184,39 @@ def _shortcut_rows(
     return "\n".join(lines) + "\n"
 
 
+def _winner_rows(winners: pd.DataFrame) -> str:
+    keys = ["base_map", "selector", "model"]
+    if winners.duplicated(keys).any() or len(winners) != 16:
+        raise ValueError("winner-composition cells are incomplete or duplicated")
+    indexed = winners.set_index(keys)
+    lines = []
+    for base_map in MAP_ORDER:
+        if base_map not in set(winners.base_map):
+            raise ValueError(f"winner-composition map missing: {base_map}")
+        map_rows = winners[winners.base_map == base_map]
+        stratum_values = set(map_rows.map_stratum)
+        if len(stratum_values) != 1:
+            raise ValueError(f"inconsistent stratum for {base_map}")
+        values = []
+        for selector, model in (
+            ("id_val", "svc"),
+            ("id_val", "gpc"),
+            ("ood_test", "svc"),
+            ("ood_test", "gpc"),
+        ):
+            row = indexed.loc[(base_map, selector, model)]
+            values.append(
+                f"{int(row.n_winners)} ({100 * row.winner_fraction:.1f}\\%)"
+            )
+        lines.append(
+            f"{MAP_LABELS[base_map]} & "
+            f"{STRATUM_LABELS[next(iter(stratum_values))]} & "
+            + " & ".join(values)
+            + r" \\"
+        )
+    return "\n".join(lines) + "\n"
+
+
 def make_tables(input_dir: Path, output_dir: Path) -> None:
     factorial = pd.read_csv(input_dir / "factorial_summary.csv")
     contrasts = pd.read_csv(input_dir / "factorial_axis_contrasts.csv")
@@ -180,6 +229,7 @@ def make_tables(input_dir: Path, output_dir: Path) -> None:
     shortcut_summary = pd.read_csv(
         input_dir / "shortcut_ablation_summary.csv"
     )
+    winners = pd.read_csv(input_dir / "quantum_winner_composition.csv")
 
     output_dir.mkdir(parents=True, exist_ok=True)
     outputs = {
@@ -192,6 +242,7 @@ def make_tables(input_dir: Path, output_dir: Path) -> None:
             shortcut,
             shortcut_summary,
         ),
+        "v8_winner_rows.tex": _winner_rows(winners),
     }
     for filename, text in outputs.items():
         path = output_dir / filename
