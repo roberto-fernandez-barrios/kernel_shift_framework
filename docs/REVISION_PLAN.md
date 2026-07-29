@@ -1,8 +1,14 @@
 # Plan de revisión completa (respuesta al informe de revisión externa)
 
+> **ESTADO: HISTÓRICO.** Este plan documenta la revisión orientada a EPJ QT de
+> julio de 2026. La estrategia, el estimando y los gates vigentes para la
+> submission a npj Quantum Information están en
+> `docs/PAPER_1_Q1_STRATEGY.md`, `docs/REVIEWER_REVISION_SPEC_V6.md` y
+> `docs/FINAL_RELEASE_CHECKLIST.md`.
+
 Autorizado por Roberto (2026-07-13): ejecutar Fases A+B+C completas para blindar el
-paper antes de enviarlo a EPJ QT. Este documento es la especificación ejecutable;
-el estado vivo se refleja al final.
+paper antes de enviarlo a EPJ QT. Este documento conserva aquella especificación
+ejecutable y su estado al cierre.
 
 ## Contexto
 Una revisión externa (GPT, simulando revisor de EPJ QT) señaló problemas verificados:

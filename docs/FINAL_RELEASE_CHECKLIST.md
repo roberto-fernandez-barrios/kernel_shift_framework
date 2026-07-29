@@ -1,6 +1,6 @@
 # Paper 1 submission and artifact-release checklist
 
-Last local validation: 28 July 2026.
+Last local validation: 29 July 2026.
 
 Target: *npj Quantum Information*, Collection "Quantum machine learning:
 understanding capabilities, limitations, and perspectives for quantum
@@ -16,26 +16,33 @@ advantage". Fallback: *EPJ Quantum Technology*.
 - [x] No pooled population significance test is attached to the eight fixed
   scenario-groups.
 - [x] Main manuscript reduced below 8,000 counted words.
-- [x] Detailed constructions and secondary analyses moved to separate
-  Supplementary Information.
+- [x] Every reproducibility-critical method is reported in the main manuscript;
+  Supplementary Information contains extended results and diagnostics only.
 - [x] Main and Supplementary PDFs compile without undefined citations,
   undefined references, or overfull boxes.
 - [x] Both PDFs rendered page by page and visually checked.
-- [x] Reporting regression test added for the equal-budget source and table
-  schema.
-- [x] README describes the current result and the canonical v4 reproduction
+- [x] Reporting regression tests cover the three-source estimand, budget
+  schemes, rank matching, repeated finite-shot analysis, and frozen hashes.
+- [x] README describes the current result and the canonical v6 reproduction
   command.
-- [x] npj Quantum Information and EPJ Quantum Technology cover letters updated
-  to match the current claims.
+- [x] The npj Quantum Information cover letter identifies the Collection,
+  prior public draft artifact, overlap, and substantive differences.
+- [x] Title (10 words) and abstract (135 words) are within the Article limits.
+- [x] References are sequentially numbered and unresolved bibliography
+  placeholders have been removed.
+- [x] Data, code, competing-interest, author-contribution, funding, and
+  generative-AI statements are present.
 
 ## Validate before freezing a release
 
 Run from the repository root in the declared environment:
 
 ```bash
-python scripts/reproduce_v4.py --stage all
-pytest -q
-python scripts/smoke/smoke_test_cli.py
+python scripts/reproduce_v6.py --stage analysis
+python scripts/reproduce_v6.py --stage report
+python scripts/reproduce_v6.py --stage audit
+python scripts/analysis/validate_v6_artifacts.py
+python -m pytest tests -q
 ```
 
 Then regenerate the submission PDFs:
@@ -50,38 +57,41 @@ Check the logs:
 
 - no undefined citations or references;
 - no overfull boxes;
-- headline values remain SVC `-0.0050` and GPC `-0.0019` against the
-  equal-budget extended family;
+- headline three-source-dataset-equal values remain SVC `-0.005649` and GPC
+  `-0.000937` against the equal-budget extended family;
 - main and Supplementary Information refer to the same protocol and version.
 
 ## Metadata to align in the release commit
 
-- [ ] Use a new release version for this post-v0.4.0 revision (`v0.4.1` is the
-  recommended patch version), and set it consistently in `pyproject.toml`,
-  `CITATION.cff`, the Git tag, and the GitHub release. Do not reuse the
-  existing `v0.4.0` tag.
-- [ ] Ensure the README title, manuscript title, release notes, and Zenodo
+- [x] Version `0.6.0` is set consistently in `pyproject.toml` and
+  `CITATION.cff`; the release will use the immutable `v0.6.0` tag.
+- [x] Ensure the README title, manuscript title, release notes, and Zenodo
   description state the same protocol-dependent conclusion.
-- [ ] Confirm author names, accents, ORCIDs, affiliation, and corresponding
+- [x] Confirm author names, accents, ORCIDs, affiliation, and corresponding
   email.
-- [ ] Confirm the code and artifact rights holder and approval of the
+- [x] Confirm the code and artifact rights holder and approval of the
   BSD-3-Clause licence; see `docs/LEGAL_RELEASE_NOTE.md`.
-- [ ] Confirm third-party dataset redistribution boundaries.
+- [x] Confirm third-party dataset redistribution boundaries.
+- [ ] Insert the reserved immutable v0.6.0 DOI in `CITATION.cff`, README, the
+  main manuscript, Supplementary Information, and cover letter.
 
 ## Archive and public repository
 
-- [ ] Commit the exact tested source and generated manuscript files.
+- [x] Commit and push the exact tested source and generated pre-DOI manuscript
+  files to draft pull request 2.
 - [ ] Tag the exact release commit; do not move or overwrite the historical
-  v0.3.0 or v0.4.0 tags.
+  tags.
 - [ ] Create a GitHub release from that tag.
-- [ ] Wait for Zenodo ingestion and inspect the deposited file list.
+- [ ] Publish the manually prepared Zenodo v0.6.0 draft and inspect the
+  deposited file list.
 - [ ] Confirm that the manuscript DOI resolves to the exact submitted release,
   not an earlier artifact state.
-- [ ] If Zenodo assigns a new version DOI, update `CITATION.cff`, README, and
-  both manuscript files, rebuild, and recheck before submission.
+- [ ] Record SHA-256 checksums for the tagged source archive and both submitted
+  PDFs.
 
-Remote publication, pushing, tagging, and Zenodo release creation require the
-corresponding author's explicit approval.
+The corresponding author has explicitly approved pushing, tagging, and
+creating the required release. Publication of the reserved Zenodo draft still
+requires the final artifact-identity check.
 
 ## Journal submission
 
@@ -91,11 +101,11 @@ corresponding author's explicit approval.
 - [ ] Confirm the Collection selection in the submission portal.
 - [ ] Confirm article type and APC route or institutional agreement.
 - [ ] Supply the final artifact DOI and repository URL.
-- [ ] Declare the earlier preprint and update it to the submitted version when
-  appropriate.
+- [x] Declare the earlier public v0.5.0 draft artifact and explain the overlap
+  and differences.
 - [ ] Prepare suggested reviewers and have all authors check conflicts,
   current affiliations, and institutional email addresses.
-- [ ] Obtain explicit co-author approval of the final claims and files.
+- [x] Obtain explicit co-author approval of the final claims and files.
 - [ ] Complete the journal reporting and editorial-policy forms.
 
 ## Scientific stop/go

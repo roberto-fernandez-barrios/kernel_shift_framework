@@ -171,8 +171,8 @@ families reach similar informative geometries; it may not state that geometry
   used for submission.
 - Add `testpaths = ["tests"]` to the pytest configuration.
 - The cover letter will be concise, state interest in the Collection, and
-  identify the earlier preprint and its overlap once its exact identifier is
-  confirmed.
+  identify the earlier public draft artifact and its overlap once its exact
+  identifier is confirmed.
 - Recompile and visually inspect every page of the main and supplementary
   PDFs after the final substantive revision.
 

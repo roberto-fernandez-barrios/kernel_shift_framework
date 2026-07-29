@@ -1,207 +1,163 @@
 # Paper 1: Q1 completion and submission strategy
 
-Status: npj-first editorial plan implemented locally, 28 July 2026. The main
-manuscript and separate Supplementary Information compile and have passed
-visual PDF inspection. Public release alignment and co-author approval remain.
+Status: npj-first major revision implemented and validated, 29 July 2026.
 
-## Recommended decision
+## Target and positioning
 
-Prepare the paper first for **npj Quantum Information**, explicitly for the
-open Collection *Quantum machine learning: understanding capabilities,
-limitations, and perspectives for quantum advantage*. The call closes on
-31 December 2026:
+Submit first to **npj Quantum Information** as an Article for the Collection
+*Quantum machine learning: understanding capabilities, limitations, and
+perspectives for quantum advantage*. This is an ambitious but defensible
+submission. The editorial case is not that quantum kernels lose a broad
+benchmark; it is that the evaluation protocol changes the apparent robustness
+claim under distribution shift.
 
-https://www.nature.com/collections/iheeaggidj
+The central contribution is the controlled combination of:
 
-This is a stretch submission, but the call is unusually well aligned with the
-paper's strongest defensible contribution: it identifies when an apparent
-quantum-kernel robustness advantage is created by evaluation choices and when
-it disappears under deployable selection and matched candidate budgets.
+1. train--test distribution shift;
+2. target-label-free model selection;
+3. train-only regularization;
+4. structurally matched candidate budgets;
+5. a ten-specification curve;
+6. fixed-case, dependence-aware conditional uncertainty;
+7. prospectively frozen corroboration on three external shifts.
 
-The submission ladder should be:
+If npj declines the paper after this fully controlled submission, **EPJ
+Quantum Technology** remains the natural fallback. Journal ranking, APC, and
+institutional-agreement status must be checked in the current JCR and
+University of Deusto systems immediately before submission.
 
-1. **npj Quantum Information, QML capabilities/limitations Collection.**
-   Highest-value fit. The journal reports a 2025 JIF of 9.0. It is fully open
-   access; the current original-research APC is EUR 3,690 before VAT, subject
-   to institutional agreements or waivers.
-2. **EPJ Quantum Technology.** Realistic fallback with direct quantum
-   information/computation scope. The journal reports a 2025 JIF of 4.5, a
-   median first decision of five days, and a current APC of EUR 1,990 before
-   VAT. Confirm its exact JCR quartile and category in the University of
-   Deusto's current JCR before treating it as satisfying a strict Q1 target.
+## Defensible claim
 
-Quantum Science and Technology is not recommended between these two: it is
-highly selective and explicitly requires a significant, lasting advance of
-broad interest. The present low-qubit, simulation-only study has a clearer
-editorial route through the npj Collection and a more realistic fallback in
-EPJ Quantum Technology.
+In these low-qubit simulated regimes, the apparent robustness ordering of
+quantum and classical kernel families under distribution shift depends on
+regularization, target-label access, reference-family strength, and search
+budget. Once the deployment-compatible controls are imposed, no robust
+family-level quantum advantage remains.
 
-Machine Learning: Science and Technology is a strong scientific fit for the
-benchmark and reproducibility angle, but its current JCR quartile should be
-verified before using it in a strict Q1-only ladder.
+This is a methodological result about what the benchmark estimates. It is not
+a claim of computational speedup, hardware advantage, universal classical
+dominance, or population inference from the fixed datasets.
 
-## The paper we should submit
+## Frozen headline evidence
 
-### One-sentence claim
+Primary equal-budget P1' source-dataset-equal effects:
 
-Under distribution shift, an apparent robustness advantage of fidelity
-quantum kernels over customary baselines is not stable to train-only
-regularization tuning, no-OOD-label model selection, and equal candidate
-budgets; kernel geometry is informative but shared by quantum and classical
-families.
-
-### Contribution hierarchy
-
-1. **Primary contribution:** an audit of evaluation choices for quantum-kernel
-   robustness under distribution shift.
-2. **Primary evidence:** the equal-budget P1' comparison, with configuration
-   selection based only on ID validation and regularization tuned on training
-   data.
-3. **Mechanistic evidence:** effective-rank matching and geometry--OOD
-   associations show that geometry, rather than kernel provenance, organizes
-   the observed behaviour.
-4. **Boundary evidence:** finite-shot perturbation shows that exact
-   statevector geometry does not transfer unchanged to finite measurement.
-5. **Context, not an endpoint:** the +0.037 same-test oracle result explains
-   how an optimistic conclusion can be produced; it must never be presented
-   as confirmatory evidence.
-
-### Claims to avoid
-
-- Quantum advantage, practical advantage, speedup, or hardware relevance.
-- A population-level effect inferred from the eight fixed scenario-groups.
-- A universal causal law connecting effective rank or alignment to OOD
-  accuracy.
-- A claim that all quantum kernels, encodings, qubit regimes, or datasets have
-  been refuted.
-- Broad novelty claims such as "the first rigorous quantum-kernel benchmark."
-
-### Novelty relative to the closest 2025--2026 work
-
-Large benchmarks already show that strong classical baselines frequently erase
-quantum-kernel gains. A 2026 study additionally combines nested cross-validation,
-spectral analysis, and a small hardware validation on tabular i.i.d. tasks.
-The novelty here must therefore be narrower and explicit:
-
-- train--test distribution shift is the primary evaluation axis;
-- target-domain labels are unavailable to the deployment selector;
-- candidate-family budget is treated as a fairness variable;
-- constructed and held-out attack-campaign shifts are compared;
-- inference is framed as fixed-case, dependence-aware estimation;
-- geometry is studied specifically as a correlate of behaviour under shift.
-
-## Evidence frozen for the main claim
-
-Primary equal-budget P1' dataset-equal means:
-
-| Classifier | Quantum minus extended classical | Leave-one-dataset-out range |
+| Classifier | Quantum minus extended classical | Leave-one-source-dataset-out range |
 |---|---:|---:|
-| SVC | -0.0050 | [-0.0060, -0.0040] |
-| GPC | -0.0019 | [-0.0028, +0.0003] |
+| SVC | -0.005649 | [-0.007024, -0.004502] |
+| GPC | -0.000937 | [-0.001900, +0.000939] |
 
-Contextual no-OOD-label comparison against linear+RBF:
+Contextual target-label-free comparison against linear+RBF:
 
 | Classifier | Quantum minus linear+RBF |
 |---|---:|
-| SVC | -0.0043 |
-| GPC | +0.0043 |
+| SVC | -0.004073 |
+| GPC | +0.005907 |
 
-The primary SVC result is classical-favoured or conditionally tied in seven of
-eight scenario-groups. The only group with a small positive SVC and GPC point
-estimate against the equal-budget extended family is UNSW-Recon under
-held-out-campaign shift; both intervals include zero.
+The primary SVC estimate is classical-favoured or within its conditional
+interval of zero in seven of eight scenario-groups. The only scenario with a
+small positive point estimate under both equal-budget classifiers is
+UNSW-NB15 reconnaissance under held-out campaign shift; both intervals include
+zero.
 
-These results are sufficient for the paper's main claim. Do not launch a new
-wide experimental grid unless peer review requests it. New experiments now
-would increase researcher degrees of freedom and risk weakening the frozen
-confirmatory framing.
+The security aggregate gives equal weight to three source datasets: EMBER,
+UNSW-NB15, and ToN-IoT. UNSW DoS and reconnaissance are scenario-groups within
+one source dataset, not independent datasets.
 
-## Manuscript surgery
+## Reviewer-driven strengthening
 
-Completed locally. The main manuscript now contains approximately 5,300 words
-of prose (approximately 5,900 including headings and captions) and 31 pages in
-the double-spaced, line-numbered review template. The separate Supplementary
-Information is six pages.
+- The complete specification curve and headline endpoint now use the same
+  three-source estimand.
+- `kernel_blocked` is explicitly primary because it samples whole
+  kernel-shape blocks crossed with all five dimensions. Uniform and
+  kernel-stratified sensitivities change no family-level conclusion.
+- Rank matching reports the predefined 1.25 caliper, 75.2% retention,
+  with-replacement reuse, rank discrepancy, alternative calipers, and
+  one-to-one matching. Its interpretation is observational.
+- Finite-shot analysis uses 30 independent measurement seeds for each of eight
+  fixed exact Gram matrices, four shot counts, and both pre- and post-PSD
+  conditions (1,920 evaluations). It remains conditional and does not simulate
+  hardware.
+- External College Scorecard, diabetes readmission, and ACS income shifts
+  corroborate protocol sensitivity under a prospectively frozen design.
+- All reproducibility-critical Methods are in the main manuscript;
+  Supplementary Information contains extended results and diagnostics only.
 
-### Main paper
+## Novelty relative to concurrent work
 
-- [x] Fold Related Work into the Introduction.
-- [x] Lead with the distribution-shift selection problem, not cybersecurity
-  background or a generic QML survey.
-- [x] Place Results and Discussion before the concise Methods section.
-- [x] Keep four main figures:
-  1. controlled protocol;
-  2. equal-budget no-OOD-label headline comparison;
-  3. combined rank-matching and geometry result;
-  4. finite-shot boundary analysis.
-- [x] Keep two compact main tables. The per-group headline table remains
-  with a large table unless the exact group estimates are essential in main
-  text.
-- [x] Condense Discussion to implications, comparison with closest work, and
-  limitations. Merge the present Conservative Interpretation and Conclusion.
+Large and recent quantum-kernel benchmarks already provide strong classical
+baselines, nested validation, spectral analysis, and in some cases hardware
+experiments. The manuscript therefore concentrates its novelty on the joint
+estimand:
 
-### Supplementary Information
+> distribution shift + target-label-free selection + train-only
+> regularization + structurally matched search + specification curve +
+> prospective external corroboration.
 
-Moved without deleting them from the publication package:
+The paper should never rely on “quantum kernels lose” as its novelty claim.
+Its contribution is showing which evaluation choices manufacture, contract,
+or reverse an apparent advantage and providing a reproducible audit design.
 
-- [x] detailed dataset and split-construction algorithms;
-- [x] complete candidate grids and preprocessing specifications;
-- [x] same-test oracle table;
-- [x] full geometry descriptor definitions and per-group table;
-- [x] Gaussian-process uncertainty diagnostics;
-- [x] finite-shot model details and artifact pointers;
-- [x] additional result inventory and machine-readable result map.
+## Claims to avoid
 
-## Traceability issue already corrected
+- Quantum advantage, practical advantage, speedup, or hardware relevance.
+- A population-level effect inferred from eight scenario-groups, three source
+  datasets, or three external tasks.
+- A causal claim that geometry rather than quantumness carries information.
+- A universal ordering over all encodings, qubit regimes, datasets, or
+  classical and quantum kernel families.
+- Treating fifteen nested pipeline realizations as fifteen independent
+  observations.
+- Calling candidate-count equality an isomorphic search space.
 
-The previous headline table and figure were labelled as budget matched while
-reading the full-pool family-comparison CSV. The primary extended-classical
-comparison now reads `results/v4/inference_confirmatory/hierarchical_effects.csv`
-with variant `budget60` and stratum `all`. The full-pool result is explicitly
-a secondary sensitivity.
+## Current submission package
 
-This distinction must be protected by a regression test before release.
+- Main Article PDF: 41 referee-format pages, 10-word title, 135-word abstract.
+- Supplementary Information PDF: 5 pages, with no Supplementary Methods.
+- Concise collection-specific cover letter with the exact v0.5.0 prior-artifact
+  identifier and overlap statement.
+- Sequential numeric bibliography with the published EPJ Quantum Technology
+  reference and concurrent 2026 benchmark.
+- Public code, frozen manifests, complete aggregated results, tests, and
+  deterministic reporting scripts.
+- Data, code, competing-interest, author-contribution, funding, and
+  generative-AI declarations.
 
-## Artifact and release blockers
+## Reproduction and release gates
 
-The local manuscript postdates the public v0.4.0 artifact (version DOI
-`10.5281/zenodo.21488509`; concept DOI `10.5281/zenodo.19147649`) and is not
-presently aligned with it. Before submission:
+Run from the repository root in the declared environment:
 
-1. Make the README describe the negative, protocol-dependent result and use
-   `python scripts/reproduce_v4.py --stage all` as the canonical entry point.
-2. Add a regression test that checks headline-table values against the frozen
-   equal-budget inference CSV.
-3. Run the complete reproduction pipeline and test suite in the declared
-   environment.
-4. Freeze a new release commit and version (`v0.4.1` is the recommended patch
-   release); ensure `pyproject.toml`, `CITATION.cff`, README, manuscript title,
-   tag, and release notes agree. Never move the existing v0.4.0 tag.
-5. Archive exactly that commit and results bundle in Zenodo.
-6. Verify that the DOI in the manuscript resolves to that exact final archive,
-   not the earlier v0.4.0 record.
-7. Only then update the public GitHub repository. Remote publication requires
-   explicit author approval.
+```bash
+python scripts/reproduce_v6.py --stage analysis
+python scripts/reproduce_v6.py --stage report
+python scripts/reproduce_v6.py --stage audit
+python scripts/analysis/validate_v6_artifacts.py
+python -m pytest tests -q
+```
 
-## Submission package
+Current status:
 
-- concise main manuscript and separate Supplementary Information;
-- cover letter naming the npj QML Collection and explaining the precise
-  capabilities/limitations contribution;
-- graphical or one-paragraph significance summary if requested;
-- reporting checklist and data/code availability statements;
-- frozen artifact DOI and public repository;
-- suggested reviewers selected for distribution shift, quantum kernels, and
-  benchmarking, with conflicts checked by the authors.
+- 66/66 local tests pass;
+- all v0.6.0 artifact gates pass;
+- CI passes on Python 3.11 and 3.12;
+- main and Supplementary PDFs contain no overfull boxes, unresolved
+  references, or unresolved citations;
+- every page has been rendered and visually inspected;
+- authors approve the target, claims, and required releases.
 
-## Stop/go criteria
+The remaining release gate is the immutable v0.6.0 DOI. Reserve it in a manual
+new-version Zenodo draft derived from v0.5.0, insert it consistently in the
+manuscript, Supplementary Information, README, `CITATION.cff`, and cover
+letter, then rebuild and repeat the complete visual and automated checks.
 
-The paper is ready to submit when:
+## Submission stop/go
 
-- every headline number traces to the equal-budget frozen result;
-- no abstract, caption, or conclusion implies population inference or hardware
-  relevance;
-- the main paper is below approximately 8,000 words;
-- the full pipeline and tests pass from the documented environment;
-- GitHub, Zenodo, citation metadata, and manuscript tell the same story;
-- all co-authors approve the claims, journal, APC route, and final files.
+Submit only when:
+
+1. the reserved DOI resolves to the exact tagged source and submitted PDFs;
+2. GitHub, Zenodo, citation metadata, manuscript, and Supplementary
+   Information identify v0.6.0 consistently;
+3. the Collection and Article type are selected in the portal;
+4. the current APC route or institutional agreement is confirmed;
+5. suggested reviewers and conflicts are checked by the authors;
+6. the journal reporting and editorial-policy forms are complete.
