@@ -1,4 +1,4 @@
-"""Reproduce and validate the reviewer-driven v0.6.0 derived artifacts.
+"""Reproduce and validate the reviewer-driven v0.7.0 derived artifacts.
 
 This command consumes versioned per-run summaries.  It does not reacquire raw
 benchmarks or rerun the expensive kernel grids.  The repeated finite-shot run
@@ -76,12 +76,18 @@ ORDER = ("analysis", "report", "audit")
 
 def preflight() -> None:
     required = [
-        Path("docs/REVIEWER_REVISION_SPEC_V6.md"),
+        Path("docs/REVIEWER_REVISION_SPEC_V7.md"),
+        Path("results/v4/budget_confirmatory/coverage.csv"),
         Path("results/v4/budget_confirmatory/p1_runs__budget60.csv"),
         Path("results/v4/family_comparison/p1_runs__vs_classical_ext.csv"),
         Path("results/v4/budget_confirmatory/resamples_by_group.csv"),
     ]
     missing = [str(path) for path in required if not path.is_file()]
+    if Path("results/v4/budget").exists():
+        missing.append(
+            "results/v4/budget: provisional incomplete-coverage directory "
+            "must not be present"
+        )
     shot_csvs = sorted(Path("results/v6/shots_mc/runs").glob("*.csv"))
     shot_manifests = sorted(Path("results/v6/shots_mc/runs").glob("*.json"))
     if len(shot_csvs) != 8 or len(shot_manifests) != 8:

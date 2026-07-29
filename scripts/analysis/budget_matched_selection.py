@@ -16,7 +16,7 @@ The resampling distribution quantifies BUDGET SENSITIVITY. It is not a
 confidence interval; conditional uncertainty is estimated downstream by
 hierarchical_effect_estimation.py on this script's run-level outputs.
 
-Outputs under --out-dir (default results/v4/budget/):
+Outputs under --out-dir (default results/v4/budget_recomputed/):
   coverage.csv                  candidate pools and budget class per group
   resamples_by_group.csv        budget-sensitivity distribution of the delta
   resamples_by_setting.csv     ... at setting level
@@ -167,7 +167,7 @@ def sample_uniform(rng, n_pool: int, k: int, B: int) -> np.ndarray:
 
 def sample_kernel_stratified(rng, shapes: np.ndarray, k: int, B: int) -> np.ndarray:
     """Per-shape strata; each resample takes 2 or 3 members per shape so the
-    total is exactly k (generalizes to the reduced 7-shape/20-budget branch)."""
+    total is exactly k."""
     uniq = np.unique(shapes)
     per_shape = {s: np.flatnonzero(shapes == s) for s in uniq}
     base = k // len(uniq)
@@ -243,7 +243,15 @@ def main() -> None:
                     help="id_test = legacy software-validation pass (spec constraint 7); "
                          "id_val = confirmatory v4 protocol; "
                          "ood_test = same-test oracle diagnostic only")
-    ap.add_argument("--out-dir", type=Path, default=Path("results/v4/budget"))
+    ap.add_argument(
+        "--out-dir",
+        type=Path,
+        default=Path("results/v4/budget_recomputed"),
+        help=(
+            "output directory; the immutable manuscript-facing endpoint is "
+            "results/v4/budget_confirmatory"
+        ),
+    )
     ap.add_argument("--n-resamples", type=int, default=5000)
     ap.add_argument("--n-curve-resamples", type=int, default=2000)
     ap.add_argument("--seed", type=int, default=SPEC_SEED)
@@ -283,10 +291,11 @@ def main() -> None:
             budget = n_q
             cov_rows.append({"group": grp, "model": model, "n_classical": n_c,
                              "n_quantum": n_q, "budget": budget,
-                             "budget_class": "full" if n_c >= 100 else "reduced"})
-            # scheme strata = full kernel token (23 balanced blocks of 5 dims in
-            # full-coverage groups; 7 blocks in reduced ones). The collapsed
-            # 'shape' would merge scale variants into unbalanced strata.
+                             "budget_class": "full" if n_c >= 100 else "incomplete"})
+            # Scheme strata use the full kernel token. In the confirmatory pool,
+            # this gives 23 balanced classical blocks of five dimensions. The
+            # collapsed ``shape`` would merge scale variants into unbalanced
+            # strata.
             kernels_c = fm_c.cfgs.iloc[c_alive]["kernel"].to_numpy()
             q_grp = np.nanmean(q_full[rows])
             settings_in_grp = gruns.setting.unique()

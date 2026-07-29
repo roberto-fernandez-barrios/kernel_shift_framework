@@ -1,4 +1,4 @@
-"""Aggregate the frozen repeated finite-shot sensitivity for v0.6.0."""
+"""Aggregate the frozen repeated finite-shot sensitivity for v0.7.0."""
 from __future__ import annotations
 
 import argparse
@@ -32,6 +32,11 @@ METRICS = (
     "train_fro_change_projection",
     "ood_fro_change_sampling",
     "ood_fro_change_projection",
+    "condition_train_fro_change_from_sampled",
+    "condition_id_val_fro_change_from_sampled",
+    "condition_id_test_fro_change_from_sampled",
+    "condition_ood_test_fro_change_from_sampled",
+    "condition_ood_square_fro_change_from_sampled",
 )
 
 
@@ -91,7 +96,8 @@ def summarize(frame: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
             "absolute_ood_difference_median",
             "train_effective_rank_ratio_median",
             "kta_ood_difference_median",
-            "train_fro_change_projection_median",
+            "condition_train_fro_change_from_sampled_median",
+            "condition_ood_square_fro_change_from_sampled_median",
         ):
             values = group[metric].to_numpy(float)
             row[f"{metric}_across_group_median"] = float(np.median(values))

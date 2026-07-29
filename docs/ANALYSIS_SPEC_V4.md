@@ -80,16 +80,21 @@ confirmatory results exist** (Section 8).
 
 ## 4. GATE 1 — budget-matched selection (confirmatory design)
 
+**Coverage-closure amendment (2026-07-29).** The confirmatory recomputation
+closed the provisional coverage gap before the manuscript-facing analysis.
+The canonical input is `results/v4/budget_confirmatory/coverage.csv`; all 16
+group--classifier cells contain 115 classical and 60 quantum candidates. The
+earlier incomplete-coverage output is superseded and is not part of the
+submission artifact.
+
 - Candidate unit: kernel geometry = (kernel shape, length/angle scale, dimension).
-  Pools (audited, deduplicated): classical_extended = 115, quantum = 60 for the five
-  full-coverage scenario-groups; 35 / 20 for the three netflow `m2_centroid` groups
-  until the v4 recompute closes the coverage gap (rows carry an explicit `budget`
-  column and are never pooled across budgets).
+  Pools (audited, deduplicated): classical_extended = 115 and quantum = 60 in
+  every scenario-group and classifier.
 - Primary analysis: repeated subsampling of the classical pool to the quantum budget
-  (60, or 20 in reduced-coverage groups), B = 5000 resamples per scheme, applying P1'
-  within the subsampled pool. Schemes: `uniform`; `kernel_stratified` (per-shape
-  strata); `kernel_blocked` (12-of-23 shapes × all 5 dims — structural mirror of the
-  quantum 12 maps × 5 dims; primary scheme).
+  (60), B = 5000 resamples per scheme, applying P1' within the subsampled
+  pool. Schemes: `uniform`; `kernel_stratified` (per-shape strata);
+  `kernel_blocked` (12-of-23 kernel/scale blocks × all 5 dims — structural
+  mirror of the quantum 12 map/scale blocks × 5 dims; primary scheme).
 - Budget curves: B ∈ {5, 10, 20, 30, 40, 50, 60} for BOTH families (symmetric
   subsampling; classical additionally at 115 as a descriptive extension), B = 2000
   resamples per point. Derived scalars per family/group: expected top-k for each k,
@@ -151,7 +156,7 @@ Following PLAN.md §18, on the confirmatory (post-recompute) GATE 1 + GATE 2 out
   all controls in specific scenario-groups, not universal.
 
 In all three cases the central contribution remains: a controlled audit of how kernel
-geometry and evaluation protocol determine conclusions about quantum kernels under
+geometry and evaluation protocol shape conclusions about quantum kernels under
 distribution shift.
 
 Prohibited in public artifacts regardless of framing: any global population p-value;

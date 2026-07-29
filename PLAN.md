@@ -219,7 +219,7 @@ Añadir al menos dos análisis adicionales:
 ### Salidas
 
 ```text
-results/v4/budget/
+results/v4/budget_recomputed/
   candidate_inventory_unique.csv
   budget_resamples_by_setting.csv
   budget_summary_by_dataset.csv

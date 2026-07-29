@@ -6,7 +6,7 @@ Target: *npj Quantum Information*, Collection "Quantum machine learning:
 understanding capabilities, limitations, and perspectives for quantum
 advantage". Fallback: *EPJ Quantum Technology*.
 
-## Completed locally
+## Scientific corrections completed locally
 
 - [x] Main title, abstract, introduction, results, discussion, and conclusion
   use the protocol-dependent negative result.
@@ -18,18 +18,19 @@ advantage". Fallback: *EPJ Quantum Technology*.
 - [x] Main manuscript reduced below 8,000 counted words.
 - [x] Every reproducibility-critical method is reported in the main manuscript;
   Supplementary Information contains extended results and diagnostics only.
-- [x] Main and Supplementary PDFs compile without undefined citations,
+- [ ] Rebuild the main and Supplementary PDFs without undefined citations,
   undefined references, or overfull boxes.
-- [x] Both PDFs rendered page by page and visually checked.
-- [x] Reporting regression tests cover the three-source estimand, budget
-  schemes, rank matching, repeated finite-shot analysis, and frozen hashes.
-- [x] README describes the current result and the canonical v6 reproduction
+- [ ] Render and inspect both PDFs page by page after the v0.7 changes.
+- [x] Reporting regression tests cover the three-source estimand, complete
+  60-candidate budget coverage, rank matching, coherent finite-shot PSD
+  extension, and frozen hashes.
+- [x] README describes the current result and the canonical v0.7 reproduction
   command.
 - [x] The npj Quantum Information cover letter identifies the Collection,
   prior public draft artifact, overlap, and substantive differences.
-- [x] Title (10 words) and abstract (135 words) are within the Article limits.
+- [x] Title (10 words) and abstract are within the Article limits.
 - [x] References are sequentially numbered and unresolved bibliography
-  placeholders have been removed.
+  placeholders have been removed; the manuscript uses `sn-nature`.
 - [x] Data, code, competing-interest, author-contribution, funding, and
   generative-AI statements are present.
 
@@ -61,10 +62,10 @@ Check the logs:
   `-0.000937` against the equal-budget extended family;
 - main and Supplementary Information refer to the same protocol and version.
 
-## Metadata to align in the release commit
+## Metadata to align in the v0.7 release commit
 
-- [x] Version `0.6.0` is set consistently in `pyproject.toml` and
-  `CITATION.cff`; the release will use the immutable `v0.6.0` tag.
+- [ ] Set version `0.7.0` consistently in `pyproject.toml` and
+  `CITATION.cff`; use the immutable `v0.7.0` tag.
 - [x] Ensure the README title, manuscript title, release notes, and Zenodo
   description state the same protocol-dependent conclusion.
 - [x] Confirm author names, accents, ORCIDs, affiliation, and corresponding
@@ -72,26 +73,28 @@ Check the logs:
 - [x] Confirm the code and artifact rights holder and approval of the
   BSD-3-Clause licence; see `docs/LEGAL_RELEASE_NOTE.md`.
 - [x] Confirm third-party dataset redistribution boundaries.
-- [x] Insert the reserved immutable v0.6.0 DOI in `CITATION.cff`, README, the
+- [ ] Insert the reserved immutable v0.7.0 DOI in `CITATION.cff`, README, the
   main manuscript, Supplementary Information, and cover letter.
 
 ## Archive and public repository
 
-- [x] Commit and push the exact tested source and generated pre-DOI manuscript
-  files to draft pull request 2.
-- [ ] Tag the exact release commit; do not move or overwrite the historical
+- [x] v0.6.0 is public on GitHub and Zenodo; DOI
+  `10.5281/zenodo.21672470` resolves and the historical tag is immutable.
+- [ ] Reserve the immutable DOI for a new Zenodo v0.7.0 version derived from
+  the public v0.6.0 record.
+- [ ] Commit and push the exact tested v0.7 source and generated PDFs.
+- [ ] Tag the exact v0.7 release commit; do not move or overwrite historical
   tags.
-- [ ] Create a GitHub release from that tag.
-- [ ] Publish the manually prepared Zenodo v0.6.0 draft and inspect the
-  deposited file list.
-- [ ] Confirm that the manuscript DOI resolves to the exact submitted release,
-  not an earlier artifact state.
+- [ ] Create the GitHub v0.7.0 release from that tag.
+- [ ] Publish and inspect the Zenodo v0.7.0 file list.
+- [ ] Confirm that the manuscript DOI resolves to the exact submitted v0.7
+  release.
 - [ ] Record SHA-256 checksums for the tagged source archive and both submitted
   PDFs.
 
-The corresponding author has explicitly approved pushing, tagging, and
-creating the required release. Publication of the reserved Zenodo draft still
-requires the final artifact-identity check.
+The corresponding author has explicitly approved pushing, tagging, creating,
+and publishing the required v0.7 release. Publication still requires the
+final artifact-identity check.
 
 ## Journal submission
 

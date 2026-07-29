@@ -1,4 +1,4 @@
-"""Regression tests for the v0.6.0 reviewer-driven corrections."""
+"""Regression tests for the v0.7.0 reviewer-driven corrections."""
 from __future__ import annotations
 
 import hashlib
@@ -205,3 +205,21 @@ def test_v6_reproduction_uses_confirmatory_budget_inputs():
     primary_command = REPRODUCE_V6_STAGES["analysis"][0]
     assert "results/v4/budget_confirmatory" in primary_command
     assert "results/v4/budget" not in primary_command
+
+
+def test_confirmatory_budget_is_60_in_all_16_cells():
+    root = Path(__file__).resolve().parents[1]
+    coverage = pd.read_csv(
+        root / "results/v4/budget_confirmatory/coverage.csv"
+    )
+    assert len(coverage) == 16
+    assert set(coverage.model) == {"svc", "gpc"}
+    assert coverage.groupby(["group", "model"]).size().eq(1).all()
+    assert (coverage.n_classical == 115).all()
+    assert (coverage.n_quantum == 60).all()
+    assert (coverage.budget == 60).all()
+
+
+def test_provisional_incomplete_budget_directory_is_absent():
+    root = Path(__file__).resolve().parents[1]
+    assert not (root / "results/v4/budget").exists()

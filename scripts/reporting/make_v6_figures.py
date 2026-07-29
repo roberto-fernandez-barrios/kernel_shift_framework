@@ -1,4 +1,4 @@
-"""Generate reviewer-requested v0.6.0 manuscript figures."""
+"""Generate reviewer-requested v0.7.0 manuscript figures."""
 from __future__ import annotations
 
 import argparse
@@ -21,8 +21,14 @@ GROUP_LABELS = {
 }
 GROUP_ORDER = tuple(GROUP_LABELS)
 CONDITIONS = (
-    ("pre_psd", "Sampled, pre-PSD", "#D55E00", "s"),
-    ("post_psd", "PSD-projected", "#0072B2", "o"),
+    ("pre_psd", "Sampled (no PSD)", "#D55E00", "s"),
+    (
+        "independent_square_psd",
+        "Independent square PSD",
+        "#0072B2",
+        "o",
+    ),
+    ("nystrom_psd", "Train-based Nyström PSD", "#009E73", "^"),
 )
 
 
@@ -89,7 +95,7 @@ def make_shots_mc_figure(summary_path: Path, output_path: Path) -> None:
         handles,
         labels,
         loc="outside upper center",
-        ncol=2,
+        ncol=3,
         frameon=False,
         handlelength=2.5,
     )

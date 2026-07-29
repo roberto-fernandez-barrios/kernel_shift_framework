@@ -1,4 +1,4 @@
-"""Fail-fast release gates for the reviewer-corrected v0.6.0 artifacts."""
+"""Fail-fast release gates for the reviewer-corrected v0.7.0 artifacts."""
 from __future__ import annotations
 
 import argparse
@@ -41,7 +41,29 @@ def validate_corrected_estimand(root: Path) -> None:
         raise ValueError("specification S10 must contain three source datasets")
 
 
-def validate_budget_and_rank(root: Path) -> None:
+def validate_budget_and_rank(root: Path, coverage_path: Path) -> None:
+    coverage = pd.read_csv(coverage_path)
+    expected_groups = {
+        "ember_m1",
+        "ember_m2",
+        "unsw_dos_natural_cur",
+        "unsw_dos_m2_centroid",
+        "unsw_recon_natural_cur",
+        "unsw_recon_m2_centroid",
+        "toniot_scanning_natural_cur",
+        "toniot_scanning_m2_centroid",
+    }
+    if len(coverage) != 16:
+        raise ValueError("confirmatory coverage must contain 16 group--classifier cells")
+    if set(coverage.group) != expected_groups or set(coverage.model) != {"svc", "gpc"}:
+        raise ValueError("confirmatory group--classifier coverage is incomplete")
+    if not (
+        (coverage.n_classical == 115)
+        & (coverage.n_quantum == 60)
+        & (coverage.budget == 60)
+    ).all():
+        raise ValueError("confirmatory budget must be 115-vs-60 with matched budget 60")
+
     budget = pd.read_csv(root / "budget/scheme_summary.csv")
     if set(budget.scheme) != {"kernel_blocked", "uniform", "kernel_stratified"}:
         raise ValueError("budget scheme sensitivity is incomplete")
@@ -84,6 +106,13 @@ def validate_finite_shots(root: Path, result_roots: tuple[Path, ...]) -> None:
         raise ValueError("unexpected finite-shot seed-cell count")
     if seed_cells.stable_seed_train.nunique() != len(seed_cells):
         raise ValueError("finite-shot train seeds collide")
+    nystrom = frame[frame.projection_condition == "nystrom_psd"]
+    if nystrom.nystrom_retained_rank.isna().any():
+        raise ValueError("Nyström retained rank is missing")
+    if (nystrom.nystrom_retained_rank <= 0).any():
+        raise ValueError("Nyström retained rank must be positive")
+    if nystrom.nystrom_eigenvalue_tolerance.isna().any():
+        raise ValueError("Nyström eigenvalue tolerance is missing")
 
     for fixed in FIXED_RUNS:
         result_dir = locate_run(fixed.run, result_roots)
@@ -116,6 +145,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=Path("results/v6"))
     parser.add_argument(
+        "--coverage",
+        type=Path,
+        default=Path("results/v4/budget_confirmatory/coverage.csv"),
+    )
+    parser.add_argument(
         "--result-roots",
         type=Path,
         nargs="+",
@@ -127,11 +161,11 @@ def main() -> None:
     args = parser.parse_args()
     validate_corrected_estimand(args.root)
     print("[ok] corrected three-source S10 estimand")
-    validate_budget_and_rank(args.root)
-    print("[ok] budget and rank-matching sensitivities")
+    validate_budget_and_rank(args.root, args.coverage)
+    print("[ok] complete 60-candidate budget and rank-matching sensitivities")
     validate_finite_shots(args.root, tuple(args.result_roots))
     print("[ok] repeated finite-shot artifacts and exact references")
-    print("[ok] all v0.6.0 analysis artifact gates passed")
+    print("[ok] all v0.7.0 analysis artifact gates passed")
 
 
 if __name__ == "__main__":
