@@ -11,6 +11,10 @@ submission. The editorial case is not that quantum kernels lose a broad
 benchmark; it is that the evaluation protocol changes the apparent robustness
 claim under distribution shift.
 
+The official Collection page was rechecked on 2026-07-29: submissions are
+open and the listed deadline is 2026-12-31:
+<https://www.nature.com/collections/iheeaggidj/about-the-collection>.
+
 The central contribution is the controlled combination of:
 
 1. train--test distribution shift;
