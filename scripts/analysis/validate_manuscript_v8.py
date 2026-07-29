@@ -7,6 +7,7 @@ from pathlib import Path
 
 MAIN = Path("manuscript/sn-article.tex")
 SUPPLEMENT = Path("manuscript/supplementary.tex")
+GENERATED_TABLE_ROWS = Path("manuscript/generated")
 
 
 def uncommented(text: str) -> str:
@@ -124,7 +125,23 @@ def validate_supplement(text: str) -> None:
         raise ValueError("Supplementary Information contains a Methods section")
     if r"\section*{Supplementary Results:" not in active:
         raise ValueError("Supplementary Results structure is missing")
+    generated_files = sorted(GENERATED_TABLE_ROWS.glob("v8_*_rows.tex"))
+    if not generated_files:
+        raise ValueError("generated v0.8 table rows are missing")
+    for path in generated_files:
+        for row in path.read_text(encoding="utf-8").splitlines():
+            if not row.strip() or row.strip() in {r"\addlinespace", r"\midrule"}:
+                continue
+            if row not in active:
+                raise ValueError(
+                    f"{path}: generated row is not represented verbatim in "
+                    "Supplementary Information"
+                )
     print("[ok] Supplementary Information contains results/diagnostics only")
+    print(
+        "[ok] Supplementary v0.8 tables match "
+        f"{len(generated_files)} generated row files"
+    )
 
 
 def main() -> None:

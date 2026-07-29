@@ -74,7 +74,12 @@ one source dataset, not independent datasets.
   estimand, but the map is explicitly cross-generation and associational.
 - A 2x2x2x2 SVC factorial within v4 crosses selection, regularization,
   reference family, and candidate budget without using the legacy/v4 boundary
-  to isolate an axis.
+  to isolate an axis. Its fixed-C/oracle/customary/native corner is +0.01308
+  and its train-CV/ID-validation/extended/equal-count corner is -0.00467
+  (descriptive contraction 0.01775). Mean paired changes are -0.00838 for
+  regularization, -0.00795 for reference strength, -0.00367 for selection,
+  and -0.00019 for budget; a +0.01394 regularization-by-reference interaction
+  prohibits treating them as additive contributions.
 - The circuit audit distinguishes two entangling ZZ maps from two separable
   product maps. At matched 30-candidate budgets, the source-dataset-equal SVC
   effects are -0.00928 and -0.00547, respectively; excluding product maps does
@@ -82,7 +87,11 @@ one source dataset, not independent datasets.
 - Logical circuit depth/CX counts and exact finite-shot sampling-resource
   projections are reported.
 - A frozen q1000 ablation removes port/protocol/service-derived fields before
-  the shared embedding and reports all six network fixed cases.
+  the shared embedding and reports all six network fixed cases. The
+  two-source-dataset-equal controlled effect changes from -0.00306 to
+  -0.02452; the source-dataset changes are -0.04468 for ToN-IoT and +0.00176
+  for UNSW-NB15, so the result is reported as heterogeneous rather than as a
+  universal shortcut conclusion.
 - `kernel_blocked` is explicitly primary because it samples whole
   kernel-shape blocks crossed with all five dimensions. Uniform and
   kernel-stratified sensitivities change no family-level conclusion.
@@ -164,8 +173,10 @@ python -m pytest tests -q
 Current status:
 
 - the immutable v0.7 reproduction and artifact gates pass;
-- the v0.8 circuit and resource gates and focused tests pass;
-- the 360-run fixed-C and 270-run shortcut campaigns are in progress;
+- the complete 360-run fixed-C and 270-run shortcut campaigns finished with
+  no worker errors;
+- all v0.8 analysis, circuit, resource, campaign-coverage, and manuscript
+  format gates pass;
 - final v0.8 full-suite, PDF, visual, and artifact-identity gates remain open;
 - authors approve the target, claims, and required releases.
 

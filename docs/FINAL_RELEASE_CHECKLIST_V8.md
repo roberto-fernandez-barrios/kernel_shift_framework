@@ -18,10 +18,10 @@ Zenodo versions must not be moved or replaced.
   conditional fixed-case interpretation.
 - [x] Remove the incomplete Huang geometric-difference claim.
 - [x] Correct environment and author-provided-audit descriptions.
-- [ ] Complete all 360 fixed-C and 270 shortcut-ablation run outputs.
-- [ ] Generate and inspect the entangling/product, factorial, shortcut, and
+- [x] Complete all 360 fixed-C and 270 shortcut-ablation run outputs.
+- [x] Generate and inspect the entangling/product, factorial, shortcut, and
   five-cluster-value outputs.
-- [ ] Insert every new result into the main manuscript and Supplementary
+- [x] Insert every new result into the main manuscript and Supplementary
   Information without hiding fixed-case heterogeneity.
 - [ ] Final author review of scientific claims and tables.
 
@@ -42,18 +42,18 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error sn-article.tex
 latexmk -pdf -interaction=nonstopmode -halt-on-error supplementary.tex
 ```
 
-- [ ] v0.7 integrity gates still pass.
-- [ ] v0.8 campaign and derived-artifact gates pass.
-- [ ] Complete test suite passes.
-- [ ] No undefined citations/references or overfull boxes.
-- [ ] Main and Supplementary PDFs rendered to page images and inspected.
+- [x] v0.7 integrity gates still pass.
+- [x] v0.8 campaign and derived-artifact gates pass.
+- [x] Complete test suite passes (79/79).
+- [x] No undefined citations/references or overfull boxes.
+- [x] Main and Supplementary PDFs rendered to page images and inspected.
 - [ ] Submission directory contains one unambiguous main PDF and one
   Supplementary PDF.
-- [ ] Article title is at most 15 words, abstract at most 150 words, and the
+- [x] Article title is at most 15 words, abstract at most 150 words, and the
   main manuscript contains no separate Conclusions or Limitations section.
-- [ ] All procedural descriptions remain in main-file Methods; Supplementary
+- [x] All procedural descriptions remain in main-file Methods; Supplementary
   Information contains results and diagnostics only.
-- [ ] Main manuscript has no more than ten display items and every multi-panel
+- [x] Main manuscript has no more than ten display items and every multi-panel
   figure uses lower-case panel labels.
 - [ ] Authors verify the public-data ethics and consent statement literally.
 

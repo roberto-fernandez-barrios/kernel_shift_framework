@@ -360,6 +360,7 @@ Scenario & Clf. & $q=7$ & $q=42$ & $q=123$ & $q=999$ & $q=2024$ \\
 \end{tabular}
 \end{table}
 
+\clearpage
 \section*{Supplementary Results: Quantum-map strata}
 \label{supp:quantum_strata}
 
@@ -402,12 +403,142 @@ Source-dataset-equal & $-0.0057\;[-0.0080,-0.0029]$ & $-0.0093\;[-0.0116,-0.0058
 For P1$'$ selection, product maps account for 594/1,080 SVC winners and
 348/1,080 GPC winners. Under same-test OOD selection, the corresponding
 counts are 650/1,080 and 528/1,080. Complete counts by individual map are
-provided in \texttt{quantum\_winner\_composition.csv}.
+shown in Table~\ref{supp:tab_quantum_winners} and provided in
+\texttt{quantum\_winner\_composition.csv}.
 
+\begin{table}[htbp]
+\centering
+\caption{Quantum-map composition of the within-family winner. Each
+model--selector column contains 1,080 fixed security runs. Counts and
+percentages describe which configuration maximizes the specified selection
+metric within the quantum family; they do not compare its OOD accuracy with
+the classical family. P1$'$ uses disjoint ID validation, whereas the OOD
+oracle reuses the shifted-test labels.}
+\label{supp:tab_quantum_winners}
+\scriptsize
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{llrrrr}
+\toprule
+Map & Stratum & P1$'$ SVC & P1$'$ GPC & OOD-oracle SVC & OOD-oracle GPC \\
+\midrule
+ZZ, 1 rep. & entangling ZZ & 290 (26.9\%) & 353 (32.7\%) & 282 (26.1\%) & 279 (25.8\%) \\
+ZZ, 2 reps. & entangling ZZ & 196 (18.1\%) & 379 (35.1\%) & 148 (13.7\%) & 273 (25.3\%) \\
+Pauli-X/Z, 1 rep. & separable product & 315 (29.2\%) & 171 (15.8\%) & 353 (32.7\%) & 246 (22.8\%) \\
+Z, 2 reps. & separable product & 279 (25.8\%) & 177 (16.4\%) & 297 (27.5\%) & 282 (26.1\%) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section*{Supplementary Results: Within-v4 factorial}
+\label{supp:factorial}
+
+The q1000 factorial holds the v4 data generation, split roles, kernel
+inventory, and preprocessing fixed while crossing regularization, selector,
+classical reference, and budget mode. Table~\ref{supp:tab_factorial} reports
+all 16 three-source-dataset-equal endpoints. The fixed-$C$, same-test-oracle,
+customary-reference, native-budget corner is $+0.0131$; the train-CV,
+ID-validation, extended-reference, equal-count corner is $-0.0047$.
+These endpoints are fixed-case summaries, not population effects.
+
+\begin{table}[htbp]
+\centering
+\caption{Within-v4 q1000 SVC factorial. Entries are three-source-dataset-equal
+quantum-minus-classical OOD balanced-accuracy effects. ``Native'' uses the
+complete family pools; ``equal count'' block-samples the larger family.
+Positive values favour the fidelity-kernel family.}
+\label{supp:tab_factorial}
+\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{lrrrr}
+\toprule
+Regularization and selector & Customary native & Customary equal & Extended native & Extended equal \\
+\midrule
+$C=1$, OOD oracle & $+0.0131$ & $+0.0094$ & $-0.0010$ & $+0.0021$ \\
+$C=1$, ID validation & $+0.0118$ & $+0.0118$ & $-0.0079$ & $-0.0068$ \\
+Train-CV, OOD oracle & $+0.0018$ & $-0.0012$ & $-0.0066$ & $-0.0040$ \\
+Train-CV, ID validation & $-0.0074$ & $-0.0084$ & $-0.0040$ & $-0.0047$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{supp:tab_factorial_contrasts} summarizes paired axis changes and
+pairwise differences-in-differences. Each axis row averages its paired change
+over the other eight factorial cells; each interaction row averages over the
+four cells of the remaining two axes. The relatively large
+regularization-by-reference interaction shows why the axis averages are not
+interpreted as independent, additive, or causal contributions.
+
+\begin{table}[htbp]
+\centering
+\caption{Descriptive factorial axis changes and pairwise interactions.
+Changes are level-two minus level-one quantum-minus-classical effects, so a
+negative value is a shift towards the classical family. Interactions are
+differences-in-differences. No population inference, causal attribution, or
+familywise decision rule is attached to these finite-design summaries.}
+\label{supp:tab_factorial_contrasts}
+\scriptsize
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lr}
+\toprule
+Finite-design summary & Mean change \\
+\midrule
+Regularization: $C=1\to$ train-CV & $-0.0084$ \\
+Selection: OOD oracle $\to$ ID validation & $-0.0037$ \\
+Reference: customary $\to$ extended & $-0.0079$ \\
+Budget: native $\to$ equal count & $-0.0002$ \\
+\addlinespace
+Interaction: reference $\times$ budget mode & $+0.0034$ \\
+Interaction: regularization $\times$ budget mode & $-0.0007$ \\
+Interaction: regularization $\times$ reference & $+0.0139$ \\
+Interaction: regularization $\times$ selection & $+0.0000$ \\
+Interaction: selection $\times$ budget mode & $+0.0001$ \\
+Interaction: selection $\times$ reference & $+0.0004$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section*{Supplementary Results: Network-field ablation}
+\label{supp:shortcut}
+
+The frozen q1000 sensitivity removes port-, protocol-, and service-related
+fields before fitting the shared train-only embedding. The ablation changes
+absolute task difficulty, especially for the ToN-IoT campaign shift, and can
+affect the two kernel families differently. Table~\ref{supp:tab_shortcut}
+therefore reports original, ablated, and paired-change effects separately.
+
+\begin{table}[htbp]
+\centering
+\caption{Port/protocol/service-field ablation under train-CV, P1$'$, and
+blocked 60-candidate matching (SVC). Scenario-group brackets are pointwise
+95\% conditional cluster-$t$ intervals over five q-split clusters and are not
+simultaneous. The final-row bracket is the range of the UNSW-NB15 and ToN-IoT
+source-dataset changes, not a confidence interval.}
+\label{supp:tab_shortcut}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrr}
+\toprule
+Scenario & Original effect & Ablated effect & Ablated minus original \\
+\midrule
+UNSW-DoS (campaign) & $-0.0021\;[-0.0208,+0.0167]$ & $-0.0108\;[-0.0231,+0.0016]$ & $-0.0087\;[-0.0234,+0.0061]$ \\
+UNSW-DoS (constructed) & $+0.0014\;[-0.0132,+0.0161]$ & $+0.0008\;[-0.0264,+0.0280]$ & $-0.0006\;[-0.0234,+0.0221]$ \\
+UNSW-Recon (campaign) & $-0.0028\;[-0.0275,+0.0220]$ & $+0.0072\;[-0.0091,+0.0234]$ & $+0.0099\;[-0.0268,+0.0466]$ \\
+UNSW-Recon (constructed) & $-0.0138\;[-0.0284,+0.0007]$ & $-0.0074\;[-0.0289,+0.0141]$ & $+0.0065\;[-0.0186,+0.0315]$ \\
+ToN-IoT (campaign) & $-0.0007\;[-0.0111,+0.0097]$ & $-0.0801\;[-0.1717,+0.0114]$ & $-0.0794\;[-0.1753,+0.0165]$ \\
+ToN-IoT (constructed) & $-0.0029\;[-0.0095,+0.0037]$ & $-0.0129\;[-0.0516,+0.0259]$ & $-0.0100\;[-0.0459,+0.0259]$ \\
+\midrule
+Two-source-dataset-equal & $-0.0031$ & $-0.0245$ & $-0.0215\;[-0.0447,+0.0018]$ \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\clearpage
 \section*{Supplementary Results: Circuit resources}
 \label{supp:circuits}
 
-\begin{table}[p]
+\begin{table}[htbp]
 \centering
 \caption{Complete logical circuit audit. Counts follow Qiskit 2.3.1
 decomposition to \texttt{rz}, \texttt{sx}, \texttt{x}, and \texttt{cx} at
