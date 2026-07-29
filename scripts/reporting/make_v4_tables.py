@@ -1,8 +1,9 @@
 # scripts/reporting/make_v4_tables.py
 """
 LaTeX tables for the v4 (honest-selection) manuscript. Every number traces to
-a results/v4/ CSV produced by the confirmatory pipeline. Framing F1: no robust
-family-level advantage survives matched budget and honest selection.
+a results/v4/ CSV produced by the confirmatory pipeline. Framing F1: the fixed
+cases provide no consistent evidence of a family-level quantum advantage
+under matched budget and target-label-free selection.
 
 Outputs booktabs bodies under results/v4/tables/.
 """
