@@ -108,6 +108,24 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def matches_frozen_text_sha256(path: Path, expected: str) -> bool:
+    """Match a frozen text hash across Git's LF/CRLF checkout conversion only.
+
+    The v0.6.0 CSV hashes were frozen from a Windows checkout.  Git stores the
+    same text with LF line endings and may materialize CRLF or LF depending on
+    platform.  Accept the raw bytes or either canonical newline rendering, but
+    no other content change.
+    """
+    raw = path.read_bytes()
+    normalized = raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    variants = {
+        raw,
+        normalized,
+        normalized.replace(b"\n", b"\r\n"),
+    }
+    return expected in {hashlib.sha256(value).hexdigest() for value in variants}
+
+
 def stable_measurement_seed(
     run: str,
     kernel: str,
@@ -196,7 +214,7 @@ def build_exact_blocks(fixed: FixedRun, result_dir: Path) -> tuple[dict, dict]:
 
     summary_path = result_dir / "summary_v4.csv"
     observed_hash = sha256_file(summary_path)
-    if observed_hash != fixed.summary_sha256:
+    if not matches_frozen_text_sha256(summary_path, fixed.summary_sha256):
         raise RuntimeError(
             f"{fixed.run}: summary hash {observed_hash} != frozen {fixed.summary_sha256}"
         )

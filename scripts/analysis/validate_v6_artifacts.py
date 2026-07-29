@@ -13,7 +13,7 @@ from scripts.analysis.shots_mc_v6 import validate as validate_shots
 from scripts.experiments.run_shots_mc_v6 import (
     FIXED_RUNS,
     locate_run,
-    sha256_file,
+    matches_frozen_text_sha256,
 )
 
 
@@ -88,7 +88,7 @@ def validate_finite_shots(root: Path, result_roots: tuple[Path, ...]) -> None:
     for fixed in FIXED_RUNS:
         result_dir = locate_run(fixed.run, result_roots)
         summary_path = result_dir / "summary_v4.csv"
-        if sha256_file(summary_path) != fixed.summary_sha256:
+        if not matches_frozen_text_sha256(summary_path, fixed.summary_sha256):
             raise ValueError(f"summary hash changed for {fixed.run}")
         summary = pd.read_csv(summary_path)
         exact = summary[

@@ -1,6 +1,7 @@
 """Regression tests for the v0.6.0 reviewer-driven corrections."""
 from __future__ import annotations
 
+import hashlib
 import sys
 from pathlib import Path
 
@@ -16,6 +17,7 @@ from scripts.analysis.mechanism_robustness_v4 import (  # noqa: E402
     summarize_rank_matches,
 )
 from scripts.experiments.run_shots_mc_v6 import (  # noqa: E402
+    matches_frozen_text_sha256,
     select_p1_winner,
     stable_measurement_seed,
 )
@@ -131,6 +133,16 @@ def test_finite_shot_seed_is_stable_and_block_specific():
     assert seed == stable_measurement_seed(*args, "train")
     assert seed != stable_measurement_seed(*args, "ood_square")
     assert 0 <= seed < 2**64
+
+
+def test_frozen_text_hash_accepts_only_line_ending_conversion(tmp_path):
+    crlf = b"group,delta\r\nember_m1,-0.1\r\n"
+    expected = hashlib.sha256(crlf).hexdigest()
+    candidate = tmp_path / "summary.csv"
+    candidate.write_bytes(crlf.replace(b"\r\n", b"\n"))
+    assert matches_frozen_text_sha256(candidate, expected)
+    candidate.write_bytes(b"group,delta\nember_m1,-0.2\n")
+    assert not matches_frozen_text_sha256(candidate, expected)
 
 
 def test_p1_tie_break_matches_lexicographic_candidate_order():
