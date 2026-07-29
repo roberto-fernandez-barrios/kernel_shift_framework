@@ -215,7 +215,7 @@ def validate_analysis_outputs(root: Path) -> None:
     shortcut_datasets = _read(root, "shortcut_ablation_dataset_effects.csv")
     if (
         len(shortcut_datasets) != 2
-        or set(shortcut_datasets.dataset) != {"UNSW-NB15", "ToN-IoT"}
+        or set(shortcut_datasets.dataset) != {"unsw", "toniot"}
         or int(shortcut_datasets.n_groups.sum()) != 6
     ):
         raise ValueError("shortcut-ablation source-dataset coverage mismatch")
