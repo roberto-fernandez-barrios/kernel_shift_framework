@@ -79,6 +79,13 @@ def validate_campaign_outputs(roots: tuple[Path, ...]) -> None:
             raise ValueError(f"{path}: expected 525 rows, found {len(frame)}")
         if set(frame.regularization) != {"fixed_c1"}:
             raise ValueError(f"{path}: fixed-C regularization label mismatch")
+        if not np.allclose(frame.c_selected, 1.0):
+            raise ValueError(f"{path}: fixed-C rows do not use C=1")
+        if (
+            set(frame.feature_policy) != {"full_v4_features"}
+            or not (frame.n_removed_features == 0).all()
+        ):
+            raise ValueError(f"{path}: fixed-C row-level feature policy mismatch")
         if set(frame.split) != {"id_val", "id_test", "ood_test"}:
             raise ValueError(f"{path}: split coverage mismatch")
         if set(frame.id_split_hash_salt) != {"ksf-v4-idsplit::"}:
