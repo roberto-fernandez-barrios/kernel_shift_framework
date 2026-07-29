@@ -33,14 +33,15 @@ This repository intentionally ships multiple dependency views because they serve
 - `environment.yml` — recommended Conda environment for normal use
 - `requirements.txt` — pinned top-level pip environment
 - `requirements-compat.txt` — looser compatibility envelope
-- `environment.lock.yml` — more explicit Conda snapshot, if needed
+- `environment.lock.yml` — more explicit Windows-specific Conda snapshot
 - `requirements.lock.txt` — more explicit pip snapshot, if needed
 
 Normal use:
 
 - use `environment.yml` for the standard Conda path,
 - use `requirements.txt` for the standard pip path,
-- use the lockfiles only when you specifically want a closer archival rerun.
+- use the lockfiles only when you specifically want a closer archival rerun;
+  they are dependency records, not exact machine images.
 
 ## What still remains outside strict archival reproducibility
 
