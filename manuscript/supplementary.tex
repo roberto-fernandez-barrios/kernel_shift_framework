@@ -1,11 +1,10 @@
 \documentclass[11pt]{article}
 
-\usepackage[a4paper,margin=2.4cm]{geometry}
+\usepackage[a4paper,margin=2.2cm]{geometry}
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{multirow}
-\usepackage[round,authoryear]{natbib}
 \usepackage[hidelinks]{hyperref}
 \usepackage{microtype}
 \usepackage{url}
@@ -15,7 +14,7 @@
 \renewcommand{\figurename}{Supplementary Figure}
 
 \title{\textbf{Supplementary Information}\\[0.5em]
-Evaluation Choices Determine Apparent Quantum-Kernel Robustness under Distribution Shift}
+Evaluation Choices Determine Apparent Quantum Kernel Robustness under Distribution Shift}
 \author{Roberto Fern\'andez-Barrios, Iker Pastor-L\'opez,\\
 Asier Gonz\'alez-Santocildes, and Pablo Garc\'ia Bringas\\[0.4em]
 \small Faculty of Engineering, University of Deusto, Bilbao, Spain}
@@ -24,115 +23,33 @@ Asier Gonz\'alez-Santocildes, and Pablo Garc\'ia Bringas\\[0.4em]
 \begin{document}
 \maketitle
 
-\section*{Supplementary Note: Scope}
+\section*{Supplementary Results: Scope}
 
-This document provides the construction details, complete candidate definitions, secondary analyses, and reporting specifications that support the main article. The primary estimand and conclusions are unchanged: the eight scenario-groups are fixed case studies; the headline comparison selects configurations without out-of-distribution (OOD) labels, tunes regularization from training data only, and gives the two extended kernel families equal candidate budgets. All tables and figures are generated from the frozen machine-readable analysis artifact.
+This document contains extended results, complete sensitivity tables, and
+diagnostics supporting the main article. No procedure is defined exclusively
+here: all data construction, preprocessing, candidate grids, selection rules,
+inference, external acquisition, geometry calculations, and finite-shot
+procedures are reported in the main manuscript Methods. Machine-readable
+values and frozen input hashes are included in the immutable release artifact.
 
-\section*{Supplementary Note: Dataset and shift construction}
-\label{supp:data}
-
-\subsection*{Common split structure}
-
-We study binary malware or network-attack classification using EMBER \citep{anderson2018ember}, UNSW-NB15 \citep{moustafa2015unsw}, and ToN-IoT \citep{alsaedi2020toniot}. Every setting has a training set $T$, an in-distribution test set $S_{\mathrm{ID}}$, and a shifted test set $S_{\mathrm{OOD}}$. Classical and quantum kernels always use the same samples. Class balance is preserved in the constructed splits, so the measured change is not driven by a prevalence shift.
-
-\subsection*{EMBER label-conditional tail shifts}
-
-The EMBER analysis uses the histogram and byte-entropy feature blocks and two reproducible stress tests. Both select OOD samples within each class. They are therefore described as \emph{label-conditional tail shifts}, not as certified covariate shifts: conditioning the split on the class does not establish that $P(Y\mid X)$ is invariant.
-
-In the $m1$ construction, each sample receives a sparsity score equal to the number of non-zero entries in the selected feature block. The OOD set contains the low- and high-score extremes within each class. The remaining samples form an ID pool from which training and ID test sets are sampled stratifiably.
-
-In the $m2$ construction, the final training set is fixed first. Class-conditional centroids are computed in a MaxAbs-scaled, TruncatedSVD space fitted on training data only. Every non-training sample is scored by its Euclidean distance to its own-class centroid. The low- and high-distance extremes within each class form the exact-size OOD set, and the ID test set is drawn from the remainder. This construction therefore probes unusual geometry relative to the final training set.
-
-\subsection*{Network-flow scenarios}
-
-The network experiments define UNSW-NB15 DoS, UNSW-NB15 Reconnaissance, and ToN-IoT Scanning scenarios. Numeric-only preparation removes identifiers, label-derived columns, and categorical protocol fields, retaining 39 UNSW-NB15 features and 89 ToN-IoT features. The largest observed absolute feature-label correlation is $0.62$, attained by a legitimate traffic feature rather than a label-derived field; the public artifact includes the leakage audit.
-
-Each scenario has a reference pool and a current pool. Two mechanisms are applied. The \emph{m2-centroid} mechanism is the network analogue of EMBER $m2$: class-conditional centroids are fitted in a train-only MaxAbs+TruncatedSVD space and within-class distance tails define the OOD pool. The \emph{attack-campaign regime shift} uses no geometric selection. Training and ID samples come from benign traffic plus all non-target attack categories, whereas OOD samples come from benign traffic plus the held-out target campaign. For UNSW-NB15, the pools also use different official capture partitions. This is consequently an unseen-campaign plus capture-partition shift, not a timestamp-defined temporal split.
-
-\section*{Supplementary Note: Controlled kernel-swap protocol}
-\label{supp:protocol}
-
-\subsection*{Preprocessing and classifiers}
-
-All models use MaxAbs scaling followed by TruncatedSVD with
-\[
-d\in\{4,6,8,10,12\}.
-\]
-For fidelity kernels, each reduced coordinate is mapped linearly to $[0,\pi]$ before the angle-scale factor is applied. Preprocessing is fitted using the training split and shared across families.
-
-Two learners consume precomputed Gram matrices. The primary learner is support-vector classification (SVC). The secondary learner is binary Gaussian-process classification using the standard Laplace approximation with a logistic link \citep{rasmussen2006gpml}. The GP classifier supplies approximate probabilities for the uncertainty analysis; no post-hoc calibration is applied. Comparisons are always made within a classifier.
-
-\subsection*{Kernel candidates}
-
-The customary classical reference contains a cosine-normalized linear kernel and the radial-basis-function (RBF) kernel
-\[
-K_{\mathrm{RBF}}(x,x')=\exp[-\gamma\|x-x'\|_2^2].
-\]
-The extended classical family adds cosine-normalized polynomial kernels of degrees 2 and 3, the Laplacian kernel, and Mat\'ern kernels with $\nu\in\{3/2,5/2\}$. Base length scales are set by the median pairwise training distance. RBF, Laplacian, and Mat\'ern candidates sweep factors
-\[
-f\in\{0.1,0.3,1,3,10\}
-\]
-relative to their base scale.
-
-The quantum family uses fidelity kernels
-\[
-K_Q(x,x')=\left|\langle\phi_Q(x)\mid\phi_Q(x')\rangle\right|^2
-\]
-from four commonly used feature-map configurations: ZZ maps with one and two repetitions, a PauliXZ map with one repetition, and a Z map. Each is evaluated at angle scales $\{0.5,1,2\}$. These candidates cover representative low-qubit fidelity constructions rather than the full quantum-kernel design space.
-
-\subsection*{Regularization, deployment selection, and candidate budgets}
-
-For each of the 23 classical and 12 quantum kernel geometries, SVC regularization is selected from
-\[
-C\in\{0.01,0.1,1,10,100\}
-\]
-by five-fold stratified cross-validation on the training Gram matrix. Ties are broken toward the smaller $C$. Because $C$ is resolved within each configuration before the family comparison, it is not counted as another family-level candidate.
-
-The primary P1$'$ deployment protocol divides the original ID test split deterministically and class-stratifiably into an ID-validation half and a disjoint ID-test half. Within a run and family, the configuration with the highest ID-validation balanced accuracy is deployed and evaluated on the untouched ID-test and OOD-test splits. No OOD label enters selection.
-
-The quantum pool contains 60 candidates in full-coverage groups and 20 in reduced-coverage groups after combining feature map, angle scale, and dimension. The frozen primary analysis compares it with an equal-size sample from the extended classical pool. Five thousand subsamples and three sampling schemes characterize budget sensitivity. The full 115-candidate classical pool is retained as a secondary sensitivity. P2 uses OOD information from other realizations and P3 selects on the same OOD test labels; neither is a deployable primary analysis.
-
-\subsection*{Repeated runs and fixed-case inference}
-
-Each setting is realized with five split seeds and three model seeds, giving fifteen pipeline realizations per evaluated configuration. The eight scenario-groups share source pools and are not exchangeable; in particular, some constructed EMBER OOD samples recur across master seeds. The analysis therefore treats scenario-groups as fixed case studies. Per-group quantum-minus-classical effects are means over the five split-seed clusters with conditional $t$ intervals. BCa bootstrap and leave-one-split-out calculations are secondary diagnostics. Across groups, we report dataset-equal means and leave-one-dataset-out ranges, not a population $p$-value.
-
-\begin{table}[t]
-\centering
-\caption{Complete experimental protocol.}
-\label{supp:tab_protocol}
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{lp{10.5cm}}
-\toprule
-Component & Specification \\
-\midrule
-Scenarios & EMBER; UNSW-NB15 DoS; UNSW-NB15 Reconnaissance; ToN-IoT Scanning \\
-Shift mechanisms & EMBER $m1$ and $m2$; network m2-centroid and held-out attack-campaign shift \\
-Master seeds & 42, 123, 999 \\
-Split seeds & 42, 123, 999, 7, 2024 \\
-Model seeds & 42, 123, 999 \\
-Runs & $5\times3=15$ per evaluated configuration \\
-Sizes $(n_{\mathrm{train}},n_{\mathrm{ID}},n_{\mathrm{OOD}})$ & $(1000,500,500)$, $(2000,1000,1000)$, $(4000,1800,1800)$ \\
-Dimensions & $d\in\{4,6,8,10,12\}$ \\
-Classifiers & Precomputed-kernel SVC; precomputed-kernel Laplace GP classifier \\
-Classical family & Linear, RBF, polynomial (2, 3), Laplacian, Mat\'ern ($3/2$, $5/2$) \\
-Quantum family & ZZ (1 and 2 repetitions), PauliXZ, Z map; fidelity overlap \\
-Scale freedom & Five classical length-scale factors; three quantum angle factors \\
-Regularization & Per-configuration SVC $C$, five-fold training-only cross-validation \\
-Primary selection & P1$'$ ID-validation; no OOD labels; equal candidate budgets \\
-Inference & Fixed-case conditional intervals; dataset-equal summaries; no population $p$-value \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\section*{Supplementary Note: Frozen specification curve}
+\section*{Supplementary Results: Frozen specification curve}
 \label{supp:specification}
 
-The specification curve aggregates only complete paired endpoints already present in the versioned legacy and v4 artifacts; it does not refit a model or alter the experiment grid. Specifications were ordered S1--S10 before aggregation and are not ranked by their observed effect. Within a specification, realizations are averaged within setting, settings within scenario-group, scenario-groups within source dataset, and finally the three source datasets with equal weight. The specification-curve figure in the main article displays every scenario-group as well as the dataset-equal mean.
+The ten rows remain in their prespecified S1--S10 order rather than being
+ranked by outcome. Every row includes all eight fixed security
+scenario-groups. Scenario-groups are averaged within EMBER, UNSW-NB15, and
+ToN-IoT before the three source datasets receive equal weight. The corrected
+S10 values in Table~\ref{supp:tab_specification} are identical to the
+confirmatory endpoint in the main article.
 
-\begin{table}[t]
+\begin{table}[ht]
 \centering
-\caption{Frozen specification definitions and dataset-equal quantum-minus-classical OOD balanced-accuracy effects. ``Oracle'' selects and evaluates on the same OOD test labels; ``ID-val'' uses a disjoint in-distribution validation split. SVC regularization is fixed at $C=1$ or selected by training-only cross-validation; this axis is not applicable to GPC.}
+\caption{Frozen specification definitions and source-dataset-equal
+quantum-minus-classical OOD balanced-accuracy effects. ``Oracle'' selects and
+evaluates on the same OOD test labels; ``ID-val'' uses a disjoint
+in-distribution validation split. SVC regularization is fixed at $C=1$ or
+selected by training-only cross-validation; this axis is not applicable to
+GPC. Values are descriptive fixed-case summaries.}
 \label{supp:tab_specification}
 \scriptsize
 \setlength{\tabcolsep}{3pt}
@@ -154,78 +71,163 @@ S10 & ID-val & Train CV & Extended & Equal & $-0.0056$ & $-0.0009$ \\
 \end{tabular}
 \end{table}
 
-The range of the dataset-equal mean is $0.0531$ for SVC and $0.0447$ for GPC. This spread is descriptive rather than a confidence interval: the specifications share data and candidates, and they are deliberately different estimands. Its purpose is to expose how much of the headline depends on label access, regularization, reference-family strength, and search budget.
+The source-dataset-equal range is 0.0531 for SVC and 0.0447 for GPC.
+This spread is not an interval: the specifications share data and candidates
+and deliberately target different estimands.
 
-\section*{Supplementary Note: External TableShift validation}
-\label{supp:external}
+\section*{Supplementary Results: Candidate-budget sampling}
+\label{supp:budget}
 
-\subsection*{Prospective freeze and acquisition}
+Table~\ref{supp:tab_budget} shows every group--classifier cell under all three
+prespecified sampling schemes. The primary blocked scheme mirrors the
+five-dimension block structure of the quantum pool; the other schemes match
+candidate count but not the same search-space structure. Their close values
+show that the controlled conclusion is not an artefact of the blocked draw.
 
-The complete external protocol was committed before TableShift data were loaded and before any external quantum or classical result was computed. The source implementation is pinned to TableShift commit \texttt{fca9429814703a07e3902d005d46563a207b7f0a} \citep{gardner2023tableshift}. The fixed tasks were College Scorecard, diabetes readmission, and ACS income; no fallback task was used. Their published domain-split variables are institution type, admission source, and geographic region, respectively. These tasks were selected to span education, health, and socioeconomic-policy data, not because of quantum-kernel performance.
+\begin{table}[ht]
+\centering
+\caption{Complete equal-budget sampling sensitivity. Entries are median
+quantum-minus-classical P1$'$ OOD differences over 5,000 classical-pool
+subsamples. ``Blocked'' is primary; ``uniform'' and ``stratified'' are
+sensitivities. Source-dataset-equal rows average scenario-group medians within
+the three source datasets. These resampling medians are distinct from the
+run-level expected-classical endpoint used for the conditional intervals in
+the main article.}
+\label{supp:tab_budget}
+\small
+\setlength{\tabcolsep}{4.5pt}
+\begin{tabular}{llrrr}
+\toprule
+Scenario & Clf. & Blocked & Uniform & Stratified \\
+\midrule
+\multirow{2}{*}{EMBER $m1$}
+ & SVC & $-0.0056$ & $-0.0054$ & $-0.0054$ \\
+ & GPC & $-0.0004$ & $-0.0009$ & $-0.0013$ \\
+\multirow{2}{*}{EMBER $m2$}
+ & SVC & $-0.0071$ & $-0.0071$ & $-0.0071$ \\
+ & GPC & $+0.0007$ & $+0.0008$ & $+0.0005$ \\
+\multirow{2}{*}{UNSW-DoS (campaign)}
+ & SVC & $-0.0036$ & $-0.0034$ & $-0.0036$ \\
+ & GPC & $-0.0072$ & $-0.0072$ & $-0.0071$ \\
+\multirow{2}{*}{UNSW-DoS (constructed)}
+ & SVC & $-0.0046$ & $-0.0030$ & $-0.0028$ \\
+ & GPC & $-0.0116$ & $-0.0113$ & $-0.0112$ \\
+\multirow{2}{*}{UNSW-Recon (campaign)}
+ & SVC & $+0.0050$ & $+0.0052$ & $+0.0052$ \\
+ & GPC & $+0.0046$ & $+0.0047$ & $+0.0049$ \\
+\multirow{2}{*}{UNSW-Recon (constructed)}
+ & SVC & $-0.0090$ & $-0.0089$ & $-0.0089$ \\
+ & GPC & $-0.0082$ & $-0.0076$ & $-0.0077$ \\
+\multirow{2}{*}{ToN-IoT (campaign)}
+ & SVC & $-0.0147$ & $-0.0149$ & $-0.0143$ \\
+ & GPC & $-0.0095$ & $-0.0094$ & $-0.0096$ \\
+\multirow{2}{*}{ToN-IoT (constructed)}
+ & SVC & $-0.0011$ & $-0.0008$ & $-0.0011$ \\
+ & GPC & $+0.0093$ & $+0.0063$ & $+0.0057$ \\
+\midrule
+\multirow{2}{*}{Source-dataset-equal}
+ & SVC & $-0.00576$ & $-0.00555$ & $-0.00548$ \\
+ & GPC & $-0.00185$ & $-0.00232$ & $-0.00253$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-TableShift's split roles are retained without reinterpretation. The \texttt{train} split fits preprocessing, kernels, classifiers, and SVC regularization; \texttt{validation} selects the deployed kernel; and \texttt{id\_test} and \texttt{ood\_test} are reporting endpoints. The source benchmark's \texttt{ood\_validation} split is never loaded into the analysis pipeline. College Scorecard was acquired from its public CC0 archive because the pinned TableShift downloader unconditionally invokes authenticated Kaggle access; only that redundant download call was bypassed, while the pinned parser, schema, and domain splitting were retained. Source-file SHA-256 hashes and the container image digest are stored in the acquisition audit.
+The largest within-cell scheme range is 0.00353 for ToN-IoT constructed
+under GPC. The next largest is 0.00184 for UNSW-DoS constructed under SVC.
 
-\subsection*{Sampling and leakage gates}
+\section*{Supplementary Results: Effective-rank matching sensitivities}
+\label{supp:rank}
 
-For each source split and seed, rows are ordered by the SHA-256 digest of the task, split, seed, and original row position. Sampling is therefore deterministic and label blind. The first stratum uses $(1000,250,250,500)$ train, validation, ID-test, and OOD-test rows; the second uses $(2000,500,500,1000)$, with the smaller sample nested in the larger one. Seeds are $\{42,123,999,7,2024\}$. Automated gates verify source-row disjointness across split roles, nesting across sizes, both classes in every sample, source-schema preservation, and at least 12 non-constant post-encoding features. All 30 task--size--seed units passed; the encoded dimensionality ranged from 209 to 954 features.
+The predefined rank ratio is
+$\max(r_Q,r_C)/\min(r_Q,r_C)$. Table~\ref{supp:tab_rank} reports all
+calipers for both observational matchers. With replacement, 75.2\% of pairs
+survive the primary 1.25 caliper. One-to-one assignment has a smaller common
+support and becomes visibly poor without a caliper (95th-percentile ratio
+11.45), making the overlap restriction scientifically material.
 
-All transformations are fitted on \texttt{train} only. Constant training columns are removed; numeric variables receive median imputation; Boolean, categorical, and string variables receive most-frequent imputation and one-hot encoding with unknown categories ignored. The combined matrix is MaxAbs scaled and mapped by TruncatedSVD to $d\in\{4,6,8,10,12\}$ using random state 20260729. Each reduced representation is standardized and mapped to $[0,\pi]$ with training-fitted parameters.
+\begin{table}[ht]
+\centering
+\caption{Pooled SVC effective-rank matching sensitivity. ``Nearest'' pairs
+each quantum candidate to its nearest classical rank with classical reuse;
+``one-to-one'' uses minimum-cost assignment without reuse. Retained
+percentages use 64,800 possible quantum candidates as denominator.
+$\Delta$ is quantum minus classical OOD balanced accuracy.}
+\label{supp:tab_rank}
+\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{llrrrrr}
+\toprule
+Matcher & Caliper & Pairs (\%) & Median ratio & 95th pct.\ ratio &
+Median $\Delta$ & Q better \\
+\midrule
+\multirow{5}{*}{Nearest}
+ & 1.10 & 27,928 (43.1) & 1.040 & 1.093 & $-0.0054$ & 29.4\% \\
+ & 1.25 & 48,708 (75.2) & 1.082 & 1.226 & $-0.0056$ & 29.7\% \\
+ & 1.50 & 60,647 (93.6) & 1.112 & 1.390 & $-0.0061$ & 28.9\% \\
+ & 2.00 & 64,408 (99.4) & 1.123 & 1.542 & $-0.0070$ & 27.8\% \\
+ & none & 64,800 (100) & 1.124 & 1.578 & $-0.0071$ & 27.6\% \\
+\midrule
+\multirow{5}{*}{One-to-one}
+ & 1.10 & 13,205 (20.4) & 1.044 & 1.094 & $-0.0048$ & 30.2\% \\
+ & 1.25 & 24,675 (38.1) & 1.092 & 1.232 & $-0.0053$ & 30.3\% \\
+ & 1.50 & 35,129 (54.2) & 1.151 & 1.447 & $-0.0057$ & 30.2\% \\
+ & 2.00 & 46,898 (72.4) & 1.232 & 1.829 & $-0.0057$ & 30.8\% \\
+ & none & 64,800 (100) & 1.418 & 11.452 & $-0.0062$ & 30.9\% \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\subsection*{Estimands and conditional uncertainty}
+At the primary 1.25 caliper, both matchers yield a negative group median in
+all eight groups. The result is descriptive of the retained overlap, not a
+causal family estimate.
 
-The kernel and classifier pools are identical to the security comparison: 60 quantum and 115 extended-classical geometries, per-candidate train-CV regularization for SVC, and the frozen Laplace GP classifier. For the primary effect, the quantum candidate with highest validation balanced accuracy is evaluated once on \texttt{ood\_test}. Twelve whole five-dimension classical kernel blocks are sampled from the 23 available blocks, producing an equal pool of 60; its validation winner is evaluated on \texttt{ood\_test}. The classical endpoint is the expectation over 5,000 such block subsamples with fixed seed 20260729.
+\section*{Supplementary Results: Geometry associations}
+\label{supp:geometry}
 
-Two diagnostics are computed from the same complete grid. The equal-budget oracle selects and evaluates on \texttt{ood\_test}. The weak-fixed oracle uses only linear and RBF references, fixes SVC at $C=1$, and also selects on the reported OOD labels. Protocol contraction is
-\[
-\Delta_{\mathrm{weak,fixed,oracle}}-
-\Delta_{\mathrm{honest,equal,tuned}}.
-\]
-Positive contraction means that replacing the controlled procedure with the weak oracle makes the quantum-minus-classical effect more favourable.
+Effective-rank association changes sign across regimes, whereas OOD
+kernel-target alignment is more consistently positive
+(Table~\ref{supp:tab_geometry}). The source-dataset leave-one-out ordering
+correlations are 0.28 for EMBER, 0.22 for UNSW-NB15, and 0.40 for ToN-IoT
+when trained on the other two sources.
 
-Seeds are averaged within task and size; the two nested sizes are averaged within task; and tasks receive equal weight. Conditional intervals resample the five seed clusters 9,999 times within task, preserving the nested-size relationship. Leave-one-task-out ranges are reported for the task-equal mean. The tasks are fixed case studies and receive no population $p$-value.
+\begin{table}[ht]
+\centering
+\caption{Geometry--OOD association and primary nearest-rank pairing for SVC.
+``Partial'' controls kernel family and scale. Matching uses replacement and
+rank ratio $\leq1.25$; $\Delta$ is the median quantum-minus-classical OOD
+difference. All quantities are observational.}
+\label{supp:tab_geometry}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccccc}
+\toprule
+Scenario & $\rho$ rank & Partial & $\rho$ KTA & Matched $\Delta$ & Q better \\
+\midrule
+EMBER $m1$ & $+0.32$ & $+0.36$ & $+0.30$ & $-0.0094$ & 33\% \\
+EMBER $m2$ & $+0.80$ & $+0.82$ & $+0.63$ & $-0.0089$ & 22\% \\
+UNSW-DoS (campaign) & $+0.44$ & $+0.41$ & $+0.64$ & $-0.0089$ & 27\% \\
+UNSW-DoS (constructed) & $-0.14$ & $-0.08$ & $+0.39$ & $-0.0057$ & 29\% \\
+UNSW-Recon (campaign) & $+0.06$ & $+0.06$ & $+0.22$ & $-0.0047$ & 37\% \\
+UNSW-Recon (constructed) & $-0.15$ & $-0.08$ & $+0.37$ & $-0.0061$ & 30\% \\
+ToN-IoT (campaign) & $+0.25$ & $+0.27$ & $+0.46$ & $-0.0060$ & 24\% \\
+ToN-IoT (constructed) & $+0.65$ & $+0.63$ & $+0.59$ & $-0.0013$ & 35\% \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-All 30 units passed the frozen audit, comprising 37,800 split-level rows. Under SVC, the size-equal controlled effects for College Scorecard, diabetes readmission, and ACS income are $-0.0160$, $-0.0066$, and $-0.0131$; the corresponding contractions are $+0.0393$, $+0.0105$, and $+0.0126$. The task-equal controlled effect is $-0.0119$ (conditional 95\% interval $[-0.0205,-0.0033]$), and contraction is $+0.0208$ ($[+0.0113,+0.0307]$). Under GPC, the task-equal controlled effect is $+0.0077$ ($[-0.0015,+0.0183]$) and contraction is $+0.0324$ ($[+0.0223,+0.0427]$). The outcome is therefore classified as \emph{replicated protocol sensitivity} by the rule frozen before external execution.
-
-\section*{Supplementary Note: Metrics and geometry descriptors}
-\label{supp:metrics}
-
-Balanced accuracy on $S_{\mathrm{OOD}}$ is the primary endpoint. Family effects are
-\[
-\Delta_{\mathrm{OOD}}=
-\mathrm{BAcc}^{(Q)}_{\mathrm{OOD}}-
-\mathrm{BAcc}^{(C)}_{\mathrm{OOD}},
-\]
-with positive values favouring the quantum family. ID balanced accuracy and the ID-to-OOD drop are secondary. The GP analysis additionally records log loss, Brier score, expected calibration error with 15 equal-width bins \citep{guo2017calibration}, and predictive entropy.
-
-For a positive-semidefinite training Gram matrix with eigenvalues $\lambda_i$ and $p_i=\lambda_i/\sum_j\lambda_j$, effective rank is
-\[
-r_{\mathrm{eff}}=\exp\left(-\sum_i p_i\log p_i\right)
-\]
-\citep{roy2007effective}. Centered kernel-target alignment (KTA) for labels $y\in\{-1,+1\}^n$ is
-\[
-\mathrm{KTA}(K,y)=
-\frac{\langle K_c,yy^\top\rangle_F}
-{n\|K_c\|_F},
-\]
-where $K_c$ is doubly centered \citep{cristianini2001kta,cortes2012centeredalignment}. KTA is computed separately on training, ID, and OOD blocks.
-
-We also record the mean and standard deviation of off-diagonal entries, cross-split similarities, and the geometric difference
-\[
-g(K_C\!\rightarrow\!K_Q)=
-\left\|
-\sqrt{K_Q}(K_C+\lambda n I)^{-1}\sqrt{K_Q}
-\right\|_\infty^{1/2}
-\]
-\citep{huang2021powerofdata}. Geometry-performance association is assessed within scenario-groups across all kernel-dimension cells using Spearman correlation, with partial association controlling for family and length scale. Leave-one-dataset-out prediction tests portability, and nearest-effective-rank matching compares families within run and dimension. These are observational diagnostics, not causal estimates or deployable selectors.
-
-\section*{Supplementary Note: Why the oracle comparison is optimistic}
+\section*{Supplementary Results: Descriptive oracle comparison}
 \label{supp:oracle}
 
-The initial evaluation selected the best candidate using the OOD test labels themselves and left SVC regularization at $C=1$. Against linear and RBF kernels, this produces a mean EMBER OOD effect of $+0.0374$ for SVC and $+0.0283$ for the GP classifier (Table~\ref{supp:tab_oracle}). Expanding the classical family nearly removes this apparent gain even before honest selection is imposed. Because the same target labels select and score the candidate, these values are descriptive upper bounds rather than deployable effect estimates.
+The initial EMBER evaluation selected its representative using OOD test
+labels and fixed SVC at $C=1$. Expanding the reference family nearly removes
+the apparent gain even before target-label-free selection is imposed.
 
-\begin{table}[t]
+\begin{table}[ht]
 \centering
-\caption{Descriptive EMBER oracle results under fixed $C=1$ (18 correlated settings). Mean and median effects are quantum minus classical balanced accuracy.}
+\caption{Descriptive EMBER oracle results under fixed $C=1$ (18 correlated
+settings). Mean and median effects are quantum minus classical balanced
+accuracy. These values are not deployable estimates or independent
+replicates.}
 \label{supp:tab_oracle}
 \small
 \begin{tabular}{llcccc}
@@ -247,62 +249,87 @@ Selection & Classifier & Classical reference & Q wins & Mean $\Delta$ & Median $
 \end{tabular}
 \end{table}
 
-\section*{Supplementary Note: Per-group geometry and rank matching}
-\label{supp:geometry}
+\section*{Supplementary Results: External fixed tasks}
+\label{supp:external}
 
-Table~\ref{supp:tab_geometry} supplies the values summarized graphically in the main article. Effective-rank association changes sign across regimes, whereas OOD KTA is more consistently positive. Nearest-rank matching favours the classical member in median accuracy in every group.
+All 30 prospectively specified task--size--seed units passed the acquisition,
+split-integrity, nesting, and leakage audits. They contain 37,800 split-level
+results. Under SVC, size-equal controlled effects for College Scorecard,
+diabetes readmission, and ACS income are $-0.0160$, $-0.0066$, and $-0.0131$;
+their protocol contractions are $+0.0393$, $+0.0105$, and $+0.0126$.
+The task-equal controlled effect is $-0.0119$ (95\% conditional seed-cluster
+interval $[-0.0205,-0.0033]$, $n=5$ seeds per task), and contraction is
+$+0.0208$ ($[+0.0113,+0.0307]$). Under GPC, the task-equal controlled effect
+is $+0.0077$ ($[-0.0015,+0.0183]$) and contraction is $+0.0324$
+($[+0.0223,+0.0427]$). These fixed-task results corroborate protocol
+sensitivity, not a universal family ordering.
 
-\begin{table}[t]
-\centering
-\caption{Geometry-OOD association and nearest-effective-rank matching for SVC. ``Partial'' controls for kernel family and length scale.}
-\label{supp:tab_geometry}
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{lccccc}
-\toprule
-Scenario & $\rho$ rank & Partial & $\rho$ KTA & Matched $\Delta$ & Q better \\
-\midrule
-EMBER $m1$ & $+0.32$ & $+0.36$ & $+0.30$ & $-0.0094$ & 33\% \\
-EMBER $m2$ & $+0.80$ & $+0.82$ & $+0.63$ & $-0.0089$ & 22\% \\
-UNSW-DoS (campaign) & $+0.44$ & $+0.41$ & $+0.64$ & $-0.0089$ & 27\% \\
-UNSW-DoS (constructed) & $-0.14$ & $-0.08$ & $+0.39$ & $-0.0057$ & 29\% \\
-UNSW-Recon (campaign) & $+0.06$ & $+0.06$ & $+0.22$ & $-0.0047$ & 37\% \\
-UNSW-Recon (constructed) & $-0.15$ & $-0.08$ & $+0.37$ & $-0.0061$ & 30\% \\
-ToN-IoT (campaign) & $+0.25$ & $+0.27$ & $+0.46$ & $-0.0060$ & 24\% \\
-ToN-IoT (constructed) & $+0.65$ & $+0.63$ & $+0.59$ & $-0.0013$ & 35\% \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\section*{Supplementary Note: Predictive uncertainty under shift}
+\section*{Supplementary Results: Predictive uncertainty}
 \label{supp:uncertainty}
 
-The Laplace GP probabilities are approximate and are assessed rather than assumed to be calibrated. Predictive entropy rises from ID to OOD for both families in every scenario-group. Expected calibration error changes moderately and comparably (Figure~\ref{supp:fig_uncertainty}). Because the honestly selected fidelity kernels have no accuracy advantage, the uncertainty analysis provides no evidence of a calibration benefit unavailable to the classical family. Entropy increase alone is not evidence of good calibration.
+Predictive entropy rises from ID to OOD for both honestly selected families
+in every scenario-group. Expected calibration error changes moderately and
+comparably (Figure~\ref{supp:fig_uncertainty}). Because the selected fidelity
+kernels have no accuracy advantage, these diagnostics show no calibration
+benefit unavailable to the classical family. Entropy increase alone is not
+evidence of good calibration.
 
-\begin{figure}[t]
+\begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{fig_v4_uncertainty.pdf}
-\caption{Mean ID-to-OOD change in predictive entropy (left) and expected calibration error (right) for the P1$'$-selected configuration of each family, aggregated by dataset.}
+\caption{Mean ID-to-OOD change in predictive entropy (left) and 15-bin
+expected calibration error (right) for the P1$'$-selected configuration of
+each family. Bars aggregate fixed scenario-groups by source dataset and are
+descriptive; no population interval is implied.}
 \label{supp:fig_uncertainty}
 \end{figure}
 
-\section*{Supplementary Note: Finite-shot fidelity-estimation model}
+\section*{Supplementary Results: Repeated finite-shot sensitivity}
 \label{supp:shots}
 
-For $s\in\{128,512,2048,8192\}$ shots, every exact fidelity $p$ is replaced by a binomial estimate $\hat p\sim\mathrm{Binomial}(s,p)/s$. Square training blocks are symmetrized, clipped to $[0,1]$, assigned an exact unit diagonal, and projected to the positive-semidefinite cone. Rectangular test blocks receive sampling and clipping only. The procedure isolates fidelity-estimation noise; it does not model a specific device, circuit compilation, gate noise, readout error, or mitigation.
+Figure~\ref{supp:fig_shots} displays all 1,920 finite-shot evaluations:
+eight fixed exact Gram matrices, four shot counts, 30 measurement replicates,
+and pre-/post-PSD conditions. The bands make the conditional Monte Carlo
+spread visible rather than treating diversity across data configurations as
+measurement replication. PSD projection often narrows or shifts the
+distribution but does not impose a uniform direction. Exact-statevector OOD
+accuracy is approached unevenly because each sampled training matrix
+reselects a discrete SVC $C$.
 
-The main article reports the aggregate perturbation results. Two qualifications matter. First, PSD projection changes the spectral object whose effective rank is measured, so both pre- and post-projection deviations are retained in the artifact. Second, low selected-configuration agreement does not imply a comparable accuracy penalty: the family optimum is flat enough that selection regret remains negligible even when the candidate identity changes.
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{fig_v6_shots_mc.pdf}
+\caption{Repeated finite-shot OOD change from the exact fixed-configuration
+endpoint. Panels show one fixed scenario-group Gram matrix. Lines are medians
+over 30 independently seeded measurement replicates and shaded regions are
+central 95\% Monte Carlo intervals ($n=30$) conditional on that matrix.
+Orange squares use the sampled indefinite matrix; blue circles use its PSD
+projection. The model includes fidelity sampling only, not device noise.}
+\label{supp:fig_shots}
+\end{figure}
 
-\section*{Supplementary Note: Machine-readable result map}
+Across the eight group medians, the perturbed/exact effective-rank ratio
+declines from 1.93 at 128 shots to 1.13 at 8,192 shots. The across-group median
+OOD-alignment change remains within 0.0007 of zero. Separate train and
+OOD-square Frobenius changes due to sampling and projection, negative-spectrum
+fractions, selected $C$, and every replicate endpoint are provided in
+\texttt{results/v6/shots\_mc/}.
+
+\section*{Supplementary Results: Machine-readable result map}
 \label{supp:artifact}
 
-The complete per-setting results are intentionally not reproduced as static tables. They include all eight scenario-groups, three sizes, master and split seeds, both classifiers, protocols P1$'$, P2, and P3, budget-resampling draws, geometry descriptors, finite-shot perturbations, and frozen input hashes. The canonical entry point is
+The canonical v0.6.0 release gates are
 \begin{verbatim}
-python scripts/reproduce_v4.py --stage all
+python scripts/analysis/validate_v6_artifacts.py
+pytest tests -q
 \end{verbatim}
-and the generated tables and figures used for the manuscript are under \texttt{results/v4/tables/} and \texttt{manuscript/}. The archived artifact is available at \url{https://doi.org/10.5281/zenodo.19147649}; the development repository is \url{https://github.com/roberto-fernandez-barrios/kernel_shift_framework}.
-
-\bibliographystyle{plainnat}
-\bibliography{sn-bibliography}
+The corrected three-source inference, budget schemes, rank sensitivities, and
+finite-shot outputs are under \texttt{results/v6/}; frozen legacy/v4/v5
+artifacts remain unchanged. The development repository is
+\url{https://github.com/roberto-fernandez-barrios/kernel_shift_framework},
+and the concept archive is
+\url{https://doi.org/10.5281/zenodo.19147649}. The immutable v0.6.0 version
+DOI will be inserted in both manuscript files after archival and before
+submission.
 
 \end{document}

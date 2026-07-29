@@ -15,12 +15,16 @@ from __future__ import annotations
 
 import argparse
 import re
+import sys
 from pathlib import Path
 from typing import Dict, List
 
 import numpy as np
 import pandas as pd
 from scipy import stats
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from src.analysis.source_datasets import source_dataset_for_group
 
 RX_EXT = re.compile(r"^(?P<setting>.+?__ms\d+__q\d+_id\d+_ood\d+__qs\d+)(?:__s(?P<mseed>\d+))?$")
 
@@ -55,9 +59,12 @@ def load_extended(root: Path, mseed: int = 42) -> pd.DataFrame:
 
 
 def dataset_of(setting: str) -> str:
-    if setting.startswith("m1_hist") or setting.startswith("m2_hist"):
-        return "ember"
-    return setting.split("__")[0]
+    if setting.startswith(("m1_hist", "m2_hist")):
+        group = f"ember_{setting.split('_', 1)[0]}"
+    else:
+        tokens = setting.split("__")
+        group = f"{tokens[0]}_{tokens[1]}"
+    return source_dataset_for_group(group)
 
 
 def main() -> None:

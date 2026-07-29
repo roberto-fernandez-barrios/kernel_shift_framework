@@ -12,12 +12,13 @@ association survives controls that the causal reading would require:
      KTA_OOD and KTA_survival (= KTA_OOD - KTA_ID) reported SEPARATELY;
   2. partial rank correlations controlling for family, dimension, and length
      scale (residualized Spearman);
-  3. leave-one-dataset-out predictive check: rank the kernels of the held-out
-     dataset by a geometry model fit on the other three; report held-out
+  3. leave-one-source-dataset-out predictive check: rank the kernels of the
+     held-out dataset by a geometry model fit on the other two; report held-out
      Spearman between predicted and actual OOD ordering;
   4. rank-matched family comparison: quantum vs classical configs paired by
-     nearest effective rank within (run, dim); does the family label carry
-     residual OOD-accuracy information once rank is matched?
+     nearest effective rank with replacement and by one-to-one minimum-cost
+     assignment within (run, dim), with a complete prespecified caliper
+     sensitivity.
 
 Input: per-run geometry_v4.csv + summary_v4.csv (SVC rows; GPC as secondary).
 Output -> results/v4/mechanism/.
@@ -26,13 +27,19 @@ from __future__ import annotations
 
 import argparse
 import re
+import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from scipy import stats
+from scipy.optimize import linear_sum_assignment
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from src.analysis.source_datasets import source_dataset_for_group
 
 RUN_RE = re.compile(r"^(?P<setting>.+)__qs(?P<qs>\d+)__s(?P<seed>\d+)$")
+RANK_CALIPERS = (1.10, 1.25, 1.50, 2.00, np.inf)
 
 
 def group_label(setting: str) -> str:
@@ -43,7 +50,8 @@ def group_label(setting: str) -> str:
 
 
 def dataset_of(group: str) -> str:
-    return "ember" if group.startswith("ember") else group.rsplit("_m", 1)[0].rsplit("_natural", 1)[0]
+    """Backward-compatible alias for the canonical three-source mapping."""
+    return source_dataset_for_group(group)
 
 
 def parse_scale(kernel: str) -> float:
@@ -97,6 +105,95 @@ def partial_spearman(y: np.ndarray, x: np.ndarray, Z: np.ndarray) -> float:
     if rx.std() < 1e-12 or ry.std() < 1e-12:
         return np.nan
     return float(np.corrcoef(rx, ry)[0, 1])
+
+
+def _rank_pair_row(run: str, group: str, dim: int, qr: pd.Series,
+                   cr: pd.Series, method: str) -> dict:
+    q_rank = float(qr.spec_train_eff_rank)
+    c_rank = float(cr.spec_train_eff_rank)
+    ratio = max(q_rank, c_rank) / max(1e-9, min(q_rank, c_rank))
+    return {
+        "run": run,
+        "group": group,
+        "dim": int(dim),
+        "match_method": method,
+        "q_kernel": qr.kernel,
+        "c_kernel": cr.kernel,
+        "q_eff_rank": q_rank,
+        "c_eff_rank": c_rank,
+        "rank_ratio": float(ratio),
+        "abs_log_rank_gap": float(abs(np.log(max(q_rank, 1e-9))
+                                      - np.log(max(c_rank, 1e-9)))),
+        "delta_bacc_q_minus_c": float(qr.balanced_accuracy
+                                      - cr.balanced_accuracy),
+    }
+
+
+def match_with_replacement(df: pd.DataFrame) -> pd.DataFrame:
+    """Pair every quantum candidate to its nearest classical rank candidate."""
+    rows = []
+    for (run, dim), g in df.groupby(["run", "dim"]):
+        q = g[g.family == "quantum"]
+        c = g[g.family != "quantum"]
+        if q.empty or c.empty:
+            continue
+        for _, qr in q.iterrows():
+            ci = (c.spec_train_eff_rank - qr.spec_train_eff_rank).abs().idxmin()
+            rows.append(_rank_pair_row(
+                run, str(g.group.iloc[0]), int(dim), qr, c.loc[ci],
+                "nearest_with_replacement",
+            ))
+    return pd.DataFrame(rows)
+
+
+def match_one_to_one(df: pd.DataFrame) -> pd.DataFrame:
+    """Minimum-cost one-to-one rank matching within each run and dimension."""
+    rows = []
+    for (run, dim), g in df.groupby(["run", "dim"]):
+        q = g[g.family == "quantum"].reset_index(drop=True)
+        c = g[g.family != "quantum"].reset_index(drop=True)
+        if q.empty or c.empty:
+            continue
+        q_log = np.log(np.clip(q.spec_train_eff_rank.to_numpy(float), 1e-9, None))
+        c_log = np.log(np.clip(c.spec_train_eff_rank.to_numpy(float), 1e-9, None))
+        q_idx, c_idx = linear_sum_assignment(np.abs(q_log[:, None] - c_log[None, :]))
+        for qi, ci in zip(q_idx, c_idx):
+            rows.append(_rank_pair_row(
+                run, str(g.group.iloc[0]), int(dim), q.iloc[qi], c.iloc[ci],
+                "one_to_one",
+            ))
+    return pd.DataFrame(rows)
+
+
+def summarize_rank_matches(*frames: pd.DataFrame) -> pd.DataFrame:
+    """Complete per-group and pooled sensitivity over the frozen calipers."""
+    rows = []
+    for frame in frames:
+        method = str(frame.match_method.iloc[0])
+        scopes = [("all", frame), *list(frame.groupby("group"))]
+        for scope, part in scopes:
+            n_total = len(part)
+            for caliper in RANK_CALIPERS:
+                kept = part if np.isinf(caliper) else part[part.rank_ratio <= caliper]
+                if kept.empty:
+                    continue
+                rows.append({
+                    "match_method": method,
+                    "scope": scope,
+                    "caliper": "unfiltered" if np.isinf(caliper) else f"{caliper:.2f}",
+                    "n_total": n_total,
+                    "n_pairs": len(kept),
+                    "retained_fraction": len(kept) / n_total,
+                    "median_rank_ratio": float(kept.rank_ratio.median()),
+                    "p95_rank_ratio": float(kept.rank_ratio.quantile(0.95)),
+                    "median_abs_log_rank_gap": float(kept.abs_log_rank_gap.median()),
+                    "mean_delta": float(kept.delta_bacc_q_minus_c.mean()),
+                    "median_delta": float(kept.delta_bacc_q_minus_c.median()),
+                    "frac_quantum_better": float(
+                        (kept.delta_bacc_q_minus_c > 0).mean()
+                    ),
+                })
+    return pd.DataFrame(rows)
 
 
 def main() -> None:
@@ -173,25 +270,13 @@ def main() -> None:
     lodo = pd.DataFrame(lodo_rows)
     lodo.to_csv(args.out_dir / "lodo_predictive.csv", index=False)
 
-    # 4: rank-matched family comparison --------------------------------------
-    match_rows = []
-    for (run, dim), g in df.groupby(["run", "dim"]):
-        q = g[g.family == "quantum"]
-        c = g[g.family != "quantum"]
-        if q.empty or c.empty:
-            continue
-        for _, qr in q.iterrows():
-            ci = (c.spec_train_eff_rank - qr.spec_train_eff_rank).abs().idxmin()
-            cr = c.loc[ci]
-            ratio = max(qr.spec_train_eff_rank, cr.spec_train_eff_rank) / \
-                max(1e-9, min(qr.spec_train_eff_rank, cr.spec_train_eff_rank))
-            match_rows.append({"run": run, "group": g.group.iloc[0], "dim": dim,
-                               "q_kernel": qr.kernel, "c_kernel": cr.kernel,
-                               "rank_ratio": float(ratio),
-                               "delta_bacc_q_minus_c": float(qr.balanced_accuracy
-                                                             - cr.balanced_accuracy)})
-    matched = pd.DataFrame(match_rows)
+    # 4: rank-matched family comparisons -------------------------------------
+    matched = match_with_replacement(df)
+    one_to_one = match_one_to_one(df)
     matched.to_csv(args.out_dir / "rank_matched_pairs.csv", index=False)
+    one_to_one.to_csv(args.out_dir / "rank_matched_one_to_one_pairs.csv", index=False)
+    sensitivity = summarize_rank_matches(matched, one_to_one)
+    sensitivity.to_csv(args.out_dir / "rank_matching_sensitivity.csv", index=False)
     tight = matched[matched.rank_ratio <= 1.25]
     msum = tight.groupby("group").agg(
         n_pairs=("delta_bacc_q_minus_c", "size"),
@@ -207,11 +292,13 @@ def main() -> None:
                                      "median_partial_eff_rank",
                                      "median_partial_kta_ood"]]
           .round(3).to_string(index=False))
-    print("\n[mech] LODO predictive ordering (geometry fit on 3 datasets, "
-          "evaluated on the 4th):")
+    print("\n[mech] LODO predictive ordering (geometry fit on 2 source datasets, "
+          "evaluated on the 3rd):")
     print(lodo.round(3).to_string(index=False))
     print("\n[mech] rank-matched (ratio<=1.25) quantum-minus-classical OOD delta:")
     print(msum.round(4).to_string(index=False))
+    print("\n[mech] pooled rank-matching sensitivity:")
+    print(sensitivity[sensitivity.scope == "all"].round(4).to_string(index=False))
 
 
 if __name__ == "__main__":
