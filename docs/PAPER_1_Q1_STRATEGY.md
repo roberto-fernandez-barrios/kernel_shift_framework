@@ -177,8 +177,7 @@ Current status:
   no worker errors;
 - all v0.8 analysis, circuit, resource, campaign-coverage, and manuscript
   format gates pass;
-- final v0.8 full-suite, PDF, and visual gates pass; artifact identity remains
-  open until the reserved version is published and independently resolved;
+- final v0.8 full-suite, PDF, visual, and public artifact-identity gates pass;
 - authors approve the target, claims, and required releases.
 
 The immutable v0.6.0 DOI `10.5281/zenodo.21672470` remains public and resolves
@@ -187,8 +186,12 @@ to the historical tagged artifact. Corrective release v0.7.0 is public at
 and <https://doi.org/10.5281/zenodo.21676563>; the DOI resolves, is DataCite
 `findable`, and identifies the tagged source plus the inspected main and
 Supplementary PDFs.
-The v0.8.0 draft is reserved under immutable DOI
-<https://doi.org/10.5281/zenodo.21717074>.
+The v0.8.0 release is public at
+<https://github.com/roberto-fernandez-barrios/kernel_shift_framework/releases/tag/v0.8.0>
+and <https://doi.org/10.5281/zenodo.21717074>. The DOI resolves, is DataCite
+`findable`, and identifies tagged commit
+`275add120a665f1b5f8d545fbd66613143dc46db`, the two inspected PDFs, and their
+published checksum manifest.
 
 ## Submission stop/go
 

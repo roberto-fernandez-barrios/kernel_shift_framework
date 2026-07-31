@@ -47,7 +47,7 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error supplementary.tex
 - [x] Complete test suite passes (79/79).
 - [x] No undefined citations/references or overfull boxes.
 - [x] Main and Supplementary PDFs rendered to page images and inspected.
-- [ ] Submission directory contains one unambiguous main PDF and one
+- [x] Submission directory contains one unambiguous main PDF and one
   Supplementary PDF.
 - [x] Article title is at most 15 words, abstract at most 150 words, and the
   main manuscript contains no separate Conclusions or Limitations section.
@@ -65,11 +65,25 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error supplementary.tex
 - [x] Insert the reserved immutable DOI in the manuscript, Supplementary
   Information, README, cover letter, and citation metadata.
 - [x] Align titles, authors, ORCIDs, affiliation, licence, and dates.
-- [ ] Commit and push the exact tested source, aggregated results, and PDFs.
-- [ ] Tag the tested commit as `v0.8.0`.
-- [ ] Publish the GitHub v0.8.0 release.
-- [ ] Publish and inspect the Zenodo v0.8.0 record.
-- [ ] Confirm DOI resolution, DataCite status, file identity, and checksums.
+- [x] Commit and push the exact tested source, aggregated results, and PDFs:
+  `275add120a665f1b5f8d545fbd66613143dc46db`.
+- [x] Tag the tested commit as `v0.8.0`; the annotated tag resolves to that
+  exact commit.
+- [x] Publish the GitHub v0.8.0 release:
+  <https://github.com/roberto-fernandez-barrios/kernel_shift_framework/releases/tag/v0.8.0>.
+- [x] Publish and inspect the Zenodo v0.8.0 record:
+  <https://doi.org/10.5281/zenodo.21717074>.
+- [x] Confirm DOI resolution, DataCite `findable` status, public file identity,
+  and checksums. The concept DOI `10.5281/zenodo.19147649` resolves to v0.8.0.
+
+Verified SHA-256 values:
+
+- main PDF:
+  `ce42579c246651b2cbde43b02acd6b3f2b9f29f32511d3219fe26a69ac1f4f94`;
+- Supplementary PDF:
+  `a0bcbc51dc411b0afd062313e39c9718d906a619356a404e77c23ec417c4b613`;
+- tagged source archive:
+  `11a1d953c0e8bc1b072a9ad4483efe8b82d2fdb26f93920b0f717e70667533bb`.
 
 ## Submission stop/go
 
