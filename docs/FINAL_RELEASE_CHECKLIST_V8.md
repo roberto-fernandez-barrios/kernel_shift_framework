@@ -59,11 +59,12 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error supplementary.tex
 
 ## Metadata and immutable release
 
-- [ ] Reserve the v0.8.0 version DOI from the existing Zenodo concept record.
-- [ ] Set version `0.8.0` in `pyproject.toml` and `CITATION.cff`.
-- [ ] Insert the reserved immutable DOI in the manuscript, Supplementary
+- [x] Reserve the v0.8.0 version DOI from the existing Zenodo concept record:
+  `10.5281/zenodo.21717074`.
+- [x] Set version `0.8.0` in `pyproject.toml` and `CITATION.cff`.
+- [x] Insert the reserved immutable DOI in the manuscript, Supplementary
   Information, README, cover letter, and citation metadata.
-- [ ] Align titles, authors, ORCIDs, affiliation, licence, and dates.
+- [x] Align titles, authors, ORCIDs, affiliation, licence, and dates.
 - [ ] Commit and push the exact tested source, aggregated results, and PDFs.
 - [ ] Tag the tested commit as `v0.8.0`.
 - [ ] Publish the GitHub v0.8.0 release.

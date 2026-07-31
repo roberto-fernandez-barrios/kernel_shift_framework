@@ -686,18 +686,19 @@ All four & 17,671,840,000 & 1,559,280,000 & 4,241,241,600,000 & 2,120,620,800,00
 \section*{Supplementary Results: Machine-readable result map}
 \label{supp:artifact}
 
-The canonical v0.7.0 release gates are
+The canonical v0.8.0 release gates are
 \begin{verbatim}
-python scripts/analysis/validate_v6_artifacts.py
-pytest tests -q
+python scripts/reproduce_v8.py --stage all
+python -m pytest tests -q
 \end{verbatim}
-The corrected three-source inference, budget schemes, rank sensitivities, and
-finite-shot outputs are under \texttt{results/v6/}; frozen legacy/v4/v5
-artifacts remain unchanged. The development repository is
+The circuit-aware strata, within-v4 factorial, shortcut ablation, and resource
+outputs are under \texttt{results/v8/}; the corrected three-source inference,
+budget, rank, and finite-shot outputs remain under \texttt{results/v6/}.
+Frozen legacy/v4/v5 artifacts remain unchanged. The development repository is
 \url{https://github.com/roberto-fernandez-barrios/kernel_shift_framework},
 and the concept archive is
-\url{https://doi.org/10.5281/zenodo.19147649}. The exact v0.7.0 submission
+\url{https://doi.org/10.5281/zenodo.19147649}. The exact v0.8.0 submission
 artifact is identified by the immutable version DOI
-\url{https://doi.org/10.5281/zenodo.21676563}.
+\url{https://doi.org/10.5281/zenodo.21717074}.
 
 \end{document}
