@@ -138,10 +138,10 @@ def validate_v11() -> None:
     code = Path("src/analysis/partial_identification.py").read_text(encoding="utf-8")
     if "def sharp_bounded_loss_envelope(" not in code:
         raise ValueError("bounded-loss implementation is missing")
-    if 'version = "1.1.0"' not in Path("pyproject.toml").read_text(encoding="utf-8"):
-        raise ValueError("pyproject version is not 1.1.0")
-    if 'version: "1.1.0"' not in Path("CITATION.cff").read_text(encoding="utf-8"):
-        raise ValueError("CITATION.cff version is not 1.1.0")
+    if 'version = "1.1.1"' not in Path("pyproject.toml").read_text(encoding="utf-8"):
+        raise ValueError("pyproject version is not 1.1.1")
+    if 'version: "1.1.1"' not in Path("CITATION.cff").read_text(encoding="utf-8"):
+        raise ValueError("CITATION.cff version is not 1.1.1")
     print("[ok] v1.1 theory, positioning, breadth, preservation, and cover gates")
 
 
