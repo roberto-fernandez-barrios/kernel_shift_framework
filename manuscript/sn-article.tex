@@ -63,10 +63,11 @@
 
 \newcommand{\orcidtext}[1]{\href{https://orcid.org/#1}{\textsuperscript{[ORCID]}}}
 \hypersetup{
-  pdftitle={Evaluation Choices Shape Apparent Quantum Kernel Robustness under Distribution Shift},
+  hypertexnames=false,
+  pdftitle={Sharp Target-Domain Certificates for Quantum-Kernel Advantage under Distribution Shift},
   pdfauthor={Roberto Fernandez-Barrios, Iker Pastor-Lopez, Asier Gonzalez-Santocildes, Pablo Garcia Bringas},
   pdfsubject={Article submitted to npj Quantum Information},
-  pdfkeywords={quantum machine learning, quantum kernels, distribution shift, out-of-distribution robustness, kernel methods},
+  pdfkeywords={quantum machine learning, quantum kernels, quantum advantage, partial identification, active testing, distribution shift},
   hidelinks
 }
 
@@ -105,7 +106,7 @@
 
 \begin{document}
 
-\title[Quantum Kernels under Distribution Shift]{Evaluation Choices Shape Apparent Quantum Kernel Robustness under Distribution Shift}
+\title[Certificates for Quantum-Kernel Advantage]{Sharp Target-Domain Certificates for Quantum-Kernel Advantage under Distribution Shift}
 
 
 %%=============================================================%%
@@ -133,7 +134,7 @@
 %% Sample for unstructured abstract %%
 %%==================================%%
 
-\abstract{Claims of quantum-kernel robustness can depend on how candidates are tuned, selected, and compared. We audit this dependence with a controlled kernel-swap benchmark under distribution shift and prospectively frozen external corroboration. In eight fixed security scenario-groups, same-test target-label selection, fixed regularization, and customary references produce apparent gains up to $+0.037$. Within one generation, moving from this bundle to train-only tuning, ID-validation selection, extended references, and matched counts changes the source-dataset-equal support-vector effect from $+0.0131$ to $-0.0047$. Under full controls it is $-0.0056$, and $-0.0009$ for Gaussian-process classification. Two of four quantum maps are separable product kernels. At matched 30-candidate budgets, entangling-ZZ and product-map support-vector effects are $-0.0093$ and $-0.0055$. Across three fixed external tasks, the controlled support-vector effect is $-0.0119$. Neither stronger controls nor restriction to entangling maps reveals consistent evidence of a positive quantum-family effect in these low-qubit fixed cases.}
+\abstract{Claims of quantum predictive advantage under distribution shift are usually evaluated only after target labels are known. We derive the assumption-free sharp identified set for a fixed model's finite-batch advantage over the best member of a prespecified family under any bounded loss; zero--one accuracy has a closed form and exact monotone partial-label updates. Across eight security shifts, zero-label upper endpoints against 115 classical kernels span 0.002--0.088. A retrospective audit reduces every endpoint to 0.010 with 0--33 of 500 labels, including entangling-ZZ models. In an internally locked prospective replication, four eligible task--classifier medians require 0--3 labels (overall median 0; maximum 76), and all 20 realized effects are negative; a third task fails its frozen feature gate. Protocol controls reverse an apparent advantage, while finite-shot noise can increase predictive distinctness without useful advantage. The framework separates protocol validity, target predictive indispensability, and quantum relevance.}
 
 
 
@@ -149,7 +150,7 @@
 % 
 % \textbf{Conclusion:} The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. The abstract must not include subheadings (unless expressly permitted in the journal's Instructions to Authors), equations or citations. As a guide the abstract should not exceed 200 words. Most journals do not set a hard limit however authors are advised to check the author instructions for the journal they are submitting to.}
 
-\keywords{quantum machine learning; quantum kernels; distribution shift; out-of-distribution robustness; kernel methods; kernel-target alignment; Gaussian processes; malware detection; network intrusion detection}
+\keywords{quantum machine learning; quantum kernels; quantum advantage; partial identification; active testing; distribution shift; classical surrogates; kernel methods}
 
 %%\pacs[JEL Classification]{D8, H51}
 
@@ -160,23 +161,19 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Quantum kernel methods embed classical data into quantum states and use state overlaps as similarities for otherwise classical learners \cite{havlicek2019quantumenhanced,schuld2019featurehilbert,schuld2021kernelmethods}. This separation makes them a clean setting for asking whether quantum-induced feature geometry provides useful inductive bias. It also makes comparison unusually sensitive to evaluation design: the downstream learner can be held fixed, but conclusions still depend on the encoding, bandwidth, regularization, classical reference set, and rule used to select a candidate \cite{huang2021powerofdata,schuld2021encoding,bowles2024betterthanclassical,schnabel2025scrutiny}.
+Quantum kernel methods embed classical data into quantum states and use state overlaps as similarities for otherwise classical learners \cite{havlicek2019quantumenhanced,schuld2019featurehilbert,schuld2021kernelmethods}. This separation makes them a clean setting for studying quantum inductive bias, but a predictive-advantage claim must pass three distinct tests. The comparison protocol must be valid; the target predictions must resist reproduction by an appropriate classical reference family; and the surviving behaviour must depend on a non-trivial quantum construction whose resources are counted. A model can pass one test and fail another.
 
-Recent benchmarks have accordingly shifted the question from whether an isolated quantum model can perform well to whether a claimed gain survives strong and symmetric controls. Broad QML studies find competitive classical baselines once pipelines are aligned \cite{bowles2024betterthanclassical}; quantum-kernel benchmarks show substantial sensitivity to feature map and hyperparameter choice \cite{schnabel2025scrutiny}; and a concurrent tabular study using nested cross-validation, spectral analysis, and hardware validation finds no significant quantum win across its tested pairs \cite{kakavand2026benchmarking}. Out-of-distribution generalization in QML is itself an established topic: prior work analyzes learning quantum dynamics outside the training distribution and relates data-dependent generalization to quantum Fisher information \cite{caro2023oodquantumdynamics,haug2024qfi}. Our narrower deployment question is whether a family-level quantum-kernel robustness claim on classical data survives target-label-free selection and symmetric tuning, reference, and search-budget controls.
+Recent benchmarks emphasize the first test. Broad QML comparisons find competitive classical baselines once pipelines are aligned \cite{bowles2024betterthanclassical}; quantum-kernel results depend strongly on feature maps and hyperparameters \cite{schnabel2025scrutiny}; and controlled tabular studies often find no stable quantum win. A concurrent finance preprint likewise shows an apparent quantum-kernel advantage vanishing under point-in-time, kernel-swap, and budget controls \cite{shen2026vanishing}. Under distribution shift the selection rule becomes part of the estimand: same-test selection is an oracle, train-only regularization can change rankings, and a larger candidate family has more opportunities to win \cite{gulrajani2021domainbed,koh2021wilds,yao2022wildtime,zhou2023dgsurvey}. Fair equal-budget benchmarking answers who wins under symmetric search, but not whether any classical witness in a declared family can reproduce the selected quantum model on the deployment inputs.
 
-Distribution shift makes model selection part of the estimand. Work on domain generalization and real-world shift has shown that robustness gains can disappear when search budgets, hyperparameters, and selection criteria are standardized \cite{gulrajani2021domainbed,koh2021wilds,yao2022wildtime,zhou2023dgsurvey}. A selector that inspects the shifted test labels estimates an oracle upper bound, not deployable performance; a family with more candidates has more opportunities to win that selection. A controlled quantum--classical evaluation under shift must therefore hold fixed not only the classifier and data split, but also regularization, candidate budget, and label access.
+Geometric and surrogate analyses approach that second question from complementary directions. Huang et al. use a label-independent geometric difference to screen whether a quantum kernel can have a prediction advantage \cite{huang2021powerofdata}; classical-surrogate constructions reproduce input--output relations of trained quantum models \cite{schreiber2023surrogates}; and recent theory studies when quantum learners depart from minimum-norm classical solutions \cite{thabet2026disagree}. Those objects characterize geometric potential, global approximation, or learning-rule separation. Our target-batch question is different. A train-only Gram matrix does not determine how a kernel transports predictions to a shifted target because deployment also depends on the target--train block, while different geometries can yield identical decisions on the observed target inputs. We therefore audit predictive indispensability directly on target covariates while keeping their labels protected.
 
-Security detection provides a useful stress test because shift is intrinsic to the application. Malware evolves over time, and experimental bias can overstate detector performance \cite{anderson2018ember,pendlebury2019tesseract,arp2022dosdonts}; network traffic changes with infrastructure and attack campaigns \cite{moustafa2015unsw,alsaedi2020toniot}. Quantum classifiers have already been evaluated on intrusion-detection benchmarks, sometimes with reported gains over small classical reference sets on i.i.d.\ splits \cite{abreu2024qmlids,abreu2025quantumnetsec,bellante2025evaluating}. We use these datasets not to propose a security system, but to expose kernel families to reproducible constructed shifts and to a held-out attack-campaign shift.
+That protection creates an identification problem. Disagreement itself is established: co-validation relates independently trained classifiers' disagreement to error and variance \cite{madani2004covalidation}, discordant-pair evaluation concentrates adjudication where two classifiers differ \cite{musgrove2023discordant}, Active Testing constructs low-variance risk estimates from actively sampled test labels \cite{kossen2021activetesting}, and limited-label model selection aims to choose the best pretrained classifier \cite{okanovic2025modelselector}. Weak-supervision work instead partially identifies individual performance metrics from fitted label-model marginals \cite{polo2024partialidentification}. We do not claim any of those ingredients. We identify the \emph{relative} finite-batch advantage of one fixed model against the best member of a prespecified family, exactly over every completion of the unaudited labels, without estimating those labels, postulating their marginals, or assuming a target sampling model.
 
-The closest kernel-robustness-specific concurrent work studies additive input corruption and proposes a spectral phase encoding \cite{herrero2026spectralphase}. Our question is complementary: rather than optimize a new encoding or claim the first QML study under shift, we audit how evaluation choices change a family-level conclusion under constructed and held-out-campaign shifts. The distinguishing contribution is a controlled classical-data kernel swap combining no-OOD-label selection, equal candidate budgets, per-configuration train-only regularization, a within-generation factorial sensitivity, and prospectively frozen external corroboration.
+We make four contributions. First, for any additive bounded loss on a finite label space, we derive the sharp partial-label identified set for advantage over the best member of a finite reference family and show that no assumption-free rule using the same information can return a uniformly smaller valid interval. Zero--one accuracy has an unusually simple closed form, including after any adaptive partial audit. Second, nested classical reference families and target-label audits define a reference-breadth--target-supervision evidence frontier. Third, we give an exact prevalence-conditional balanced-accuracy formulation and an explicit PSD construction showing why train-only geometry cannot determine target predictions. Fourth, we embed these objects in a controlled quantum-kernel benchmark and internally lock a prospective Gate~2 replication before opening target labels; entanglement strata and repeated finite-shot perturbations separately test when predictive distinctness is quantum-relevant.
 
-We implement a controlled \emph{kernel-swap} benchmark in which preprocessing, splits, classifier, and family-internal selection logic are fixed while only the kernel changes. Four security scenarios from EMBER, UNSW-NB15, and ToN-IoT yield eight scenario-groups across constructed and held-out-campaign shifts. Support-vector and Laplace Gaussian-process classifiers consume the same precomputed Gram matrices. The quantum family contains four fidelity feature-map families with angle-scale sweeps; the classical family extends linear and RBF references with polynomial, Laplacian, and Mat\'ern kernels and symmetric bandwidth freedom. Each configuration's regularization is tuned from training data alone. The primary deployed candidate is selected on a disjoint ID-validation split, and the two extended families receive equal candidate budgets. Fifteen pipeline realizations per setting quantify conditional variability; the benchmarks are treated as fixed case studies rather than as random draws from an undefined population.
+The benchmark uses four security scenarios from EMBER, UNSW-NB15, and ToN-IoT, producing eight fixed constructed or held-out-campaign shifts. Support-vector and Laplace Gaussian-process classifiers consume identical precomputed Gram matrices. The quantum family contains entangling-ZZ and separable-product fidelity maps at 4--12 qubits; the classical family contains 115 linear, RBF, polynomial, Laplacian, and Mat\'ern candidates. Models are tuned on training data and selected on a disjoint ID-validation split. Equal 60-candidate pools support fair performance comparison, while the complete prespecified classical family supports the separate indispensability audit. One prospectively frozen three-task TableShift study corroborates protocol sensitivity; a second, internally locked experiment tests transfer of Gate~2 on previously unused task identifiers.
 
-The comparison is coupled to a circuit and geometry audit. Two of the four implemented quantum maps contain two-qubit interactions; the other two prepare product states whose fidelity kernels factorize over coordinates. We therefore separate entangling and product-map results, report logical circuit and shot resources, and restrict the current geometry argument to effective rank and centered kernel-target alignment \cite{roy2007effective,cristianini2001kta,cortes2012centeredalignment}. Complementary work links data-induced randomness to classification through a class-margin diagnostic \cite{casas2026datainduced}; here geometry is used to test associations under shift and family controls, not to introduce a new embedding metric. Partial association, leave-one-source-dataset-out prediction, and effective-rank matching constrain interpretation; repeated finite-shot perturbations compare unprojected, independent-square PSD, and coherent train-eigenspace PSD estimators.
-
-The evaluation choices change the conclusion. With same-test oracle selection, fixed regularization, and customary linear+RBF baselines, fidelity kernels appear to improve OOD balanced accuracy by as much as $+0.037$. With train-only regularization, no-OOD-label selection, and structurally matched candidate budgets, the source-dataset-equal quantum-minus-classical delta is $-0.0056$ for SVC and $-0.0009$ for the GP classifier. Across the fixed cases, we observe no consistent evidence of a quantum advantage under this controlled endpoint. Effective rank and OOD alignment remain associated with accuracy, but the association is regime-dependent and shared by both families. Nearest-rank pairing within the predefined overlap yields negative median differences in all eight groups, including under one-to-one and caliper sensitivities. Repeated finite-shot estimates inflate exact-statevector effective rank and produce condition-dependent OOD deviations.
-
-The contribution is therefore the combined evaluation design: distribution shift, target-label-free selection, train-only regularization, structurally matched search budgets, a within-v4 factorial, circuit-aware quantum strata, and prospectively frozen external corroboration. Together these controls show how the reported quantum-kernel robustness result changes across evaluation bundles and whether the observed behaviour requires entangling feature geometry. The scope is deliberately limited to the low-qubit fidelity kernels, datasets, and shift constructions studied here.
+Against the full classical family, the zero-label upper endpoint of accuracy advantage ranges from 0.002 to 0.050 for SVC and 0.006 to 0.088 for GPC. In a retrospective fixed-batch analysis, an adaptive bottleneck-coverage audit reduces it to at most 0.010 using 0--33 of 500 labels (median 13 over 16 fixed case--classifier cells). Dynamic random-disagreement and non-adaptive initial-coverage controls both have median 12.5, so the large gain over prediction-independent ordering is attributable to excluding non-actionable queries rather than to the proposed coverage heuristic. The result persists for selected entangling-ZZ models. In the prospective Gate-2 replication, two technically eligible tasks produce four task--classifier medians of 0--3 labels (overall seed-level median 0; maximum 76), satisfying the frozen strong-transfer rule; the third task fails its prespecified minimum-feature gate before model execution. All 20 prospective realized accuracy effects are negative. The certificate remains conditional on the finite classical family and target batch, not evidence of classical simulability or complexity-theoretic separation. It converts the earlier benchmark conclusion---that controls remove an apparent gain---into a quantitative question: how much advantage remains possible, and how much classical search and target supervision suffice to falsify a material claim?
 
 % Figure generated by scripts/reporting/make_v4_figures.py
 \begin{figure*}[t]
@@ -191,7 +188,137 @@ The contribution is therefore the combined evaluation design: distribution shift
 
 \subsection{Overview}
 
-All comparisons share classifier, preprocessing, and split definitions within a scenario-group; only the kernel changes. Each setting contains fifteen pipeline realizations nested in five q-split clusters. We first contrast an optimistic same-test oracle against the controlled endpoint, then separate product and entangling maps and decompose evaluation axes within v4. Geometry and finite-shot analyses are explicitly diagnostic. Throughout, the eight security groups are fixed cases; pointwise conditional intervals describe pipeline variation given the benchmark pools and design, not uncertainty over a population of datasets.
+The results are organized as three gates. Gate~1 asks whether the comparison protocol itself is valid: regularization is fitted on training data, deployment candidates are selected without OOD labels, and family search budgets are distinguished from unrestricted adversarial reference breadth. Gate~2 asks whether the selected quantum model is predictively indispensable on the observed target inputs. This is the new target-batch certificate and evidence frontier. Gate~3 asks whether any surviving behaviour is quantum-relevant, separating entangling-ZZ maps from product maps and accounting for finite-shot estimation. The eight security groups are fixed cases; conditional intervals over q-split clusters describe pipeline variation given the benchmark pools and design, not uncertainty over a population of datasets.
+
+\subsection{Sharp target-batch identification of predictive advantage}
+\label{sec:res_certificate}
+
+Consider a finite target batch, a fixed quantum prediction, and $M$ fixed classical predictions. For a finite label space $\mathcal Y$ and an additive bounded loss, let $\ell_i^Q(y)$ and $\ell_{ij}^C(y)$ be their losses on item $i$ if its label were $y$, and define the classical-minus-quantum contrast $a_{ij}(y)=\ell_{ij}^C(y)-\ell_i^Q(y)$. Positive advantage favours the quantum model:
+\[
+\Delta_\ell(y)=\min_{j\leq M}\frac1n\sum_{i=1}^n a_{ij}(y_i).
+\]
+If labels have been audited on $L$ and $S_j(L)=\sum_{i\in L}a_{ij}(y_i)$, every assignment on $L^c$ remains admissible.
+
+\begin{theorem}[Sharp bounded-loss region and information optimality]
+\label{thm:bounded_loss}
+The smallest interval containing $\Delta_\ell(y)$ for every completion of the unaudited labels is $[L_\ell(L),U_\ell(L)]$, where
+\[
+L_\ell(L)=\frac1n\min_j\left\{S_j(L)+
+\sum_{i\notin L}\min_{y\in\mathcal Y}a_{ij}(y)\right\},
+\]
+\[
+U_\ell(L)=\frac1n\max_{y_{L^c}\in\mathcal Y^{|L^c|}}
+\min_j\left\{S_j(L)+\sum_{i\notin L}a_{ij}(y_i)\right\}.
+\]
+Both endpoints are attained. Consequently, any assumption-free interval computed from the same fixed losses and audited labels and valid for every admissible completion must contain both endpoints.
+\end{theorem}
+
+The lower endpoint separates over labels after choosing a witness. The upper endpoint is an exact finite max--min problem, expressible as a mixed-integer linear program with one-hot label variables. Auditing any additional label removes completions, so the lower endpoint cannot decrease and the upper endpoint cannot increase. This general statement is not a claim that loss-based partial identification or active evaluation is new; the contribution is the exact relative-family estimand and its information-optimal finite-batch certificate. Zero--one classification has further structure: assigning an unaudited label to the quantum hard prediction simultaneously maximizes its contrast with every disagreeing classical witness. This yields the following closed forms used in all experiments.
+
+Fix the hard target predictions of a selected quantum classifier $h_Q$ and a prespecified classical family $\mathcal C_B=\{h_{C_1},\ldots,h_{C_M}\}$ on $n$ target inputs. For an otherwise unrestricted target labelling $y$, define
+\[
+\Delta_B(y)=\operatorname{Acc}(h_Q;y)-
+             \max_{j\leq M}\operatorname{Acc}(h_{C_j};y),
+\qquad
+d_j=\frac{1}{n}\sum_{i=1}^{n}
+\mathbf 1\{h_Q(x_i)\neq h_{C_j}(x_i)\}.
+\]
+
+\begin{theorem}[Sharp zero-label region]
+\label{thm:zero_label}
+The smallest interval containing $\Delta_B(y)$ for every possible target labelling is
+\[
+\mathcal I_B^{(0)}
+=\left[-\max_{j\leq M}d_j,\ \min_{j\leq M}d_j\right].
+\]
+Both endpoints are attainable, including for multiclass hard predictions.
+\end{theorem}
+
+The upper endpoint is not a probabilistic bound or an estimate: it is the exact largest advantage compatible with the observed prediction matrix when every target label remains unknown. It is attained by setting $y=h_Q$. The lower endpoint is attained by assigning the predictions of the classical model farthest from $h_Q$. Hence no smaller label-free interval is valid without extra assumptions. In particular, if $\min_j d_j<\tau$, any accuracy advantage of at least $\tau$ over this classical family is falsified on the batch, even before a target label is revealed. Whenever $\min_jd_j>0$, the same target covariates and prediction matrix remain compatible with both signs of advantage; disagreement alone cannot identify which family wins.
+
+The zero-label certificate is already restrictive in several cases (Figure~\ref{fig:v9_certificate}a). Against the complete 115-candidate classical family, the upper endpoint ranges from $0.002$ to $0.050$ for SVC and from $0.006$ to $0.088$ for GPC (Table~\ref{tab:v9_certificate}). A small endpoint says that at least one classical witness nearly reproduces the selected quantum decisions; it does not say that the quantum kernel is efficiently simulable or globally reproducible.
+
+\begin{theorem}[Sharp arbitrary-partial-label region]
+\label{thm:partial_label}
+Let $L$ be any audited subset. For classical witness $j$, let
+\[
+S_j(L)=\sum_{i\in L}
+\left[\mathbf 1\{h_Q(x_i)=y_i\}-
+      \mathbf 1\{h_{C_j}(x_i)=y_i\}\right]
+\]
+and let $R_j(L)$ count unaudited points on which $h_Q$ and $h_{C_j}$ disagree. Then the sharp identified interval over all completions of the unaudited labels is
+\[
+\mathcal I_B(L)=
+\left[
+\min_j\frac{S_j(L)-R_j(L)}{n},\
+\min_j\frac{S_j(L)+R_j(L)}{n}
+\right].
+\]
+The upper endpoint is non-increasing as labels are audited and collapses to the realized family advantage when $L$ contains the full batch.
+\end{theorem}
+
+We use this result as an active falsification audit, not as a new model-selection rule. At each step the models remain fixed; one tested rule queries the point covering the largest number of witnesses currently tying at the smallest reducible upper bound (Methods). In this retrospective fixed-batch analysis, the rule reduces the $0.010$ endpoint using 0--33 of 500 labels, with median 13 across the 16 case--classifier cells (Figure~\ref{fig:v9_certificate}b). Stronger controls remove any claim that the coverage heuristic itself is unusually efficient: dynamic random sampling restricted to current actionable disagreements and a fixed initial-coverage ordering both have median 12.5 labels. Against random-active sampling, the adaptive rule wins, ties, and loses in 5, 5, and 6 cells; against initial coverage the counts are 6, 4, and 6. An exact ex-post label oracle needs median 6.5 labels, and the adaptive rule's median excess is 4.5. The main acquisition result is therefore that prediction-aware restriction makes a small audit possible, not that one heuristic dominates. Prediction-independent ordering remains a weak diagnostic (median 245.5) and is reported only in Supplementary Information.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{fig_v9_certificate.pdf}
+\caption{Sharp target-batch certificates against the full 115-candidate classical family. \textbf{a}, Zero-label upper endpoints for the SVC and GPC quantum models fixed by P1$'$. Colour separates selected entangling-ZZ and product-map models; the dashed line marks 0.010 accuracy. \textbf{b}, Labels needed to reduce the endpoint to at most 0.010 (symmetric-log scale). Horizontal ticks are the exact retrospective label oracle; filled markers are the fixed adaptive coverage rule; open diamonds and triangles are medians for dynamic random-active and non-adaptive initial-coverage controls, with bars spanning 2.5--97.5\% across 200 SHA-256 tie orders. All certificates use the canonical q1000 realization (master, q-split, and model seeds 42) and a 500-point target batch. Comparator ranges are tie-order sensitivities, not confidence intervals.}
+\label{fig:v9_certificate}
+\end{figure*}
+
+\begin{table*}[t]
+\centering
+\caption{Sharp accuracy certificates for the eight fixed target batches against the full 115-candidate classical family. $U_0$ is the zero-label upper endpoint; $n_{.01}$ is the fixed adaptive-coverage count for $U\leq0.010$; $\Delta_{\rm full}$ is the point-identified quantum advantage after all 500 labels are unlocked. The canonical run, quantum model, and every classical candidate were fixed before this audit; target labels are never used to retune or reselect them.}
+\label{tab:v9_certificate}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrr@{\qquad}rrr@{}}
+\toprule
+& \multicolumn{3}{c}{SVC} & \multicolumn{3}{c}{GPC}\\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Target case & $U_0$ & $n_{.01}$ & $\Delta_{\rm full}$ &
+$U_0$ & $n_{.01}$ & $\Delta_{\rm full}$\\
+\midrule
+EMBER $m1$                 & .050 & 12 & $-.024$ & .080 & 29 & $-.030$\\
+EMBER $m2$                 & .054 & 15 & $-.036$ & .074 & 33 & $-.016$\\
+ToN-IoT constructed        & .002 &  0 & $-.004$ & .016 &  3 & $-.014$\\
+ToN-IoT campaign           & .002 &  0 & $-.018$ & .006 &  0 & $-.012$\\
+UNSW DoS constructed       & .010 &  0 & $-.016$ & .066 & 22 & $-.052$\\
+UNSW DoS campaign          & .034 & 11 & $-.026$ & .028 & 12 & $-.032$\\
+UNSW Recon constructed     & .046 & 14 & $-.032$ & .088 & 22 & $-.066$\\
+UNSW Recon campaign        & .034 & 28 & $-.026$ & .030 & 14 & $+.002$\\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{A reference-breadth--target-supervision evidence frontier}
+\label{sec:res_frontier}
+
+Nested classical reference families and partial labels expose two different costs of falsification. Increasing the classical family can only decrease the certificate's upper endpoint; auditing informative target labels can only decrease it further. We therefore report the surface $(B,|L|)\mapsto U_B(L)$ and, for a materiality threshold $\tau$, the smallest reference breadth and target supervision required to establish $U_B(L)\leq\tau$. Here $B$ indexes a prespecified \emph{reference breadth}, not runtime or computational complexity.
+
+The frozen block-ordering analysis already provides three nested breadths: 30, 60, and 115 candidates. For each cell we take the median zero-label endpoint over 5,000 prespecified whole-block orderings, then summarize the 16 case--classifier cells. The cross-cell median contracts from 0.042 at $B=30$ to 0.034 at $B=60$ and remains 0.034 at $B=115$; the number of cells already at or below 0.010 changes from 3 to 4 to 4 (Supplementary reference-breadth table). Thus most aggregate contraction occurs by 60 candidates, but the full family remains necessary for the deliberately adversarial question and for individual cases. These ordering distributions quantify dependence on reference breadth; they are not confidence intervals or computational-cost measurements.
+
+The prediction-aware evidence curves contract rapidly because only disagreements capable of lowering a current witness endpoint need adjudication (corresponding curve display in Supplementary Information). The adaptive rule is not consistently better than random-active sampling, although recomputing the active set avoids the 286.5-label median outlier produced by a frozen initial-coverage ordering. The result persists when the selected quantum model uses an entangling-ZZ map: across the 12 entangling case--classifier cells, the adaptive rule needs 0--33 labels (median 14) for the 0.010 endpoint, while random-active cell medians are 0--34 (median 12.5). Thus the finding is not an artefact of including classically factorizable product maps.
+
+Reference breadth matters separately from fair benchmarking. For ToN-IoT scanning under GPC, the customary 30-candidate linear/RBF family yields a realized quantum accuracy advantage of $+0.028$, so no number of labels can falsify a one-point claim against that restricted reference. Against the full 115-candidate family the realized advantage is $-0.014$, the zero-label upper endpoint is $0.016$, and three targeted labels reduce it below $0.010$. Equal 60-versus-60 budgets remain the appropriate performance comparison; the full family asks the different, deliberately adversarial question of predictive indispensability.
+
+\subsection{Gate 2 transfers prospectively in a technically limited replication}
+\label{sec:res_gate2_prospective}
+
+The security acquisition curves above are retrospective. We therefore froze a separate Gate-2 replication before acquiring its three TableShift tasks, computing a model prediction, or opening a target label. The task identifiers---BRFSS Diabetes, ACS Food Stamps, and NHANES Lead---were inherited from an unused fallback list in the earlier external protocol. The immutable specification fixed five label-blind sampling seeds, the q1000 split sizes, P1$'$ selection, both classifiers, the 60-quantum and 115-classical pools, physical prediction--label separation, three thresholds, 200 SHA-256 orders for each strong control, and numerical outcome categories. The aggregate prediction lock was hashed before the one-time label audit (Methods).
+
+All five NHANES seeds produced only 11 non-constant post-encoding features, below the frozen 12-dimensional grid requirement. The task therefore failed a prespecified minimum-feature gate before any model candidate was executed; it was not replaced or repaired by reducing the grid. The replication is consequently technically limited to ten task--seed units, or 20 fixed task--seed--classifier cells, rather than evidence from three complete tasks.
+
+The available result meets the frozen strong-transfer category (Figure~\ref{fig:v10_gate2}). Against the full classical family, zero-label endpoints range from 0 to 0.168 (median 0.010), and 11/20 cells already satisfy $U\leq0.010$ without target labels. The fixed adaptive audit reduces every remaining endpoint to that threshold with 0--76 labels (overall median 0). The four task--classifier medians are 0 for ACS SVC, 3 for ACS GPC, 3 for BRFSS SVC, and 0 for BRFSS GPC; all are below the 50-label criterion, and the worst seed remains below the frozen 100-label ceiling. Every realized accuracy effect is negative, ranging from $-0.156$ to $-0.002$.
+
+The prospective controls reproduce the earlier negative algorithmic conclusion. Against both dynamic random-active and non-adaptive initial-coverage medians, adaptive coverage wins, ties, and loses in 3, 15, and 2 of the 20 cells, respectively; the median paired difference is zero. Prediction-independent ordering is far less efficient in the non-trivial cells. Thus the transferred result concerns the sharp certificate and restriction to actionable disagreements, not superiority of the coverage heuristic. All prospectively selected quantum winners are product maps, so this replication does not independently validate the entangling-ZZ stratum; that stratum remains supported only by the retrospective security cases.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{fig_v10_gate2_prospective.pdf}
+\caption{Prospectively locked Gate-2 replication against the full 115-candidate classical family. \textbf{a}, Zero-label upper endpoints for five deterministic sampling seeds in each technically eligible task--classifier cell; black ticks mark medians and the dashed line marks 0.010 accuracy. \textbf{b}, Labels required to reduce the endpoint to at most 0.010. Coloured points are the five fixed adaptive counts, black ticks are exact retrospective label-oracle counts, and open markers with bars are medians and 2.5--97.5\% quantiles for dynamic random-active and non-adaptive initial-coverage policies across 1,000 seed--order combinations (five seeds times 200 SHA-256 orders). The 50-label line is the frozen task--classifier median criterion; the dotted 100-label line is the frozen seed-level ceiling. Comparator ranges are algorithmic sensitivities, not confidence intervals. NHANES Lead failed the prespecified 12-feature gate before model execution and is absent.}
+\label{fig:v10_gate2}
+\end{figure*}
 
 \subsection{The apparent advantage under oracle selection}
 \label{sec:res_baselines}
@@ -199,21 +326,6 @@ All comparisons share classifier, preprocessing, and split definitions within a 
 We begin with a deliberately optimistic reference comparison: fidelity-based quantum kernels against linear and RBF baselines, with each family's representative chosen by Best-by-OOD selection---the configuration with the highest balanced accuracy on the OOD test split itself---and the classical kernels left at the default regularization $C=1$. Related intrusion-detection studies motivate the small-reference context \cite{abreu2024qmlids,abreu2025quantumnetsec,bellante2025evaluating}, but we do not claim that this exact protocol dominates QML practice. Under these conventions, on EMBER, the quantum family shows an OOD advantage of $+0.037$ under SVC and $+0.028$ under the GP classifier against linear+RBF, shrinking to $+0.004$/$+0.002$ once the classical family is enlarged with heavier-tailed kernels. Supplementary Table~5 gives the complete oracle results.
 
 Two features favour this apparent quantum result. Best-by-OOD is an \emph{oracle}: it uses the labels it then reports. Fixing $C=1$ also leaves classical candidates at a potentially unsuitable regularization point. These values are therefore descriptive upper bounds, not deployable effects.
-
-\subsection{A cross-generation sensitivity map is associational}
-\label{sec:res_specification}
-
-To avoid privileging a preferred endpoint, we enumerated all ten logically valid, already-computed specifications fixed before this extension (Figure~\ref{fig:specification}). They trace a descriptive path over target-label access, SVC regularization, classical reference strength, and candidate budget. S1--S4 use the legacy generation with fixed $C=1$, whereas S5--S10 use the corrected v4 generation with train-cross-validated $C$; the S4--S5 transition therefore does not isolate regularization from generation. Every specification retains all eight security scenario-groups.
-
-The family-level conclusion spans both sides of zero. For SVC, the source-dataset-equal quantum-minus-classical mean ranges from $+0.047$ under legacy ID selection with fixed $C=1$ and the customary reference (S2) to $-0.006$ under ID-validation selection, train-only regularization, the extended reference, and equal budgets (S10). For the GP classifier, for which the regularization axis is not applicable, the corresponding range is $+0.042$ to $-0.003$. Expanding the classical reference contracts the positive effect in the relevant legacy comparisons; the complete controlled v4 bundle yields estimates at or slightly below zero. The path is not monotone in every intermediate specification, which is precisely why reporting only an oracle and a final controlled endpoint would be insufficient. The curve shows that the apparent advantage is conditional on a bundle of evaluation decisions rather than a stable property of quantum provenance.
-
-% Figure generated by scripts/analysis/specification_curve_v5.py
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{fig_v6_specification.pdf}
-\caption{A prespecified cross-generation sensitivity map shows how the apparent family effect changes across evaluation bundles. Grey points are the eight fixed security scenario-groups; diamonds average groups within EMBER, UNSW-NB15, and ToN-IoT before giving the three source datasets equal weight. Specifications are shown in their prespecified S1--S10 order, not sorted by effect. S1--S4 use the legacy generation with fixed $C=1$; S5--S10 use the corrected v4 generation with train-cross-validated $C$, so their boundary is generation-confounded and does not isolate a regularization effect. Positive values favour the fidelity-kernel family. GPC has no $C$-regularization axis. These are descriptive fixed-case summaries, not per-axis causal effects; no specification-level hypothesis test or population interval is reported.}
-\label{fig:specification}
-\end{figure*}
 
 \subsection{The controlled comparison does not preserve the apparent advantage}
 \label{sec:res_honest}
@@ -275,15 +387,7 @@ Scenario & Clf. & vs lin./RBF & vs ext. (equal $B$) & interval / LODO range \\
 \paragraph{The candidate-budget result is insensitive to the sampling scheme.}
 The primary \texttt{kernel\_blocked} scheme samples 12 whole classical kernel-shape blocks crossed with all five dimensions, matching both the quantum count and its feature-map-by-dimension structure. Uniform and kernel-stratified samples match the count but not this block structure. The source-dataset-equal resampling estimates remain close under all three schemes: $-0.00576$, $-0.00555$, and $-0.00548$ for SVC, and $-0.00185$, $-0.00232$, and $-0.00253$ for GPC, respectively. The largest scheme range in any group--classifier cell is $0.00353$. Supplementary Table~2 reports all 48 cells. Candidate-count equality is therefore distinct from search-space isomorphism, but this distinction does not drive the conclusion here.
 
-\paragraph{Rank-matched differences remain negative within the predefined overlap.} We pair each quantum configuration with the classical configuration of nearest training effective rank within the same run and dimension. This observational matching reuses classical candidates and applies the prespecified caliper $\max(r_Q,r_C)/\min(r_Q,r_C)\leq1.25$. It retains 48,708 of 64,800 pairs (75.2\%; 69.3--83.3\% by group). Figure~\ref{fig:rankmatched} reports negative median quantum-minus-classical differences in all eight groups ($-0.0013$ to $-0.0094$); the quantum member is more accurate in 22--37\% of retained pairs. The pooled median is $-0.0056$. Minimum-cost one-to-one matching retains 24,675 pairs at the same caliper and yields a pooled median of $-0.0053$, again negative in every group. Results remain negative over calipers 1.10, 1.50, 2.00, and without a caliper (Supplementary Table~3). These pairings describe the predefined region of rank overlap; they do not identify a causal effect of kernel family.
-
-% Figure generated by scripts/reporting/make_v4_figures.py
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{fig_v4_rankmatched.pdf}
-\caption{Nearest-rank pairing yields negative median quantum-minus-classical differences in all eight fixed scenario-groups. Each quantum configuration is paired, with replacement, to the nearest-effective-rank classical configuration within run and dimension, subject to rank ratio $\leq1.25$. The filter retains 48,708/64,800 pairs (75.2\%; 69.3--83.3\% by group). Bars show per-group median OOD balanced-accuracy differences; annotations give the fraction of retained pairs in which the quantum member is more accurate. This is observational matching; classical candidates may be reused and no causal family effect is implied.}
-\label{fig:rankmatched}
-\end{figure}
+\paragraph{Rank-matched differences remain negative within the predefined overlap.} We pair each quantum configuration with the classical configuration of nearest training effective rank within the same run and dimension. This observational matching reuses classical candidates and applies the prespecified caliper $\max(r_Q,r_C)/\min(r_Q,r_C)\leq1.25$. It retains 48,708 of 64,800 pairs (75.2\%; 69.3--83.3\% by group). Supplementary Figure~3 reports negative median quantum-minus-classical differences in all eight groups ($-0.0013$ to $-0.0094$); the quantum member is more accurate in 22--37\% of retained pairs. The pooled median is $-0.0056$. Minimum-cost one-to-one matching retains 24,675 pairs at the same caliper and yields a pooled median of $-0.0053$, again negative in every group. Results remain negative over calipers 1.10, 1.50, 2.00, and without a caliper (Supplementary Table~3). These pairings describe the predefined region of rank overlap; they do not identify a causal effect of kernel family.
 
 \subsection{The quantum pool mixes entangling and product kernels}
 \label{sec:res_circuits}
@@ -351,64 +455,36 @@ The secondary GP classifier shows a larger contraction of $+0.0324$ ($[+0.0223,+
 
 The results are consistent with both families reaching similar informative geometries. Geometry carries partial information about behaviour under shift, but neither the analysis nor the matching identifies it as a causal mediator: the association is regime-dependent, not the single governing law that optimistic accounts (our own earlier report included) proposed.
 
-% Figure generated by scripts/reporting/make_v4_figures.py
-\begin{figure*}[t]
-\centering
-\includegraphics[width=0.72\textwidth]{fig_v4_mechanism.pdf}
-\caption{The geometry--OOD association is regime-dependent. Points are median within-unit Spearman correlations between each geometry descriptor and OOD balanced accuracy, per fixed scenario-group for SVC; each unit is a run--dimension cell. Effective rank orders accuracy strongly in some regimes (EMBER $m2$, ToN-IoT $m2$) and weakly or negatively in others (the UNSW constructed-shift scenarios); OOD alignment is more consistently positive but never uniform. These descriptive associations have no population interval and do not identify a causal mechanism.}
-\label{fig:mechanism}
-\end{figure*}
-
 \paragraph{The geometry--OOD link is a regime-dependent association, not a law.}
-Two descriptors of the training and OOD Gram matrices carry information about which kernels generalize: the effective rank of the training kernel and the centered kernel-target alignment on the OOD split. But their association with OOD accuracy is regime-dependent, not a single mechanism. Within scenario-groups (Figure~\ref{fig:mechanism} and Supplementary Table~4), the median Spearman correlation between effective rank and OOD accuracy ranges from $+0.80$ (EMBER $m2$) down to $-0.15$ (UNSW-NB15 reconnaissance under the constructed shift); partial correlations that control for family label and length scale track the raw values closely. OOD alignment is more consistently positive ($+0.22$ to $+0.64$) but likewise varies by regime. Because OOD KTA uses the labels of the same OOD split on which accuracy is measured, it is a post hoc, label-reusing diagnostic rather than an independently validated mechanism. A geometry model trained on two source datasets and used to rank kernels in the third achieves only Spearman $0.22$--$0.40$ (EMBER $0.28$, UNSW-NB15 $0.22$, ToN-IoT $0.40$). We therefore describe a genuine but partial association, not a causal mechanism or deployable predictor.
+Two descriptors of the training and OOD Gram matrices carry information about which kernels generalize: the effective rank of the training kernel and the centered kernel-target alignment on the OOD split. But their association with OOD accuracy is regime-dependent, not a single mechanism. Within scenario-groups (Supplementary Figure~4 and Supplementary Table~4), the median Spearman correlation between effective rank and OOD accuracy ranges from $+0.80$ (EMBER $m2$) down to $-0.15$ (UNSW-NB15 reconnaissance under the constructed shift); partial correlations that control for family label and length scale track the raw values closely. OOD alignment is more consistently positive ($+0.22$ to $+0.64$) but likewise varies by regime. Because OOD KTA uses the labels of the same OOD split on which accuracy is measured, it is a post hoc, label-reusing diagnostic rather than an independently validated mechanism. A geometry model trained on two source datasets and used to rank kernels in the third achieves only Spearman $0.22$--$0.40$ (EMBER $0.28$, UNSW-NB15 $0.22$, ToN-IoT $0.40$). We therefore describe a genuine but partial association, not a causal mechanism or deployable predictor.
 
-\subsection{Finite-shot estimation: the geometry is a statevector idealization}
+\subsection{Finite shots can create distinctness without useful advantage}
 \label{sec:res_shots}
 
-All quantum kernels above are computed by exact statevector simulation, which isolates kernel geometry but is not what a device would return. We therefore froze a post-confirmatory Monte Carlo sensitivity before computing its outcomes, then froze a reviewer-motivated out-of-sample correction before computing that extension. The subset contains one $q1000$ run per scenario-group, all at master, q-split, and model seed 42; within each run, the exact P1$'$-selected quantum SVC configuration is fixed. For each of four shot counts, 30 independent measurement replicates replace every fidelity entry by a binomial estimate and reselect $C$ from training data under three conditions: no PSD correction, independent projection of square train and OOD matrices with rectangular blocks unchanged, and a coherent train-eigenspace Nyström extension (Methods). Stable SHA-256 seeds are distinct by run, configuration, shot count, replicate, and matrix block.
+All primary quantum kernels use exact statevectors. To test whether finite estimation can create apparent non-emulability, we apply the same zero-label certificate to 30 repeated binomial fidelity estimates at 128, 512, 2,048, and 8,192 shots for one fixed SVC quantum model per case. Each replicate reselects $C$ from training data under unprojected, independently projected, and coherent Nystr{\"o}m-PSD conditions (Methods).
 
-One case--replicate samples 1,624,250 input-pair fidelities: 499,500 train-triangle entries, 500,000 combined ID-holdout--train entries, 500,000 OOD--train entries, and 124,750 OOD-triangle entries. The ID-validation and ID-test roles partition the 500-row holdout and therefore need not each contain exactly 250 rows. This corresponds to 207,904,000 shots at 128 shots per fidelity and 13,305,856,000 at 8,192. Across eight cases, there are 12,994,000 case-conditioned parameterizations; repeating them 30 times gives 389,820,000 fidelity-estimation instances per shot level. Estimating all eight fixed configurations by circuits at all four levels projects 4.24 trillion shots (Supplementary Table~14). Four configurations are separable-product maps, however, so direct classical factorization can bypass their circuit sampling; the corresponding projection for the four entangling cases alone is 2.12 trillion shots. The three PSD conditions reuse the same sampled measurements. These are algebraic projections before device routing, calibration, mitigation, and repeated job overhead, not executed hardware costs or minimum implementation costs.
+At 128 shots the perturbed model disagrees with its exact-statevector counterpart on a median $7.2$--$7.4\%$ of target decisions, depending on PSD handling. Yet the across-case median increase in the full-family zero-label endpoint is only $+0.003$ for Nystr{\"o}m, $+0.005$ unprojected, and $+0.009$ for independent projection; individual cases range from decreases of $0.014$ to increases of $0.040$. The corresponding median realized balanced-accuracy changes are $-0.0010$, $-0.0044$, and $-0.0005$, respectively (Figure~\ref{fig:v9_shots}). As shots increase, median certificate changes generally approach zero, while the case ranges remain heterogeneous.
 
-Table~\ref{tab:shots} summarizes the eight conditional Monte Carlo distributions. Sampling does not induce a uniform accuracy direction. Under the original independent-square heuristic, the median across the eight fixed scenario-group medians is $-0.0005$ at 128 shots (group range $[-0.0252,+0.0131]$), $-0.0051$ at 512, $-0.0052$ at 2,048, and $0.0000$ at 8,192 shots. The coherent Nyström values are $-0.0010$, $-0.0026$, $0.0000$, and $0.0000$; the unprojected values are $-0.0044$, $-0.0009$, $-0.0005$, and $0.0000$. PSD handling is therefore part of the estimand rather than an innocuous cleanup step, but no condition produces a uniform accuracy direction. Central 95\% Monte Carlo intervals for all runs are shown in Supplementary Figure~2.
+Finite-shot noise can therefore move a quantum predictor away from every exact classical witness without making it better. This is a specifically important insufficiency result for the certificate: predictive non-emulability is necessary for a material advantage against the reference family, but it is not sufficient, and measurement noise can manufacture distinctness. Effective-rank inflation and the original performance sensitivities remain in the Supplementary Information. One case--replicate requires 1,624,250 distinct fidelity estimates; the full four-shot-level sensitivity projects 4.24 trillion circuit shots before routing and device overhead, halved if the four selected product-map cases are evaluated by direct factorization instead.
 
-Effective rank is measurement-sensitive: the median perturbed-to-exact ratio falls from $1.93$ at 128 shots to $1.13$ at 8,192. Median absolute OOD-accuracy deviations are $0.0065$--$0.0069$ under the Nyström extension and $0.0070$--$0.0084$ under the independent-square heuristic; non-monotonicity is expected because each perturbed training matrix reselects a discrete $C$. OOD-KTA changes under Nyström are not directly comparable to those from the independently sampled OOD square because Nyström derives that square from OOD--train features; we report them as estimator-dependent diagnostics in the artifact. These distributions quantify measurement-sampling variability conditional on eight fixed exact Gram matrices. They do not model a device, circuit compilation, gate or readout noise, mitigation, or hardware feasibility.
-
-% Table generated from results/v6/shots_mc/descriptive_across_groups.csv
-\begin{table}[t]
+% Finite-shot certificate summary.
+\begin{figure*}[t]
 \centering
-\caption{Repeated finite-shot fidelity-estimation sensitivity for eight fixed exact Gram matrices (SVC). Each row summarizes, across scenario-groups, the within-run median over 30 measurement replicates. $\Delta_{\mathrm{OOD}}$ is perturbed minus exact OOD balanced accuracy; brackets give the range of the eight medians, not a confidence interval. ``Independent PSD'' projects train and OOD square matrices separately while leaving evaluation--train blocks unchanged; it is an algorithmic heuristic, not one coherent out-of-sample kernel. ``Nyström PSD'' derives all corrected blocks from the sampled training matrix's positive eigenspace. Rank ratio is perturbed/exact effective rank after clipping negative spectral mass and is shared across conditions. Per-run central 95\% Monte Carlo intervals are in Supplementary Figure~2.}
-\label{tab:shots}
-\scriptsize
-\setlength{\tabcolsep}{3.0pt}
-\begin{tabular}{@{}cllcc@{}}
-\toprule
-Shots & Condition & median $\Delta_{\mathrm{OOD}}$ [group range] & median $|\Delta_{\mathrm{OOD}}|$ & rank ratio \\
-\midrule
-128 & Unprojected     & $-0.0044\;[-0.0563,+0.0137]$ & 0.0118 & 1.93 \\
-128 & Independent PSD & $-0.0005\;[-0.0252,+0.0131]$ & 0.0070 & 1.93 \\
-128 & Nyström PSD     & $-0.0010\;[-0.0227,+0.0140]$ & 0.0068 & 1.93 \\
-512 & Unprojected     & $-0.0009\;[-0.0226,+0.0192]$ & 0.0068 & 1.48 \\
-512 & Independent PSD & $-0.0051\;[-0.0281,+0.0041]$ & 0.0084 & 1.48 \\
-512 & Nyström PSD     & $-0.0026\;[-0.0239,+0.0048]$ & 0.0069 & 1.48 \\
-2,048 & Unprojected     & $-0.0005\;[-0.0222,+0.0055]$ & 0.0080 & 1.24 \\
-2,048 & Independent PSD & $-0.0052\;[-0.0238,+0.0041]$ & 0.0072 & 1.24 \\
-2,048 & Nyström PSD     & $0.0000\;[-0.0225,+0.0093]$ & 0.0065 & 1.24 \\
-8,192 & Unprojected     & $0.0000\;[-0.0158,+0.0114]$ & 0.0101 & 1.13 \\
-8,192 & Independent PSD & $0.0000\;[-0.0149,+0.0143]$ & 0.0081 & 1.13 \\
-8,192 & Nyström PSD     & $0.0000\;[-0.0158,+0.0162]$ & 0.0070 & 1.13 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Predictive uncertainty under shift}
-\label{sec:res_uncertainty}
-
-The Laplace GP probabilities provide a secondary uncertainty check (Supplementary Figure~1). For the target-label-free selected candidate, predictive entropy rises from ID to OOD for both families in every scenario-group, while expected calibration error changes moderately and comparably. Together with the controlled accuracy results, these diagnostics provide no consistent evidence in the fixed cases of a calibration benefit unique to the selected fidelity kernels. We do not interpret rising entropy alone as evidence of calibration.
+\includegraphics[width=0.86\textwidth]{fig_v9_shot_emulation.pdf}
+\caption{Finite-shot perturbations can increase apparent non-emulability without increasing performance. Lines are medians across the eight fixed case-level Monte Carlo medians and ribbons span their minima and maxima. \textbf{a}, Change from the exact-statevector zero-label accuracy upper endpoint against the full classical family. \textbf{b}, Change in realized OOD balanced-accuracy advantage. Each case has 30 measurement replicates at each shot level and PSD condition. Ribbons are fixed-case ranges, not confidence intervals.}
+\label{fig:v9_shots}
+\end{figure*}
 
 \section{Discussion}
 \label{sec:discussion}
 
-The results support a narrow conclusion: the apparent family advantage is evaluation-sensitive. Under the controlled endpoint we observe no consistent evidence of a quantum advantage across the fixed low-qubit cases, while nearest-rank pairing yields negative median differences throughout the predefined overlap. Geometry descriptors carry partial, regime-dependent information and occur in both families. The quantum-specific question is sharpened by the circuit audit: half of the map blocks are separable product constructions, yet the matched entangling-ZZ stratum is more negative than either the product stratum or the full pool. The controlled direction therefore does not arise from pooling product kernels with entangling circuits.
+The central result is an exact answer to a deliberately narrower question than quantum advantage in the complexity-theoretic sense: given fixed target inputs, fixed predictions, a bounded loss, and a prespecified classical reference family, how much predictive advantage remains compatible with the labels not yet inspected? The finite max--min gives the sharp region after any partial audit without a sampling, calibration, prevalence, or shift assumption. No interval based only on those observables can be uniformly smaller. For zero--one accuracy, the disagreement matrix collapses that optimization to a closed form. This turns ``a classical model looks similar'' into an information-optimal finite-batch falsification statement with an explicit materiality threshold.
+
+This scope distinguishes the result from its nearest ingredients. Co-validation uses disagreement between retrained classifiers to study error and variance \cite{madani2004covalidation}; Active Testing targets unbiased, low-variance risk estimation \cite{kossen2021activetesting}; limited-label model selection seeks the best model to deploy \cite{okanovic2025modelselector}; and weak-supervision partial identification combines fitted label marginals with Fr\'echet bounds for individual metrics \cite{polo2024partialidentification}. Our models remain fixed, the estimand is advantage against the best member of a declared family, and every unaudited label completion remains admissible. The acquisition rule is therefore secondary: it chooses which ambiguity to remove, whereas the certificate remains exact for any chosen subset. In QML, this target-decision object also complements Huang's train-sample geometric sieve rather than replacing it \cite{huang2021powerofdata}.
+
+The empirical frontier is much sharper than the benchmark effect alone. Against 115 classical kernels, at most 33 of 500 labels under the fixed adaptive rule are required to rule out an accuracy advantage above one point in every retrospective SVC and GPC case. Strong prediction-aware controls are at least as efficient on average, with median 12.5 labels versus 13, whereas an exact retrospective oracle needs median 6.5. This negative algorithmic result matters: most of the gain comes from adjudicating actionable disagreements, not from a privileged acquisition heuristic. The same certificate contraction holds for the selected entangling-ZZ subset. In the internally locked prospective replication, all four eligible task--classifier medians require at most three labels and the overall seed-level median is zero; the controls again show no acquisition-heuristic advantage. It does not establish universal classical emulation: it identifies the quantum model's decisions relative to a finite reference family on these particular target covariates. Its value is that every remaining ambiguity is visible in the certificate rather than hidden inside an average performance comparison.
+
+The three-gate interpretation prevents stronger conclusions from being conflated. Protocol validity asks whether the reported comparison could be deployed; predictive indispensability asks whether an appropriate classical witness reproduces the fixed target decisions; quantum relevance asks whether any surviving behaviour depends on a non-factorizable circuit and remains meaningful after accounting for estimation cost. Passing all three gates creates a candidate for deeper advantage analysis, not a proof of speedup. Here Gate~1 reverses the optimistic sign, Gate~2 rules out a material batch advantage with limited auditing and transfers prospectively on two new eligible tasks, and Gate~3 finds no rescue from the retrospective entangling stratum while finite-shot noise sometimes increases distinctness without performance. Because all prospective winners are product maps, the prospective experiment strengthens Gate~2 but adds no independent evidence about Gate~3.
 
 From the perspective of distribution-shift research, this reinforces that robustness conclusions are conditional on the protocol \cite{quinonero-candela2008datasetshift,gulrajani2021domainbed,koh2021wilds,yao2022wildtime}. Within v4, moving from the fixed-$C$, same-test-oracle, customary-reference, native-budget corner to the fully controlled corner changes the q1000 estimate from $+0.0131$ to $-0.0047$. Train-CV regularization and the extended reference have the largest mean paired changes, but their sizeable interaction precludes an additive or causal reading. The legacy/v4 display still cannot isolate regularization, and the larger historical $+0.037$ endpoint remains interpretable only as a complete evaluation bundle.
 
@@ -426,13 +502,15 @@ Our shift operationalization covers three reproducible mechanisms---within-class
 
 Kernel and encoding coverage also remains finite. The classical family spans seven kernels plus a bandwidth sweep, and both families receive symmetric tuning freedom, but neither candidate set is exhaustive: the quantum side is restricted to four commonly used fidelity feature maps at low qubit counts, and trained or task-adapted encodings, projected kernels, and deeper maps are not evaluated. The observed association suggests that future extensions should report their Gram-matrix geometry as well as provenance, but it does not predict their outcome. At substantially larger qubit counts, exponential kernel concentration \cite{thanasilp2024concentration} creates an additional regime not represented here, so our conclusions should not be extrapolated beyond the low-qubit study.
 
-All selection procedures operate over finite candidate sets. Candidate matching, full-pool endpoints, and budget curves expose part of this dependence, but conclusions can still change with candidate definitions and search granularity. Fully nested selection over additional independent benchmark pools would strengthen the analysis.
+The certificate is relative to a finite, prespecified classical family and a fixed observed target batch. It does not rule out a quantum advantage against a different classical family, establish a surrogate outside the observed covariates, or convert candidate count into computational complexity. Likewise, the batch interval is not a confidence interval for a future deployment population. The optional population result requires i.i.d.\ target sampling and models fixed before observing that sample, assumptions that do not describe the constructed tail batches.
+
+The partial-label result is mathematically valid for any audit subset, but its security acquisition curve was formulated after the eight target label files were unlocked, and the stronger comparators were added after the first retrospective curves were known. The separate Gate-2 experiment addresses that chronology internally: tasks, prediction locks, policies, thresholds, and success categories were fixed and hashed before label opening, and it meets the strong-transfer rule on every technically eligible task--classifier cell. This was not a public preregistration or an independently timestamped commitment. Its scope remains narrow. Only two tasks completed the frozen feature grid because NHANES failed a prespecified gate, the seeds are deterministic subsamples rather than independent task replicates, and every prospective quantum winner is a product map. The result supports transfer of the certificate and actionable-disagreement principle to these fixed tasks, not a population claim, entangling-kernel replication, or superiority of bottleneck coverage. Balanced-accuracy certification additionally requires a prespecified prevalence or prevalence range; using the retrospectively observed prevalence is only a post-unlock sensitivity.
 
 The quantum kernels are simulated rather than executed on hardware. The study therefore characterizes fidelity-kernel geometry, not noisy-device behaviour. Repeated binomial sampling quantifies one component of measurement uncertainty, but hardware noise, transpilation, readout, mitigation, and circuit-dependent correlations remain unmodelled \cite{wang2021nisq}; exponential concentration may also make informative spectral structure expensive to resolve at larger scales \cite{thanasilp2024concentration}. We make no claim about hardware feasibility, resource advantage, or quantum speedup---the only rigorously established quantum-classical learning separation concerns a specifically constructed problem, not natural data \cite{liu2021rigorous}. At the dimensions studied, the fidelity kernels are also classically simulable \cite{schreiber2023surrogates,jerbi2024shadows}, which is precisely what makes them available as practical kernel constructions today.
 
 Dataset scope and feature caveats provide a final boundary. Dynamic malware analysis and encrypted traffic remain untested. The network exports retain port-derived counters and, for ToN-IoT, direct port, protocol, and service indicators that can support shortcuts in NIDS benchmarks \cite{engelen2021troubleshooting}. Sharing features controls the inputs but does not imply that distinct kernels exploit them equally. In the frozen q1000 ablation, removing these fields shifts the two-source-dataset-equal effect from $-0.0031$ to $-0.0245$, but the change is highly heterogeneous and concentrated in ToN-IoT. This is evidence that feature access can affect the relative comparison, not proof that every shortcut has been removed or that the ablated tasks define a preferred deployment benchmark.
 
-We do not claim universal superiority, equivalence, complexity-theoretic advantage, hardware relevance, or a refutation of quantum kernels. The open problem for both families is whether a label-free, train-only signal can identify a useful geometry under shift; label-free drift detection \cite{yang2021cade} and task--model alignment theory \cite{bordelon2020spectrum,canatar2021taskmodel,ma2023covariate} provide starting points. This interpretation is consistent with calls for controlled QML benchmarking \cite{bowles2024betterthanclassical,schnabel2025scrutiny,kakavand2026benchmarking}.
+We do not claim universal classical superiority, predictive equivalence, complexity-theoretic advantage, hardware relevance, or a refutation of quantum kernels. The proposed audit instead makes a candidate advantage progressively falsifiable: first by protocol controls, then by a prespecified classical witness family on target covariates, and finally by limited adjudication of the disagreements that keep a material advantage possible. Future work should broaden the prospective replication to more tasks and entangling winners, and pair candidate breadth with measured computational resources. This interpretation is consistent with calls for controlled QML benchmarking \cite{bowles2024betterthanclassical,schnabel2025scrutiny,kakavand2026benchmarking}.
 
 \section{Methods}
 \label{sec:methods}
@@ -448,6 +526,112 @@ The primary endpoint is OOD balanced accuracy after P1$'$ deployment selection. 
 \mathrm{BAcc}^{(C)}_{\mathrm{OOD}},
 \]
 so positive values favour the quantum family. ID balanced accuracy and ID-to-OOD degradation are secondary. P2 selects from OOD information in other realizations, and P3 selects and evaluates on the same OOD test labels; both are explicitly non-deployable descriptive oracles.
+
+\subsection{Sharp finite-target identification}
+\label{sec:methods_identification}
+
+For Theorem~\ref{thm:bounded_loss}, fix the prediction-dependent loss tables before the audit and write $a_{ij}(y)=\ell_{ij}^C(y)-\ell_i^Q(y)$. For any completion of the labels outside $L$,
+\[
+\Delta_\ell(y)=\frac1n\min_j\left\{S_j(L)+
+\sum_{i\notin L}a_{ij}(y_i)\right\}.
+\]
+For the lower endpoint, minima commute and the label choices separate by item:
+\[
+\min_{y_{L^c}}\min_j\left\{S_j+\sum_{i\notin L}a_{ij}(y_i)\right\}
+=\min_j\left\{S_j+\sum_{i\notin L}\min_y a_{ij}(y)\right\}.
+\]
+For the upper endpoint introduce one-hot variables $z_{iy}\in\{0,1\}$ with $\sum_{y\in\mathcal Y}z_{iy}=1$ and maximize $t$ subject to
+\[
+nt\leq S_j(L)+\sum_{i\notin L}\sum_{y\in\mathcal Y}
+a_{ij}(y)z_{iy}\qquad\text{for every }j.
+\]
+This mixed-integer linear program enumerates the finite max--min implicitly. Finiteness of $\mathcal Y^{|L^c|}$ guarantees that both extrema are attained. Any interval based on the same loss tables and audited labels that excluded either endpoint would fail on the attaining completion, proving information optimality. Revealing a label restricts the completion set, which proves monotone contraction. The implementation is tested against exhaustive enumeration for binary Brier loss, arbitrary multiclass bounded-loss tables, arbitrary partial labels, and the zero--one specialization.
+
+The empirical accuracy certificate changes the estimand from a selected family mean to a fixed-model comparison. Let $q_i=h_Q(x_i)$ and $c_{ij}=h_{C_j}(x_i)$ be hard predictions on a target batch of size $n$. The quantum model is the P1$'$ winner fixed using ID validation; the classical candidates, their train-only hyperparameters, and their target predictions are also fixed before any target-label audit. Every displayed certificate uses the same inherited canonical realization per security group: $n_{\rm train}=1000$, $n_{\rm ID}=500$, $n_{\rm OOD}=500$, master seed 42, q-split seed 42, and model seed 42. The exact scenario run prefixes and selected SVC/GPC configurations appear in the canonical-run table in Supplementary Information. For a candidate labelling $y$,
+\[
+g_j(y)=\operatorname{Acc}(q;y)-\operatorname{Acc}(c_j;y),
+\qquad
+\Delta_B(y)=\min_j g_j(y).
+\]
+Only disagreements contribute to $g_j$. If $d_j=n^{-1}\sum_i\mathbf 1\{q_i\neq c_{ij}\}$, then $g_j(y)\in[-d_j,d_j]$. The labelling $y_i=q_i$ attains $g_j=d_j$ for every $j$ simultaneously, so $\max_y\Delta_B(y)=\min_jd_j$. If $k$ maximizes $d_j$, the labelling $y_i=c_{ik}$ attains $\Delta_B(y)\leq g_k(y)=-d_k$; no $g_j$ can be below $-d_j\geq-d_k$, so $\min_y\Delta_B(y)=-\max_jd_j$. This proves Theorem~\ref{thm:zero_label} and its sharpness.
+
+For an arbitrary audited subset $L$, define the observed signed contribution $S_j(L)$ and remaining disagreement count $R_j(L)$ as in Theorem~\ref{thm:partial_label}. Every completion satisfies
+\[
+\frac{S_j-R_j}{n}\leq g_j(y)\leq\frac{S_j+R_j}{n}.
+\]
+Assigning every unaudited label to $q_i$ attains all witness upper endpoints simultaneously. Assigning them to the witness that minimizes $S_j-R_j$ attains the lower endpoint of $\Delta_B$. This proves Theorem~\ref{thm:partial_label}. In binary classification, if $D_j$ is the original disagreement count and the audit has revealed $a_j$ disagreements favouring $q$ and $b_j$ favouring $c_j$, the interval simplifies to
+\[
+\left[
+\min_j\frac{-D_j+2a_j}{n},\
+\min_j\frac{D_j-2b_j}{n}
+\right].
+\]
+Thus the upper endpoint cannot increase under arbitrary adaptive querying. A classical-favouring label on a binary disagreement reduces that witness endpoint by exactly $2/n$; a quantum-favouring label leaves its upper endpoint unchanged. These statements are deterministic for the observed batch and require neither i.i.d.\ sampling nor a model for the unaudited labels.
+
+For completeness, an optional population form is available when the target inputs are i.i.d.\ and every model is fixed before observing them. A union bound and Hoeffding's inequality give, with probability at least $1-\delta$,
+\[
+\sup_y\Delta_B^{P_T}(y)
+\leq \min_{j\leq M}\widehat d_j+
+\sqrt{\frac{\log(2M/\delta)}{2n}}.
+\]
+We do not apply this result to the constructed tail batches, for which the finite-batch certificate is the appropriate estimand.
+
+\subsection{Reference tiers and active target-label audit}
+\label{sec:methods_frontier}
+
+The partial-label audits use two nested operational tiers. The customary tier contains the 30 linear and RBF candidates; the full tier contains all 115 prespecified classical candidates. Separately, the frozen zero-label breadth sensitivity evaluates 30, 60, and 115 candidates using 5,000 nested whole-block orderings rooted at \texttt{ksf-v9-frontier-20260731}; a 60-candidate draw contains 12 of 23 five-dimension blocks and the full tier contains all blocks. Tier size measures reference breadth only. It is not a computational-resource claim because training time, memory, and model-construction cost are not equalized by candidate count.
+
+At every audit step, we calculate the witness-specific numerator $S_j+R_j$. Among witnesses with unaudited disagreements, the adaptive coverage rule identifies those tying at the smallest reducible numerator and queries an unaudited input that covers the largest number of these bottleneck witnesses. Ties follow a fixed SHA-256 order. The rule uses target covariates, predictions, and previously revealed outcomes, but never an unrevealed label. It is evaluated retrospectively for thresholds $\tau\in\{0.005,0.010,0.020\}$.
+
+We compare it with three stronger references. Dynamic random-active sampling selects by SHA-256 order among all unaudited points disagreeing with at least one current reducible bottleneck witness. Non-adaptive initial coverage ranks points once by how many zero-label bottleneck witnesses they cover, without label feedback. Both use 200 frozen SHA-256 tie orders. Finally, an undeployable label oracle gives the exact ex-post minimum number of queries over every possible audit subset. If $D_j$ is witness $j$'s total disagreement count, crossing threshold $\tau$ requires
+\[
+r_j(\tau)=\max\!\left\{0,\left\lceil\frac{D_j-n\tau}{2}\right\rceil\right\}
+\]
+revealed disagreements whose realized label favours witness $j$; the oracle minimum is the smallest feasible $r_j(\tau)$ over witnesses. This is exact because the family endpoint crosses when any one witness endpoint crosses. A prediction-independent complete ordering is retained only as a weak diagnostic. Comparator quantiles describe frozen algorithmic orders, not sampling uncertainty.
+
+The zero-label SVC definition and go/no-go criterion were frozen before prediction outcomes were inspected. The arbitrary-partial-label acquisition extension was declared only after the target labels had been unlocked; the strong-comparator amendment was declared after the original acquisition curves were known. Both are exploratory on these eight cases. GPC repeats the mathematics and policies but is not an independent prospective validation. Target labels are used only to evaluate certificate contraction, the oracle, and the final realized effect; no kernel, classifier, regularization, threshold, or P1$'$ winner is refitted or reselected. Prediction archives and the separately stored label file are joined only after SHA-256, row-index, model, and target-length gates pass.
+
+\subsection{Prospectively frozen Gate-2 replication}
+\label{sec:methods_gate2_prospective}
+
+The Gate-2 replication specification was hashed on 1 August 2026 before any of its three tasks was acquired, any model prediction was computed, or any target label was inspected. The source is the same TableShift implementation pinned at commit \texttt{fca9429814703a07e3902d005d46563a207b7f0a} \cite{gardner2023tableshift}. BRFSS Diabetes (race shift), ACS Food Stamps (Census-division shift), and NHANES Lead (poverty shift) were exactly the unused fallback identifiers recorded before the earlier external campaign; no project quantum result or target sample for them existed at freeze time. All three were attempted and none could be replaced based on availability or outcome.
+
+For each task, seeds $\{42,123,999,7,2024\}$ define deterministic label-blind samples with $(n_{\rm train},n_{\rm val},n_{\rm ID},n_{\rm target})=(1000,250,250,500)$. The v5 train-only semantic encoding, scaling, TruncatedSVD dimensions $\{4,6,8,10,12\}$, and angular representation are reused verbatim. The 60 quantum candidates and 115 classical candidates, P1$'$ validation selection, candidate-specific train-CV for SVC, fixed Laplace GPC, and decision thresholds are unchanged. The customary 30-candidate tier is secondary; the full tier and $\tau=0.010$ define the prospective outcome. Secondary thresholds are 0.005 and 0.020.
+
+The pipeline is fail-closed. A prediction-lock stage copies target labels to a separate sealed tree, removes them from the model state, and writes hard target predictions, row-order digests, selected validation-only quantum configurations, and SHA-256 hashes without calculating or printing target performance, prevalence, disagreement, or an acquisition curve. Candidate checkpoints contain only target predictions and validation-selection quantities. An aggregate manifest is accepted only when every available task--seed unit has all 175 kernel configurations for both classifiers or a permitted pre-model technical-failure record. The audit stage verifies that aggregate hash, records the one-time label opening and analysis-code hash, then joins labels by source-position digest. No model is refitted after the join.
+
+For each classifier and the two classical tiers, the fixed policies are adaptive bottleneck coverage, 200 dynamic random-active SHA-256 orders, 200 non-adaptive initial-coverage orders, the exact ex-post label oracle, and a weak prediction-independent order. The hash root appends task, seed, model, tier, policy, and draw. The primary summaries are four or six task--classifier medians over five seeds, depending on technical availability. Strong transfer requires every available task--classifier median to be at most 50 labels, the overall seed-level median to be at most 25, and no seed to exceed 100. With exactly two available tasks, all four cells are required and the result remains explicitly technically limited. Partial transfer requires all four medians to be at most 50 and an overall median at most 50; all other complete two-task outcomes fail to transfer. Fewer than two available tasks is technically incomplete. These categories were evaluated exactly once.
+
+NHANES generated 11 non-constant encoded features in all five seeds, fewer than required for the frozen 12-dimensional candidate grid. Minimum-feature failure was an explicitly permitted technical-unavailability gate. No NHANES model candidate was executed, the task was not replaced, and dimensions were not changed. BRFSS Diabetes and ACS Food Stamps passed every gate, leaving ten task--seed units for the technically limited prospective outcome.
+
+\subsection{Balanced-accuracy identification}
+\label{sec:methods_bacc}
+
+Balanced accuracy is not label-free unless target prevalence is known or restricted. At a fixed positive count $n_+$, we group inputs by their joint prediction signature $z=(q_i,c_{i1},\ldots,c_{iM})$. Let $n_z$ be the size of group $z$ and $k_z\in\{0,\ldots,n_z\}$ its unknown number of positive labels, with $\sum_zk_z=n_+$. For classifier $h$ with group-level prediction $h_z\in\{0,1\}$,
+\[
+\operatorname{BAcc}_h(k)=\frac12\left[
+\frac{\sum_z k_z h_z}{n_+}+
+\frac{\sum_z(n_z-k_z)(1-h_z)}{n-n_+}
+\right].
+\]
+The sharp upper endpoint is the mixed-integer linear program that maximizes $t$ subject to
+\[
+t\leq\operatorname{BAcc}_Q(k)-\operatorname{BAcc}_{C_j}(k)
+\quad\text{for every }j,
+\]
+together with the integer and prevalence constraints above. The lower endpoint is the minimum over witnesses of their corresponding linear minima. Relaxing $k_z$ to a continuous interval gives the sharp distributional or fractional-label LP. When prevalence is known only to lie in an interval, we maximize over its admissible integer counts. We report this as a sensitivity because the natural target prevalence is unavailable without labels; accuracy remains the main assumption-free certificate.
+
+\subsection{Why train-only geometry cannot determine target prediction}
+\label{sec:methods_transport}
+
+The geometric difference and effective rank summarize training Gram structure, whereas deployment also depends on the target--train block. An explicit normalized PSD construction makes the distinction exact. Set $K_{TT}=I_n$. One valid joint Gram extension gives a unit-norm target feature orthogonal to all training features, hence $K_{UT}=0$. A second gives the target the same feature as the first training point, hence $K_{UT}=e_1^\top$. Both joint matrices are PSD, have unit diagonal, and share identical $K_{TT}$. For kernel ridge regularization $\lambda>0$, however, their target prediction operators are
+\[
+0
+\quad\text{and}\quad
+e_1^\top(I_n+n\lambda I_n)^{-1}
+=\frac{e_1^\top}{1+n\lambda},
+\]
+whose spectral-norm difference is $1/(1+n\lambda)$. Train-only geometry can therefore screen possible separation but cannot characterize target transport. We use the hard-prediction certificate for SVC and GPC rather than treating this KRR construction as an endpoint result.
 
 \subsection{Security datasets and shared split sizes}
 
@@ -588,13 +772,15 @@ The coherent Nystr{\"o}m condition eigendecomposes the sampled training matrix a
 K_T^+=U_+\operatorname{diag}(\lambda_+)U_+^\top,\qquad
 \Phi_E=K_{E,T}U_+\operatorname{diag}(\lambda_+)^{-1/2}.
 \]
-The corrected evaluation--train and evaluation-square blocks are $\Phi_E\Phi_T^\top$ and $\Phi_E\Phi_E^\top$, respectively, with $\Phi_T=U_+\operatorname{diag}(\lambda_+)^{1/2}$. Thus the OOD square used for KTA is derived from the sampled OOD--train block rather than independently projected. In all three conditions, $C$ is reselected by the same five-fold train-only procedure and the final SVC is refitted. Outputs include signed and absolute OOD change from the fixed exact endpoint, effective-rank ratio, OOD-KTA change, retained rank, eigenvalue tolerance, negative-eigenvalue fraction, and Frobenius changes for every block. Within each fixed Gram matrix, medians and central 2.5--97.5\% Monte Carlo intervals summarize 30 replicates. Across the eight fixed matrices, medians and ranges are descriptive. This model contains no device or correlated-noise process.
+The corrected evaluation--train and evaluation-square blocks are $\Phi_E\Phi_T^\top$ and $\Phi_E\Phi_E^\top$, respectively, with $\Phi_T=U_+\operatorname{diag}(\lambda_+)^{1/2}$. Thus the OOD square used for KTA is derived from the sampled OOD--train block rather than independently projected. In all three conditions, $C$ is reselected by the same five-fold train-only procedure and the final SVC is refitted. Outputs include signed and absolute OOD change from the fixed exact endpoint, effective-rank ratio, OOD-KTA change, retained rank, eigenvalue tolerance, negative-eigenvalue fraction, and Frobenius changes for every block. Within each fixed Gram matrix, medians and central 2.5--97.5\% Monte Carlo intervals summarize 30 replicates. Across the eight fixed matrices, medians and ranges are descriptive.
+
+For the v0.9 extension we export the hard target prediction of every perturbed SVC and compare it with the unchanged exact-statevector classical witnesses. For each replicate and classical tier we record self-disagreement from the exact quantum predictor, the zero-label interval, and realized accuracy and balanced-accuracy advantages after the integrity-gated label join. This deliberately asks whether quantum measurement perturbation creates behaviour absent from the existing classical reference; it does not give the classical family an additional noise or retuning budget. The model contains no device or correlated-noise process.
 
 \subsection{Statistics and reproducibility}
 
 No null-hypothesis test is used for the eight security groups, three source datasets, or three external tasks. Every uncertainty object names its effective $n$, resampling unit, and conditioning set: security intervals use five q-split clusters; external intervals use five deterministic seed clusters per task; finite-shot intervals use 30 measurement replicates conditional on one fixed Gram matrix. The fifteen security pipeline realizations are never treated as independent. Security intervals use the $t_4$ reference and are pointwise, not simultaneous; the five underlying cluster means are published. Inclusion of zero is never interpreted as equivalence. No multiplicity adjustment was prespecified. Because multiple intervals and diagnostics are displayed, they are interpreted descriptively rather than as a familywise error-controlled decision procedure; the BCa analysis with five clusters is retained only as a fragile sensitivity.
 
-Sample sizes were design- and compute-constrained and fixed before outcome analysis; no power calculation was used. No completed group, task, specification, budget scheme, caliper, or finite-shot replicate was removed based on its result. Randomized operations use recorded seeds; external sampling and ID division use deterministic SHA-256 ordering. The test suite validates source-dataset mapping, endpoint equality across analyses, candidate-budget coverage, matching uniqueness, seed stability, exact-reference hashes, and complete Monte Carlo cells.
+Sample sizes were design- and compute-constrained and fixed before outcome analysis; no power calculation was used. No completed group, task, specification, budget scheme, caliper, or finite-shot replicate was removed based on its result. Randomized operations use recorded seeds; external sampling, ID division, and audit tie-breaking use deterministic SHA-256 ordering. The test suite validates source-dataset mapping, endpoint equality across analyses, candidate-budget coverage, matching uniqueness, seed stability, exact-reference hashes, prediction/label separation, theorem endpoints by exhaustive enumeration, MILP consistency, monotone partial-label contraction, and complete Monte Carlo cells.
 
 \subsection{Software environment}
 
@@ -609,7 +795,7 @@ OpenAI Codex was used during manuscript revision for language editing, code insp
 \section*{Declarations}
 
 \bmhead{Data Availability}
-This study uses the public EMBER \cite{anderson2018ember}, UNSW-NB15 \cite{moustafa2015unsw}, ToN-IoT \cite{alsaedi2020toniot}, and TableShift \cite{gardner2023tableshift} benchmarks, which remain subject to their original access conditions. Raw source records are not redistributed. Derived split definitions, deterministic row-position hashes, shift constructions, experiment manifests, complete aggregated results, and summary tables are available through the project Zenodo concept record at \url{https://doi.org/10.5281/zenodo.19147649}. The exact v0.8.0 submission artifact is identified by the immutable version DOI \url{https://doi.org/10.5281/zenodo.21717074} \cite{fernandezbarrios2026artifactv08}.
+This study uses the public EMBER \cite{anderson2018ember}, UNSW-NB15 \cite{moustafa2015unsw}, ToN-IoT \cite{alsaedi2020toniot}, and TableShift \cite{gardner2023tableshift} benchmarks, which remain subject to their original access conditions. Raw source records are not redistributed. Derived split definitions, deterministic row-position hashes, shift constructions, experiment manifests, complete aggregated results, target-prediction matrices, physically separated audit labels, evidence frontiers, technical-failure records, and integrity manifests are archived in the immutable v1.1.0 release at \url{https://doi.org/10.5281/zenodo.21750725}. The all-version concept DOI is \url{https://doi.org/10.5281/zenodo.19147649}; the exact v0.8.0 predecessor is \url{https://doi.org/10.5281/zenodo.21717074} \cite{fernandezbarrios2026artifactv08}.
 
 \bmhead{Code Availability}
 Code for constructing the splits, running the kernel experiments, reproducing every analysis, and regenerating every table and figure is available at \url{https://github.com/roberto-fernandez-barrios/kernel_shift_framework} and in the versioned Zenodo archive above. A Windows-specific Conda snapshot and platform-neutral package specifications document the software dependencies; neither is claimed as an exact machine image of every full-scale run. The code is released under BSD-3-Clause with no restriction on non-academic use.

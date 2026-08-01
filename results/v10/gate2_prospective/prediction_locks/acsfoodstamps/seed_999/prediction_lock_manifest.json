@@ -1,0 +1,97 @@
+{
+  "status": "prospective_predictions_locked_before_target_audit",
+  "specification": "docs/GATE2_PROSPECTIVE_REPLICATION_SPEC_V10.md",
+  "specification_sha256": "3a8318d92d4af2aeeaf0c0edb069c3be59f31da6d1ee50fb6a6256e9d9d280b0",
+  "task": "acsfoodstamps",
+  "stratum": "q1000",
+  "seed": 999,
+  "target_role": "ood_test",
+  "n_target": 500,
+  "target_indices_sha256": "63cf5e23a38be76e929560e2ab139c5e2e5639b84f829178e4e76fc0c4ca7e46",
+  "sealed_label_artifact": "results/v10/gate2_prospective/sealed_labels/acsfoodstamps/seed_999/evaluation_labels.npz",
+  "sealed_label_artifact_sha256": "295cc62e92c5d41baddf660c37b3a9a5635ad7e14457a4ae2604a2b8ca0698c3",
+  "target_labels_opened_for_analysis": false,
+  "kernel_backend": "cuda",
+  "preprocessing": {
+    "n_raw_features": 28,
+    "n_train_nonconstant_features": 27,
+    "n_dropped_constant_features": 1,
+    "n_numeric_features": 7,
+    "n_categorical_features": 20,
+    "n_post_encoding_features": 223,
+    "kept_columns": [
+      "ENG",
+      "FER",
+      "HUPAC",
+      "WIF",
+      "NWLA",
+      "NWLK",
+      "OCCP",
+      "POBP",
+      "RELP",
+      "WKHP",
+      "WKW",
+      "WRK",
+      "DIS",
+      "MIL",
+      "ANC",
+      "NATIVITY",
+      "DEAR",
+      "DEYE",
+      "DREM",
+      "PUBCOV",
+      "AGEP",
+      "SEX",
+      "ST",
+      "MAR",
+      "CIT",
+      "RAC1P",
+      "SCHL"
+    ],
+    "svd_explained_variance_ratio_sum": {
+      "4": 0.28121674278866554,
+      "6": 0.3766125234988136,
+      "8": 0.44191114102059903,
+      "10": 0.4910847704982751,
+      "12": 0.5324508759884246
+    },
+    "fit_split": "train",
+    "target_used": false,
+    "protocol_seed": 20260729
+  },
+  "models": {
+    "svc": {
+      "model": "svc",
+      "n_target": 500,
+      "n_classical": 115,
+      "n_customary": 30,
+      "quantum_winner": {
+        "cfg": "zmap_r2__svc__d6",
+        "kernel": "zmap_r2",
+        "dim": 6,
+        "c_selected": 1.0,
+        "selection_split": "validation",
+        "selection_balanced_accuracy": 0.7527846534653465
+      },
+      "prediction_artifact": "results/v10/gate2_prospective/prediction_locks/acsfoodstamps/seed_999/predictions_svc.npz",
+      "prediction_sha256": "efb5043ab2243c518bb8f08205ce66fae6c968985a7783f102b644073467a09a"
+    },
+    "gpc": {
+      "model": "gpc",
+      "n_target": 500,
+      "n_classical": 115,
+      "n_customary": 30,
+      "quantum_winner": {
+        "cfg": "pauli_xz_r1_full__gpc__d6",
+        "kernel": "pauli_xz_r1_full",
+        "dim": 6,
+        "c_selected": null,
+        "selection_split": "validation",
+        "selection_balanced_accuracy": 0.6260313531353136
+      },
+      "prediction_artifact": "results/v10/gate2_prospective/prediction_locks/acsfoodstamps/seed_999/predictions_gpc.npz",
+      "prediction_sha256": "5f01e53829eba5ccc99abe27e250a915c5c923691d9ebaf116d2a6d31c4c4f40"
+    }
+  },
+  "elapsed_seconds": 407.76077699661255
+}

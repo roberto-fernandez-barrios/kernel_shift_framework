@@ -43,6 +43,10 @@ jobs:
           python scripts/analysis/validate_v8_artifacts.py
           python scripts/analysis/validate_manuscript_v8.py
 
+      - name: Validate v1.1 certificates and prospective Gate-2 artifacts
+        run: |
+          python scripts/analysis/validate_manuscript_v11.py
+
       - name: Guard against withdrawn terminology in public artifacts
         run: |
           python - <<'PY'

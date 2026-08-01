@@ -5,6 +5,7 @@
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{multirow}
+\usepackage{float}
 \usepackage[hidelinks]{hyperref}
 \usepackage{microtype}
 \usepackage{url}
@@ -13,15 +14,15 @@
 \renewcommand{\tablename}{Supplementary Table}
 \renewcommand{\figurename}{Supplementary Figure}
 \hypersetup{
-  pdftitle={Supplementary Information: Evaluation Choices Shape Apparent Quantum Kernel Robustness under Distribution Shift},
+  pdftitle={Supplementary Information: Sharp Target-Domain Certificates for Quantum-Kernel Advantage under Distribution Shift},
   pdfauthor={Roberto Fernandez-Barrios, Iker Pastor-Lopez, Asier Gonzalez-Santocildes, Pablo Garcia Bringas},
   pdfsubject={Supplementary Information submitted to npj Quantum Information},
-  pdfkeywords={quantum machine learning, quantum kernels, distribution shift, robustness},
+  pdfkeywords={quantum machine learning, quantum kernels, partial identification, active testing, distribution shift},
   hidelinks
 }
 
 \title{\textbf{Supplementary Information}\\[0.5em]
-Evaluation Choices Shape Apparent Quantum Kernel Robustness under Distribution Shift}
+Sharp Target-Domain Certificates for Quantum-Kernel Advantage under Distribution Shift}
 \author{Roberto Fern\'andez-Barrios, Iker Pastor-L\'opez,\\
 Asier Gonz\'alez-Santocildes, and Pablo Garc\'ia Bringas\\[0.4em]
 \small Faculty of Engineering, University of Deusto, Bilbao, Spain}
@@ -38,6 +39,325 @@ here: all data construction, preprocessing, candidate grids, selection rules,
 inference, external acquisition, geometry calculations, and finite-shot
 procedures are reported in the main manuscript Methods. Machine-readable
 values and frozen input hashes are included in the immutable release artifact.
+
+\section*{Supplementary Results: Target-label evidence frontier}
+\label{supp:v9_frontier}
+
+The main text reports the 0.010 materiality threshold. Supplementary
+Table~\ref{supp:tab_v9_thresholds} gives the fixed adaptive audit at 0.005 and
+0.020; Supplementary Table~\ref{supp:tab_v9_acquisition} compares strong
+prediction-aware controls, the exact ex-post oracle, and the weak
+prediction-independent reference at 0.010. A value of zero means the
+zero-label certificate already crosses the threshold. Every adaptive count is
+deterministic for the fixed prediction matrix, labels, acquisition rule, and
+tie order. Comparator medians summarize 200 prespecified SHA-256 tie orders
+and are algorithmic sensitivities, not confidence intervals.
+
+The prespecified reference-breadth sensitivity uses complete five-dimension
+kernel blocks and 5,000 SHA-256-derived nested block orderings. It therefore
+contains three evaluated breadths rather than only the customary and full
+endpoints. The final Supplementary table summarizes the median zero-label
+endpoint within each case--classifier cell over those orderings and then
+across the 16 cells. Candidate count is a measure of reference breadth only,
+not time, memory, or computational cost.
+
+\begin{table}[H]
+\centering
+\caption{Target labels required against the full 115-candidate classical
+family. Columns $n_{.005}$, $n_{.010}$, and $n_{.020}$ use the fixed adaptive
+coverage audit. Every target batch contains 500 points.}
+\label{supp:tab_v9_thresholds}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llrrr}
+\toprule
+Target case & Classifier & $n_{.005}$ & $n_{.010}$ & $n_{.020}$\\
+\midrule
+EMBER $m1$ & SVC & 15 & 12 & 10\\
+EMBER $m2$ & SVC & 17 & 15 & 12\\
+ToN-IoT constructed & SVC & 0 & 0 & 0\\
+ToN-IoT campaign & SVC & 0 & 0 & 0\\
+UNSW DoS constructed & SVC & 3 & 0 & 0\\
+UNSW DoS campaign & SVC & 13 & 11 & 5\\
+UNSW Recon constructed & SVC & 17 & 14 & 11\\
+UNSW Recon campaign & SVC & 34 & 28 & 11\\
+\addlinespace
+EMBER $m1$ & GPC & 32 & 29 & 26\\
+EMBER $m2$ & GPC & 40 & 33 & 23\\
+ToN-IoT constructed & GPC & 4 & 3 & 0\\
+ToN-IoT campaign & GPC & 1 & 0 & 0\\
+UNSW DoS constructed & GPC & 24 & 22 & 20\\
+UNSW DoS campaign & GPC & 14 & 12 & 5\\
+UNSW Recon constructed & GPC & 23 & 22 & 19\\
+UNSW Recon campaign & GPC & 54 & 14 & 10\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Acquisition controls at $U\leq0.010$. Oracle is the exact
+retrospective minimum; adaptive is the fixed bottleneck-coverage rule; random
+active and initial coverage are medians across 200 SHA-256 tie orders; hash
+all is the weak prediction-independent median. The adaptive rule does not
+dominate either strong control.}
+\label{supp:tab_v9_acquisition}
+\scriptsize
+\setlength{\tabcolsep}{3.2pt}
+\begin{tabular}{llrrrrr}
+\toprule
+Target case & Classifier & Oracle & Adaptive & Random active & Initial coverage & Hash all\\
+\midrule
+EMBER $m1$ & SVC & 10 & 12 & 14.0 & 14.0 & 267.0\\
+EMBER $m2$ & SVC & 11 & 15 & 16.0 & 16.0 & 284.0\\
+ToN-IoT constructed & SVC & 0 & 0 & 0.0 & 0.0 & 0.0\\
+ToN-IoT campaign & SVC & 0 & 0 & 0.0 & 0.0 & 0.0\\
+UNSW DoS constructed & SVC & 0 & 0 & 0.0 & 0.0 & 0.0\\
+UNSW DoS campaign & SVC & 6 & 11 & 8.0 & 8.0 & 220.0\\
+UNSW Recon constructed & SVC & 9 & 14 & 13.0 & 13.0 & 234.0\\
+UNSW Recon campaign & SVC & 7 & 28 & 28.0 & 286.5 & 312.5\\
+\addlinespace
+EMBER $m1$ & GPC & 18 & 29 & 34.0 & 34.0 & 369.5\\
+EMBER $m2$ & GPC & 16 & 33 & 34.0 & 34.0 & 371.5\\
+ToN-IoT constructed & GPC & 2 & 3 & 2.0 & 2.0 & 112.0\\
+ToN-IoT campaign & GPC & 0 & 0 & 0.0 & 0.0 & 0.0\\
+UNSW DoS constructed & GPC & 14 & 22 & 21.0 & 21.0 & 244.5\\
+UNSW DoS campaign & GPC & 5 & 12 & 11.0 & 11.0 & 246.5\\
+UNSW Recon constructed & GPC & 20 & 22 & 25.0 & 24.0 & 260.0\\
+UNSW Recon campaign & GPC & 5 & 14 & 12.0 & 12.0 & 352.5\\
+\midrule
+Median over cells & & 6.5 & 13.0 & 12.5 & 12.5 & 245.5\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The frozen initial-coverage policy has one severe failure: for UNSW Recon
+campaign SVC, its median is 286.5 labels because the zero-label witness set
+becomes stale. Recomputing the actionable witness set avoids that failure,
+but optimizing tied-witness coverage gives no consistent advantage over
+dynamic random-active sampling.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{fig_v9_label_frontier.pdf}
+\caption{Witness-directed contraction of the sharp accuracy upper endpoint
+against the full classical family. Each curve is one fixed target batch and
+selected quantum model; colour denotes source dataset, and solid/dashed lines
+separate its paired shifts. Labels audit the fixed comparison and never
+retune or select a model. Curves can cross below zero because the quantum
+classifier can become certifiably worse than the best classical witness. At
+500 labels every curve equals the realized advantage.}
+\label{supp:fig_v9_frontier}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Canonical fixed runs and P1$'$ quantum configurations used by every
+target certificate. The exact run identifier is the displayed prefix followed
+by \texttt{\_\_ms42\_\_q1000\_id500\_ood500\_\_qs42\_\_s42}; a slash in a
+prefix denotes a literal \texttt{\_\_} separator. Configuration columns
+identify the classifier and report map, scale, dimension, and the selected
+SVC $C$ where applicable.}
+\label{supp:tab_v9_runs}
+\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{llll}
+\toprule
+Target case & Run prefix & SVC configuration & GPC configuration\\
+\midrule
+EMBER $m1$ & \texttt{m1\_hist\_byteent} & \texttt{pauli\_xz\_r1\_full/as2/d12/C10} & \texttt{zz\_r1\_full/as0.5/d12}\\
+EMBER $m2$ & \texttt{m2\_hist\_byteent} & \texttt{pauli\_xz\_r1\_full/as2/d12/C100} & \texttt{zz\_r2\_full/as2/d8}\\
+ToN-IoT constructed & \texttt{toniot\_scanning/m2\_centroid} & \texttt{zz\_r2\_full/as2/d6/C10} & \texttt{zz\_r1\_full/as2/d6}\\
+ToN-IoT campaign & \texttt{toniot\_scanning/natural\_cur} & \texttt{pauli\_xz\_r1\_full/as2/d12/C10} & \texttt{zz\_r2\_full/as0.5/d10}\\
+UNSW DoS constructed & \texttt{unsw\_dos/m2\_centroid} & \texttt{zmap\_r2/as0.5/d12/C100} & \texttt{zz\_r1\_full/d12}\\
+UNSW DoS campaign & \texttt{unsw\_dos/natural\_cur} & \texttt{zz\_r2\_full/as0.5/d4/C100} & \texttt{zz\_r1\_full/as0.5/d4}\\
+UNSW Recon constructed & \texttt{unsw\_recon/m2\_centroid} & \texttt{zz\_r2\_full/as0.5/d4/C100} & \texttt{zz\_r2\_full/as0.5/d8}\\
+UNSW Recon campaign & \texttt{unsw\_recon/natural\_cur} & \texttt{zz\_r1\_full/as0.5/d6/C10} & \texttt{zz\_r2\_full/as0.5/d4}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section*{Supplementary Results: Prevalence-conditional balanced accuracy}
+\label{supp:v9_bacc}
+
+Supplementary Table~\ref{supp:tab_v9_bacc} reports the exact finite-batch
+MILP after fixing prevalence to the target value that becomes available when
+the label file is unlocked. It is a retrospective metric sensitivity, not a
+label-free use of the true prevalence. The LP relaxation and integer program
+agree to numerical precision in all reported cells. Because these batches
+are close to balanced by construction, the balanced-accuracy upper endpoints
+closely track their accuracy counterparts and do not rescue a broad
+zero-label certificate.
+
+\begin{table}[htbp]
+\centering
+\caption{Prevalence-conditional sharp balanced-accuracy upper endpoints
+against the full classical family. $U_{\rm Acc}$ is the assumption-free
+zero-label accuracy endpoint, $U_{\rm BAcc}(\pi)$ is the exact MILP endpoint
+at the retrospectively unlocked prevalence, and
+$\Delta_{\rm BAcc,full}$ is the realized balanced-accuracy advantage.}
+\label{supp:tab_v9_bacc}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{llrrrr}
+\toprule
+Target case & Classifier & $\pi$ & $U_{\rm Acc}$ & $U_{\rm BAcc}(\pi)$ &
+$\Delta_{\rm BAcc,full}$\\
+\midrule
+EMBER $m1$ & SVC & .488 & .050 & .050 & $-.024$\\
+EMBER $m2$ & SVC & .488 & .054 & .054 & $-.037$\\
+ToN-IoT constructed & SVC & .492 & .002 & .002 & $-.004$\\
+ToN-IoT campaign & SVC & .518 & .002 & .002 & $-.018$\\
+UNSW DoS constructed & SVC & .496 & .010 & .010 & $-.016$\\
+UNSW DoS campaign & SVC & .520 & .034 & .035 & $-.025$\\
+UNSW Recon constructed & SVC & .498 & .046 & .046 & $-.032$\\
+UNSW Recon campaign & SVC & .470 & .034 & .033 & $-.022$\\
+\addlinespace
+EMBER $m1$ & GPC & .488 & .080 & .078 & $-.033$\\
+EMBER $m2$ & GPC & .488 & .074 & .073 & $-.016$\\
+ToN-IoT constructed & GPC & .492 & .016 & .016 & $-.014$\\
+ToN-IoT campaign & GPC & .518 & .006 & .006 & $-.012$\\
+UNSW DoS constructed & GPC & .496 & .066 & .066 & $-.052$\\
+UNSW DoS campaign & GPC & .520 & .028 & .029 & $-.033$\\
+UNSW Recon constructed & GPC & .498 & .088 & .088 & $-.066$\\
+UNSW Recon campaign & GPC & .470 & .030 & .029 & $+.001$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section*{Supplementary Results: Prospective Gate-2 replication}
+\label{supp:v10_gate2}
+
+The Gate-2 protocol was frozen before acquiring any of its three tasks,
+computing a model prediction, or opening a target label. Its specification
+SHA-256 is
+\texttt{3a8318d92d4af2ae\allowbreak eaf0c0edb069c3be\allowbreak 59f31da6d1ee50fb\allowbreak 6a6256e9d9d280b0}.
+The prediction stage copied target labels into a separate sealed tree and
+then removed them from the fitting state. Once every available unit contained
+175 candidate checkpoints for both classifiers, the aggregate prediction
+lock was written with SHA-256
+\texttt{e4ee6bb89bc78047\allowbreak e7c848a0db3a6255\allowbreak cf0a2600a21b42fb\allowbreak ab956a0e889507d1}.
+Only then did the audit process record its one-time label opening. The tasks
+were inherited unchanged from the unused fallback list in the earlier
+external protocol.
+
+During acquisition, the pinned NHANES download URLs returned HTML 404 pages.
+The transport paths alone were updated to the current official CDC directory;
+the same 37 cycle-specific XPT filenames, TableShift parser, columns, and
+domain definition were retained. XPORT magic bytes and SHA-256 hashes were
+verified before export, and the complete URL-repair audit is archived. This
+maintenance preceded every model execution and did not alter the subsequent
+minimum-feature disposition.
+
+\begin{table}[H]
+\centering
+\caption{Technical disposition of every frozen prospective Gate-2 task.
+``Candidates'' counts kernel configurations per available seed; each
+configuration supplies SVC and GPC predictions. NHANES was retained as a
+recorded technical failure and was not replaced.}
+\label{supp:tab_v10_availability}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lclrr}
+\toprule
+Task & Shift & Status & Seeds & Candidates/seed\\
+\midrule
+BRFSS Diabetes & race & prediction-locked & 5 & 175\\
+ACS Food Stamps & Census division & prediction-locked & 5 & 175\\
+NHANES Lead & poverty & minimum-feature failure ($11<12$) & 5 & 0\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Supplementary Table~\ref{supp:tab_v10_primary} gives every seed-level primary
+cell. The sharp endpoint is already at most 0.010 without labels in 11/20
+cells. Across all cells, the adaptive audit has median zero and range 0--76;
+the exact label oracle has median zero and range 0--40. Every realized
+accuracy effect is negative. The one broad zero-label case, ACS Food Stamps
+SVC at seed 999, is retained and determines the maximum adaptive count.
+
+\begin{table}[H]
+\centering
+\caption{Every prospective full-family cell at the primary accuracy threshold.
+$U_0$ is the zero-label sharp upper endpoint, $n_{.01}$ is the fixed adaptive
+count, $n^*_{.01}$ is the exact retrospective label-oracle minimum, and
+$\Delta_{\rm full}$ is the realized quantum-minus-best-classical accuracy
+difference after label opening.}
+\label{supp:tab_v10_primary}
+\scriptsize
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{llrrrrr}
+\toprule
+Task & Classifier & Seed & $U_0$ & $n_{.01}$ & $n^*_{.01}$ & $\Delta_{\rm full}$\\
+\midrule
+BRFSS Diabetes & SVC & 42   & .012 &  3 &  1 & $-.154$\\
+                 & SVC & 123  & .008 &  0 &  0 & $-.156$\\
+                 & SVC & 999  & .008 &  0 &  0 & $-.110$\\
+                 & SVC & 7    & .024 & 12 &  4 & $-.096$\\
+                 & SVC & 2024 & .018 &  4 &  2 & $-.118$\\
+                 & GPC & 42   & .000 &  0 &  0 & $-.008$\\
+                 & GPC & 123  & .002 &  0 &  0 & $-.010$\\
+                 & GPC & 999  & .004 &  0 &  0 & $-.018$\\
+                 & GPC & 7    & .002 &  0 &  0 & $-.002$\\
+                 & GPC & 2024 & .018 &  2 &  2 & $-.026$\\
+\addlinespace
+ACS Food Stamps & SVC & 42   & .010 &  0 &  0 & $-.030$\\
+                 & SVC & 123  & .014 &  1 &  1 & $-.060$\\
+                 & SVC & 999  & .168 & 76 & 40 & $-.104$\\
+                 & SVC & 7    & .010 &  0 &  0 & $-.108$\\
+                 & SVC & 2024 & .006 &  0 &  0 & $-.076$\\
+                 & GPC & 42   & .010 &  0 &  0 & $-.004$\\
+                 & GPC & 123  & .006 &  0 &  0 & $-.018$\\
+                 & GPC & 999  & .022 &  3 &  3 & $-.014$\\
+                 & GPC & 7    & .032 & 10 &  6 & $-.010$\\
+                 & GPC & 2024 & .024 &  4 &  4 & $-.006$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The frozen outcome summaries are the medians over five seeds in each
+task--classifier cell. They are 3, 0, 0, and 3 labels for BRFSS SVC, BRFSS
+GPC, ACS SVC, and ACS GPC, respectively. All four are at most 50, the overall
+seed-level median is zero, and the maximum is 76, satisfying every numerical
+condition for strong prospective transfer. The reported category remains
+\texttt{strong prospective transfer---technically limited two-task
+replication} because only two tasks completed the grid.
+
+\begin{table}[H]
+\centering
+\caption{Prospective acquisition controls at $U\leq0.010$. Adaptive entries
+are median [minimum, maximum] over five seeds. Other entries are median
+[2.5th, 97.5th percentile] over 1,000 seed--order combinations. Ranges are
+algorithmic sensitivities, not confidence intervals.}
+\label{supp:tab_v10_controls}
+\scriptsize
+\setlength{\tabcolsep}{3.4pt}
+\begin{tabular}{llrrrr}
+\toprule
+Task & Classifier & Adaptive & Random active & Initial coverage & Hash all\\
+\midrule
+BRFSS Diabetes & SVC & $3[0,12]$ & $2[0,12]$ & $2[0,12]$ & $91[0,301]$\\
+                & GPC & $0[0,2]$  & $0[0,2]$  & $0[0,2]$  & $0[0,162]$\\
+ACS Food Stamps & SVC & $0[0,76]$ & $0[0,79]$ & $0[0,78]$ & $0[0,350]$\\
+                & GPC & $3[0,10]$ & $4[0,15]$ & $4[0,15]$ & $141[0,415]$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Adaptive coverage wins, ties, and loses against each strong comparator in 3,
+15, and 2 seed-level cells; its median paired difference is zero. This
+prospectively repeats the conclusion that actionable-disagreement restriction
+is useful while coverage optimization is not demonstrably superior. The
+realized-prevalence balanced-accuracy MILP is retained as a retrospective
+sensitivity. Its full-family upper endpoints span 0--0.223, whereas every
+realized balanced-accuracy effect is negative (range $-0.080$ to $-0.013$).
+Because prevalence was not known
+before label opening, these values are not prospective label-free
+balanced-accuracy certificates.
+
+All 20 selected prospective quantum models are product maps. Consequently,
+this experiment validates transfer of Gate~2 on the eligible fixed tasks but
+does not independently replicate the retrospective entangling-ZZ result.
 
 \section*{Supplementary Results: Cross-generation sensitivity map}
 \label{supp:specification}
@@ -683,22 +1003,86 @@ All four & 17,671,840,000 & 1,559,280,000 & 4,241,241,600,000 & 2,120,620,800,00
 \end{tabular}
 \end{table}
 
+\section*{Supplementary Results: Geometry displays moved from the main text}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.72\textwidth]{fig_v4_rankmatched.pdf}
+\caption{Nearest-rank pairing yields negative median quantum-minus-classical
+differences in all eight fixed scenario-groups. Each quantum configuration is
+paired, with replacement, to the nearest-effective-rank classical
+configuration within run and dimension, subject to rank ratio $\leq1.25$.
+Annotations give the fraction of retained pairs in which the quantum member
+is more accurate. The pairing is observational and does not imply a causal
+family effect.}
+\label{supp:fig_rankmatched}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{fig_v4_mechanism.pdf}
+\caption{The geometry--OOD association is regime-dependent. Points are median
+within-unit Spearman correlations between each descriptor and OOD balanced
+accuracy for SVC. Effective rank is strong in some regimes and weak or
+negative in others; OOD alignment is more consistently positive but reuses
+the target labels. These descriptive associations do not identify a causal
+mechanism.}
+\label{supp:fig_mechanism}
+\end{figure}
+
+\begin{table}[ht]
+\centering
+\caption{Zero-label certificate across the frozen nested reference breadths.
+The endpoint column is the median across the 16 cell-level medians; the range
+is across those cell medians. Final columns count cells whose median upper
+endpoint is at or below each materiality threshold. Every 30- and
+60-candidate cell uses 5,000 whole-block orderings; breadth 115 contains the
+complete family in every ordering.}
+\label{supp:tab_v11_breadth}
+\scriptsize
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{rrrrrrr}
+\toprule
+$B$ & Blocks & Median $U_B^{(0)}$ & Cell range & $U\leq.005$ & $U\leq.010$ & $U\leq.020$\\
+\midrule
+30  &  6 & .042 & .004--.094 & 2 & 3 & 3\\
+60  & 12 & .034 & .002--.088 & 2 & 4 & 5\\
+115 & 23 & .034 & .002--.088 & 2 & 4 & 5\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
 \section*{Supplementary Results: Machine-readable result map}
 \label{supp:artifact}
 
-The canonical v0.8.0 release gates are
+The v0.9 retrospective artifacts and manuscript gates are reproduced by
 \begin{verbatim}
-python scripts/reproduce_v8.py --stage all
-python -m pytest tests -q
+python scripts/reproduce_v9.py --stage analysis
+python scripts/reproduce_v9.py --stage report
+python scripts/reproduce_v9.py --stage audit
+python scripts/reproduce_v10.py --stage all
+python scripts/reproduce_v11.py --stage all
 \end{verbatim}
-The circuit-aware strata, within-v4 factorial, shortcut ablation, and resource
-outputs are under \texttt{results/v8/}; the corrected three-source inference,
-budget, rank, and finite-shot outputs remain under \texttt{results/v6/}.
-Frozen legacy/v4/v5 artifacts remain unchanged. The development repository is
+The exact-prediction export is separately available as
+\texttt{python scripts/reproduce\_v9.py --stage export}; it skips complete,
+integrity-gated case artifacts unless forced. Target prediction matrices,
+separated audit labels, sharp envelopes, evidence-frontier curves, and
+finite-shot certificate outputs are under
+\texttt{results/v9/partial\_identification/}. Circuit-aware strata and the
+within-v4 factorial remain under \texttt{results/v8/}; prior inference,
+budget, rank, and finite-shot inputs remain under \texttt{results/v6/}.
+Frozen earlier artifacts are unchanged. The development repository is
 \url{https://github.com/roberto-fernandez-barrios/kernel_shift_framework},
-and the concept archive is
-\url{https://doi.org/10.5281/zenodo.19147649}. The exact v0.8.0 submission
-artifact is identified by the immutable version DOI
-\url{https://doi.org/10.5281/zenodo.21717074}.
+and the immutable v1.1.0 archive is
+\url{https://doi.org/10.5281/zenodo.21750725}; the all-version concept DOI is
+\url{https://doi.org/10.5281/zenodo.19147649}. The exact v0.8.0 predecessor is
+identified by \url{https://doi.org/10.5281/zenodo.21717074}. The v1.0
+prospective inputs and outputs are under
+\texttt{results/v10/gate2\_prospective/}; the frozen specification,
+acquisition audits, prediction locks, opaque label hashes, one-time opening
+record, all policy draws, technical-unavailability records, and final outcome
+are included in the v1.1.0 archive together with the bounded-loss tests,
+consolidation specification, manuscript sources, and final PDFs.
 
 \end{document}
