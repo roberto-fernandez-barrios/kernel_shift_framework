@@ -5,7 +5,7 @@ was not published as a stand-alone release. Its immutable inputs, outputs,
 integrity records, tests, and manuscript contribution are preserved without
 alteration in the consolidated v1.1.0 submission snapshot. This historical
 checklist records that decision; v1.1.0 is the initial public consolidation
-and the byte-portable v1.1.1 patch is the submission release identity.
+and the byte-portable v1.1.2 patch is the submission release identity.
 
 ## Completed locally
 
