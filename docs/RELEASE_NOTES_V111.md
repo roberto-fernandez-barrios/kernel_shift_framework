@@ -3,7 +3,7 @@
 Version 1.1.1 was a tagged but unreleased CI candidate. It proved that the
 frozen manifest bytes were portable, then exposed a Linux-specific direct-script
 import failure in the workflow. It has no Zenodo version and no GitHub release;
-v1.1.2 supersedes it. No scientific result, prediction, label, analysis,
+v1.1.3 supersedes it. No scientific result, prediction, label, analysis,
 theorem, figure, or reported number changed.
 
 The patch marks the prospectively frozen aggregate prediction-lock manifest as

@@ -98,7 +98,7 @@ The reporting and audit stages deliberately consume versioned summaries and pred
 
 ## Manuscript and citation
 
-The main manuscript and Supplementary Information live in [`manuscript/`](manuscript/) (Springer Nature-compatible main source plus a standalone Supplementary file). If you use this software, please cite the immutable v1.1.2 release via [`CITATION.cff`](CITATION.cff) and [10.5281/zenodo.21751137](https://doi.org/10.5281/zenodo.21751137). The immutable v1.1.0 predecessor is [10.5281/zenodo.21750725](https://doi.org/10.5281/zenodo.21750725), the earlier v0.8.0 artifact is [10.5281/zenodo.21717074](https://doi.org/10.5281/zenodo.21717074), and the all-version concept DOI is [10.5281/zenodo.19147649](https://doi.org/10.5281/zenodo.19147649).
+The main manuscript and Supplementary Information live in [`manuscript/`](manuscript/) (Springer Nature-compatible main source plus a standalone Supplementary file). If you use this software, please cite the immutable v1.1.3 release via [`CITATION.cff`](CITATION.cff) and [10.5281/zenodo.21751137](https://doi.org/10.5281/zenodo.21751137). The immutable v1.1.0 predecessor is [10.5281/zenodo.21750725](https://doi.org/10.5281/zenodo.21750725), the earlier v0.8.0 artifact is [10.5281/zenodo.21717074](https://doi.org/10.5281/zenodo.21717074), and the all-version concept DOI is [10.5281/zenodo.19147649](https://doi.org/10.5281/zenodo.19147649).
 
 ## License
 

@@ -74,7 +74,10 @@ def validate_v11() -> None:
     active = uncommented(main)
     supplement = SUPPLEMENT.read_text(encoding="utf-8")
     bibliography = BIBLIOGRAPHY.read_text(encoding="utf-8")
-    cover = COVER.read_text(encoding="utf-8")
+    # The cover letter is private submission correspondence and is intentionally
+    # excluded from the public repository. Validate it when present locally,
+    # while keeping the public reproducibility gate self-contained.
+    cover = COVER.read_text(encoding="utf-8") if COVER.exists() else None
 
     if sha256_file(SPEC) != SPEC_SHA256:
         raise ValueError("frozen v1.1 consolidation specification changed")
@@ -99,24 +102,28 @@ def validate_v11() -> None:
     if missing_bib:
         raise ValueError("missing v1.1 bibliography entries: " + ", ".join(missing_bib))
 
-    expected_title = (
-        "Sharp Target-Domain Certificates for Quantum-Kernel Advantage "
-        "under Distribution Shift"
-    )
-    cover_plain = cover.replace("**", "")
-    if expected_title not in cover_plain:
-        raise ValueError("npj cover letter does not use the v1.1 manuscript title")
-    for fragment in (
-        "bounded loss",
-        "information can be uniformly smaller",
-        "internally locked",
-        "rather than publicly preregistered",
-        "finite-shot noise can manufacture predictive distinctness",
-    ):
-        if fragment not in cover:
-            raise ValueError(f"cover letter is missing v1.1 positioning: {fragment}")
-    if "Evaluation Choices Shape Apparent" in cover or "v0.8.0 Zenodo record" in cover:
-        raise ValueError("cover letter retains obsolete v0.8 submission framing")
+    if cover is not None:
+        expected_title = (
+            "Sharp Target-Domain Certificates for Quantum-Kernel Advantage "
+            "under Distribution Shift"
+        )
+        cover_plain = cover.replace("**", "")
+        if expected_title not in cover_plain:
+            raise ValueError("npj cover letter does not use the v1.1 manuscript title")
+        for fragment in (
+            "bounded loss",
+            "information can be uniformly smaller",
+            "internally locked",
+            "rather than publicly preregistered",
+            "finite-shot noise can manufacture predictive distinctness",
+        ):
+            if fragment not in cover:
+                raise ValueError(f"cover letter is missing v1.1 positioning: {fragment}")
+        if (
+            "Evaluation Choices Shape Apparent" in cover
+            or "v0.8.0 Zenodo record" in cover
+        ):
+            raise ValueError("cover letter retains obsolete v0.8 submission framing")
 
     frontier = pd.read_csv(FRONTIER)
     medians = frontier.groupby("budget").median_accuracy_upper.median()
@@ -138,11 +145,15 @@ def validate_v11() -> None:
     code = Path("src/analysis/partial_identification.py").read_text(encoding="utf-8")
     if "def sharp_bounded_loss_envelope(" not in code:
         raise ValueError("bounded-loss implementation is missing")
-    if 'version = "1.1.2"' not in Path("pyproject.toml").read_text(encoding="utf-8"):
-        raise ValueError("pyproject version is not 1.1.2")
-    if 'version: "1.1.2"' not in Path("CITATION.cff").read_text(encoding="utf-8"):
-        raise ValueError("CITATION.cff version is not 1.1.2")
-    print("[ok] v1.1 theory, positioning, breadth, preservation, and cover gates")
+    if 'version = "1.1.3"' not in Path("pyproject.toml").read_text(encoding="utf-8"):
+        raise ValueError("pyproject version is not 1.1.3")
+    if 'version: "1.1.3"' not in Path("CITATION.cff").read_text(encoding="utf-8"):
+        raise ValueError("CITATION.cff version is not 1.1.3")
+    cover_status = "local cover checked" if cover is not None else "private cover omitted"
+    print(
+        "[ok] v1.1 theory, positioning, breadth, preservation, and release gates "
+        f"({cover_status})"
+    )
 
 
 def main() -> None:
