@@ -294,7 +294,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("manuscript/fig_v8_reviewer_revision.pdf"),
+        default=Path("manuscript/fig_v8_protocol_sensitivities.pdf"),
     )
     args = parser.parse_args()
     make_figure(args.input_dir, args.output)

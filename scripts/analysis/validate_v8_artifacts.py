@@ -1,4 +1,4 @@
-"""Fail-fast integrity gates for the v0.8 reviewer-revision artifacts."""
+"""Fail-fast integrity gates for the frozen v0.8 analysis artifacts."""
 from __future__ import annotations
 
 import argparse
@@ -502,7 +502,7 @@ def main() -> None:
     print("[ok] quantum-stratum, factorial, shortcut, and cluster outputs")
     validate_resource_outputs(args.root)
     print("[ok] circuit and finite-shot resource outputs")
-    print("[ok] all v0.8.0 reviewer-revision artifact gates passed")
+    print("[ok] all v0.8.0 analysis artifact gates passed")
 
 
 if __name__ == "__main__":

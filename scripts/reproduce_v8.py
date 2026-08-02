@@ -1,4 +1,4 @@
-"""Rebuild and validate the v0.8 reviewer-revision derived artifacts.
+"""Rebuild and validate the v0.8 circuit and protocol derived artifacts.
 
 This command consumes the versioned v4 summaries plus the frozen
 ``summary_v8_fixedc.csv`` and ``summary_v8_shortcut.csv`` campaign outputs. It

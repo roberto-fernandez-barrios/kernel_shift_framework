@@ -28,7 +28,7 @@ REQUIRED_MAIN = (
     r"\includegraphics[width=\textwidth]{fig_v10_gate2_prospective.pdf}",
     r"\label{fig:v10_gate2}",
     "technically limited",
-    "All 20 prospective realized accuracy effects are negative",
+    "All 20 prospective realized accuracy effects were negative",
     "All prospectively selected quantum winners are product maps",
 )
 

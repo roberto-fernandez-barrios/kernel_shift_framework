@@ -1,4 +1,4 @@
-"""Reviewer-motivated v0.8 analyses frozen in docs/REVIEWER_REVISION_SPEC_V8.md.
+"""Prespecified v0.8 circuit and protocol analyses.
 
 The script produces:
 
@@ -9,7 +9,7 @@ The script produces:
   security interval.
 
 The v0.4 primary endpoint is not replaced. These are fixed-case,
-reviewer-motivated sensitivities. Resampling distributions quantify candidate
+prespecified circuit and protocol sensitivities. Resampling distributions quantify candidate
 budget sensitivity and are never confidence intervals.
 """
 from __future__ import annotations
@@ -724,7 +724,7 @@ def main() -> None:
     make_factorial_outputs(v4, fixed, args.out_dir)
     make_shortcut_outputs(v4, shortcut, args.out_dir)
     make_primary_cluster_values(args.out_dir)
-    print(f"[OK] wrote v0.8 reviewer-revision outputs to {args.out_dir}")
+    print(f"[OK] wrote v0.8 circuit and protocol outputs to {args.out_dir}")
 
 
 if __name__ == "__main__":

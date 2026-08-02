@@ -1,4 +1,4 @@
-"""Tests for the frozen v0.8 reviewer-revision analyses."""
+"""Tests for the frozen v0.8 circuit and protocol analyses."""
 from __future__ import annotations
 
 import json

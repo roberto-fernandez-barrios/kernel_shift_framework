@@ -1,6 +1,6 @@
 # Paper 1: Q1 completion and submission strategy
 
-Status: npj-first v0.8 reviewer revision in progress, 29 July 2026.
+Status: historical npj-first v0.8 planning record, 29 July 2026.
 
 ## Target and positioning
 

@@ -9,7 +9,7 @@ Zenodo versions must not be moved or replaced.
 
 ## Scientific closure
 
-- [x] Freeze the reviewer-revision estimands before generating new outcomes.
+- [x] Freeze the v0.8 sensitivity estimands before generating new outcomes.
 - [x] Correct the separable versus entangling circuit characterization.
 - [x] Add logical circuit and finite-shot resource accounting.
 - [x] Replace causal interpretation of the cross-generation S1--S10 display

@@ -23,11 +23,11 @@ Within each experimental setting, the classifier, preprocessing, and splits are 
 - **5 q-split clusters per scenario-group**, each containing three model-seed realizations, evaluated under **target-label-free ID-validation selection** (P1′) and reported as fixed case studies with conditional cluster-*t* intervals — no population *p*-value.
 - **Repeated finite-shot fidelity estimation** with 30 independent measurement replicates at four shot counts under an unprojected estimate, the original independent-square PSD heuristic, and a coherent train-based Nyström extension, conditional on eight fixed exact Gram matrices.
 - **Prospectively frozen external validation** on College Scorecard, diabetes readmission, and ACS income, with 30 audited units and 37,800 split-level results.
-- **Sharp target-domain certificates** for any additive bounded loss on a finite label space, with a closed-form zero--one specialization, exact partial-label contraction, information optimality, a 30/60/115 reference-breadth frontier, and an internally locked prospective Gate-2 replication.
+- **Sharp target-domain certificates** for any additive bounded loss on a finite label space, with a closed-form zero--one specialization, exact partial-label contraction, information optimality, a 30/60/115 reference-breadth frontier, and a prospectively specified Gate-2 replication against the prespecified classical-kernel reference family.
 
 ## Key findings
 
-![Controlled family effects under target-label-free, budget-matched selection](docs/assets/fig_v4_honest.png)
+![Descriptive family contrasts under target-label-free, budget-matched selection](docs/assets/fig_v4_honest.png)
 
 1. Under a deliberately optimistic **test-peeking oracle selection with fixed regularization**, fidelity kernels appear to beat linear+RBF baselines by up to $+0.037$ OOD balanced accuracy.
 2. Once each configuration's `C` is tuned on training data alone, selection uses **no OOD labels** (an ID-validation split), and budgets are structurally matched, the fixed cases provide no consistent evidence of a quantum advantage. Against the equal-budget extended classical family, the three-source-dataset-equal $\Delta_{\mathrm{OOD}}$ is **-0.00565 for SVC** and **-0.00094 for GPC**; against linear+RBF it is **-0.00407** and **+0.00591**, respectively. Pointwise intervals are conditional on five q-split clusters and are not equivalence tests or simultaneous intervals.
@@ -36,8 +36,8 @@ Within each experimental setting, the classifier, preprocessing, and splits are 
 5. A within-v4 factorial changes from **+0.0131** at its fixed-`C`, same-test-oracle, customary-reference, native-budget corner to **-0.0047** under the fully controlled corner. Mean paired changes are largest for train-CV regularization and the extended reference, but a substantial interaction prevents additive or causal attribution. Removing frozen port/protocol/service-related fields changes the two-network-source mean from **-0.0031** to **-0.0245**, with strong group heterogeneity.
 6. Repeated finite-shot perturbations show that effective rank is measurement-sensitive and that PSD handling can change the sign and magnitude of a fixed-run OOD deviation. The original independent-square correction is distinguished from a coherent train-based Nyström extension. The full conditional sensitivity projects **4.24 trillion shots** before device overhead; it is not a hardware simulation.
 7. A historical cross-generation sensitivity map ranges from **+0.047 to -0.006** for SVC but is not used to assign effects to individual choices. On three external TableShift tasks, the controlled task-equal SVC effect is **-0.0119** (conditional 95% interval **[-0.0205, -0.0033]**) and protocol contraction is **+0.0208** (**[+0.0113, +0.0307]**), prospectively corroborating protocol sensitivity without implying a universal family ordering.
-8. The exact bounded-loss identified set is information-optimal for the fixed prediction and partial-label information; for zero--one accuracy it reduces to disagreement closed forms. Across the frozen 30/60/115 reference breadths, the median zero-label upper endpoint across 16 security cells contracts from **0.042 to 0.034 to 0.034**.
-9. Against the full 115-candidate family, retrospective security certificates fall below **0.010 accuracy with 0--33 labels**. An internally locked prospective Gate-2 replication meets its strong-transfer rule on two eligible tasks: task--classifier medians are **0--3 labels**, the overall median is **0**, the worst seed uses **76**, and all 20 realized effects are negative. NHANES Lead fails the frozen 12-feature gate before model execution, so the result is explicitly a technically limited two-task replication rather than a public preregistration.
+8. The exact bounded-loss identified interval is information-optimal for the fixed prediction and partial-label information; for zero--one accuracy it reduces to disagreement closed forms. Across the frozen 30/60/115 reference breadths, the median zero-label upper endpoint across 16 security cells contracts from **0.042 to 0.034 to 0.034**.
+9. Against the full 115-candidate prespecified classical-kernel reference family, retrospective security certificates fall below **0.010 accuracy with 0--33 labels**. Prospective corroboration in two technically eligible tasks met the predefined criteria: task--classifier medians are **0--3 labels**, the overall median is **0**, the worst seed uses **76**, and all 20 realized effects are negative. NHANES Lead fails the prespecified 12-feature gate before model execution.
 
 **Bottom line:** under equal candidate budgets and no-OOD-label selection, the tested fixed low-qubit cases show **no consistent evidence of an out-of-distribution advantage** for the fidelity-kernel family over well-tuned classical kernels. The circuit-aware analysis separates this empirical statement from any claim about entanglement, hardware, or computational speedup.
 
@@ -73,7 +73,7 @@ python scripts/reproduce_v4.py --stage all
 # Audit and reproduce the frozen specification curve and external validation.
 python scripts/reproduce_v5.py --stage all
 
-# Validate the reviewer-revision estimand, matching, budget, and shot-noise gates.
+# Validate the estimand, matching, budget, and shot-noise gates.
 python scripts/reproduce_v6.py --stage all
 
 # Rebuild the circuit-aware strata, within-v4 factorial, shortcut ablation,
@@ -83,7 +83,7 @@ python scripts/reproduce_v8.py --stage all
 # Rebuild the v0.9 sharp retrospective frontiers and validate their artifacts.
 python scripts/reproduce_v9.py --stage all
 
-# Verify the prospective prediction lock, Gate-2 audit, figure, and v1.0 gates.
+# Verify the prospective Gate-2 audit against the prespecified classical-kernel reference family.
 python scripts/reproduce_v10.py --stage all
 
 # Verify the bounded-loss theorem implementation, preservation ledger,
@@ -94,11 +94,11 @@ python scripts/reproduce_v11.py --stage all
 python -m pytest -q
 ```
 
-The reporting and audit stages deliberately consume versioned summaries and prediction locks. The frozen contracts include [`docs/PARTIAL_IDENTIFICATION_SPEC_V9.md`](docs/PARTIAL_IDENTIFICATION_SPEC_V9.md), [`docs/GATE2_PROSPECTIVE_REPLICATION_SPEC_V10.md`](docs/GATE2_PROSPECTIVE_REPLICATION_SPEC_V10.md), and the non-empirical [`docs/V11_CONSOLIDATION_SPEC.md`](docs/V11_CONSOLIDATION_SPEC.md), alongside the earlier analysis and reviewer-revision specifications.
+The reporting and audit stages deliberately consume versioned summaries and prediction locks. The frozen contracts include [`docs/PARTIAL_IDENTIFICATION_SPEC_V9.md`](docs/PARTIAL_IDENTIFICATION_SPEC_V9.md), [`docs/GATE2_PROSPECTIVE_REPLICATION_SPEC_V10.md`](docs/GATE2_PROSPECTIVE_REPLICATION_SPEC_V10.md), and the non-empirical [`docs/V11_CONSOLIDATION_SPEC.md`](docs/V11_CONSOLIDATION_SPEC.md), alongside the earlier analysis specifications.
 
 ## Manuscript and citation
 
-The main manuscript and Supplementary Information live in [`manuscript/`](manuscript/) (Springer Nature-compatible main source plus a standalone Supplementary file). If you use this software, please cite the immutable v1.1.3 release via [`CITATION.cff`](CITATION.cff) and [10.5281/zenodo.21751137](https://doi.org/10.5281/zenodo.21751137). The immutable v1.1.0 predecessor is [10.5281/zenodo.21750725](https://doi.org/10.5281/zenodo.21750725), the earlier v0.8.0 artifact is [10.5281/zenodo.21717074](https://doi.org/10.5281/zenodo.21717074), and the all-version concept DOI is [10.5281/zenodo.19147649](https://doi.org/10.5281/zenodo.19147649).
+The main manuscript and Supplementary Information live in [`manuscript/`](manuscript/) (Springer Nature-compatible main source plus a standalone Supplementary file). If you use this software, please cite the immutable v1.1.4 release via [`CITATION.cff`](CITATION.cff) and [10.5281/zenodo.21759058](https://doi.org/10.5281/zenodo.21759058). The immutable v1.1.3 predecessor is [10.5281/zenodo.21751137](https://doi.org/10.5281/zenodo.21751137), the v1.1.0 predecessor is [10.5281/zenodo.21750725](https://doi.org/10.5281/zenodo.21750725), the earlier v0.8.0 artifact is [10.5281/zenodo.21717074](https://doi.org/10.5281/zenodo.21717074), and the all-version concept DOI is [10.5281/zenodo.19147649](https://doi.org/10.5281/zenodo.19147649).
 
 ## License
 

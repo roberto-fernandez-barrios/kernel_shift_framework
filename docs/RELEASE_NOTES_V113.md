@@ -6,12 +6,12 @@ contains the complete theory, evidence chain, manuscript, Supplementary
 Information, tests, and integrity records prepared for submission to *npj
 Quantum Information*.
 
-The central contribution is an exact, attainable target-batch identified set
+The central contribution is an exact, attainable target-batch identified interval
 for the advantage of a fixed quantum classifier over the best member of a
-prespecified classical reference family. The framework includes exact partial
+prespecified classical-kernel reference family. The framework includes exact partial
 label updates, an information-optimality result, a reference-breadth–target-
 supervision evidence frontier, balanced-accuracy sensitivity, and both
-retrospective and internally locked prospective audits. Earlier benchmark
+retrospective and prospectively specified audits. Earlier benchmark
 contributions remain preserved: protocol reversal, equal search budgets,
 factorial and shortcut analyses, external TableShift shifts, product and ZZ
 maps, circuit resources, geometry diagnostics, and finite-shot experiments.

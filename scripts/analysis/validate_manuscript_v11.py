@@ -29,22 +29,23 @@ FRONTIER = Path(
 
 REQUIRED_MAIN = (
     r"\label{thm:bounded_loss}",
-    "Sharp bounded-loss region and information optimality",
+    "Sharp bounded-loss interval hull and information optimality",
     "any assumption-free interval",
     "reference-breadth--target-supervision evidence frontier",
     "30, 60, and 115 candidates",
-    "internally locked prospective replication",
-    "This was not a public preregistration",
+    "Prospective Gate-2 corroboration against the prespecified classical-kernel reference family",
+    "Accordingly, ethics approval and additional informed consent were not required",
     r"\cite{madani2004covalidation}",
     r"\cite{okanovic2025modelselector}",
     r"\cite{shen2026vanishing}",
+    r"\cite{slattery2023numerical}",
 )
 
 PRESERVATION_FRAGMENTS = (
     r"\label{tab:headline}",
     r"\label{fig:honest}",
     r"\label{tab:circuits}",
-    r"\label{fig:v8_revision}",
+    r"\label{fig:v8_sensitivities}",
     r"\label{fig:external}",
     r"\label{fig:v9_shots}",
     "Within-v4 sensitivities separate the evaluation bundle",
@@ -58,6 +59,30 @@ REQUIRED_BIB = (
     "madani2004covalidation",
     "okanovic2025modelselector",
     "shen2026vanishing",
+    "slattery2023numerical",
+    "uscensus2026pums",
+    "cdc2022brfss",
+    "cdc2026nhanesethics",
+    "uci2014diabetes",
+    "used2026scorecard",
+)
+
+PUBLIC_TEXT = (
+    MAIN,
+    SUPPLEMENT,
+    Path("README.md"),
+    Path("CITATION.cff"),
+    Path("docs/RELEASE_NOTES_V113.md"),
+    Path("docs/RELEASE_NOTES_V114.md"),
+)
+
+FORBIDDEN_EDITORIAL_HISTORY = (
+    r"reviewer[- ]motivated",
+    "post" + r"-review",
+    r"reviewer[- ]revision",
+    r"strong prospective transfer",
+    r"strong-transfer",
+    r"sharp identified set",
 )
 
 
@@ -112,18 +137,42 @@ def validate_v11() -> None:
             raise ValueError("npj cover letter does not use the v1.1 manuscript title")
         for fragment in (
             "bounded loss",
-            "information can be uniformly smaller",
-            "internally locked",
-            "rather than publicly preregistered",
-            "finite-shot noise can manufacture predictive distinctness",
+            "can be uniformly smaller",
+            "Slattery et al.",
+            "prespecified classical-kernel reference family",
+            "Prospective corroboration in two technically eligible tasks",
         ):
             if fragment not in cover:
                 raise ValueError(f"cover letter is missing v1.1 positioning: {fragment}")
+        word_count = len(re.findall(r"\b[\wÀ-ÿ][\wÀ-ÿ'’.-]*\b", cover))
+        if not 350 <= word_count <= 450:
+            raise ValueError(f"cover letter must contain 350--450 words, found {word_count}")
         if (
             "Evaluation Choices Shape Apparent" in cover
             or "v0.8.0 Zenodo record" in cover
         ):
             raise ValueError("cover letter retains obsolete v0.8 submission framing")
+
+    public_text = {path: path.read_text(encoding="utf-8") for path in PUBLIC_TEXT}
+    if cover is not None:
+        public_text[COVER] = cover
+    violations = []
+    for path, text in public_text.items():
+        for pattern in FORBIDDEN_EDITORIAL_HISTORY:
+            if re.search(pattern, text, flags=re.IGNORECASE):
+                violations.append(f"{path}: {pattern}")
+        for paragraph in re.split(r"\n\s*\n", text):
+            if paragraph.lstrip().startswith(("\\", "```")):
+                continue
+            normalized = re.sub(r"\s+", " ", paragraph)
+            if re.search(r"\bGate(?:[-~ ]+)2\b", normalized, flags=re.IGNORECASE):
+                if "prespecified classical-kernel reference family" not in normalized:
+                    violations.append(f"{path}: unscoped Gate 2 paragraph")
+    if violations:
+        raise ValueError("editorial terminology gate failed: " + "; ".join(violations))
+
+    if "No new participant consent or ethics approval was required" in active:
+        raise ValueError("unsupported institutional ethics determination remains")
 
     frontier = pd.read_csv(FRONTIER)
     medians = frontier.groupby("budget").median_accuracy_upper.median()
@@ -145,10 +194,10 @@ def validate_v11() -> None:
     code = Path("src/analysis/partial_identification.py").read_text(encoding="utf-8")
     if "def sharp_bounded_loss_envelope(" not in code:
         raise ValueError("bounded-loss implementation is missing")
-    if 'version = "1.1.3"' not in Path("pyproject.toml").read_text(encoding="utf-8"):
-        raise ValueError("pyproject version is not 1.1.3")
-    if 'version: "1.1.3"' not in Path("CITATION.cff").read_text(encoding="utf-8"):
-        raise ValueError("CITATION.cff version is not 1.1.3")
+    if 'version = "1.1.4"' not in Path("pyproject.toml").read_text(encoding="utf-8"):
+        raise ValueError("pyproject version is not 1.1.4")
+    if 'version: "1.1.4"' not in Path("CITATION.cff").read_text(encoding="utf-8"):
+        raise ValueError("CITATION.cff version is not 1.1.4")
     cover_status = "local cover checked" if cover is not None else "private cover omitted"
     print(
         "[ok] v1.1 theory, positioning, breadth, preservation, and release gates "
