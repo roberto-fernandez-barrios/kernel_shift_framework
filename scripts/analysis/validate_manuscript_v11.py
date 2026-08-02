@@ -29,16 +29,22 @@ FRONTIER = Path(
 
 REQUIRED_MAIN = (
     r"\label{thm:bounded_loss}",
-    "Sharp bounded-loss interval hull and information optimality",
+    "Sharp bounded-loss interval hull: sharpness and minimality",
     "any assumption-free interval",
+    "fixed candidate versus best member of a prespecified fixed family",
+    "pathwise exact after any realized audit subset",
     "reference-breadth--target-supervision evidence frontier",
     "30, 60, and 115 candidates",
     "Prospective Gate-2 corroboration against the prespecified classical-kernel reference family",
     "Accordingly, ethics approval and additional informed consent were not required",
-    r"\cite{madani2004covalidation}",
-    r"\cite{okanovic2025modelselector}",
+    "madani2004covalidation",
+    "okanovic2025modelselector",
     r"\cite{shen2026vanishing}",
     r"\cite{slattery2023numerical}",
+    r"\cite{manski2003partialidentification,molinari2020microeconometrics}",
+    r"\cite{balsubramani2015optimally}",
+    r"\cite{gentinetta2024complexity}",
+    r"\cite{agliardi2026covariant}",
 )
 
 PRESERVATION_FRAGMENTS = (
@@ -65,6 +71,19 @@ REQUIRED_BIB = (
     "cdc2026nhanesethics",
     "uci2014diabetes",
     "used2026scorecard",
+    "manski2003partialidentification",
+    "molinari2020microeconometrics",
+    "balsubramani2015optimally",
+    "katariya2012activeevaluation",
+    "kossen2022activesurrogate",
+    "garg2022leveraging",
+    "rosenfeld2023disagreement",
+    "mishra2025odd",
+    "bazinet2026bound",
+    "ashouritaklimi2026predictionpowered",
+    "shanmugam2025evaluating",
+    "gentinetta2024complexity",
+    "agliardi2026covariant",
 )
 
 PUBLIC_TEXT = (
@@ -72,8 +91,7 @@ PUBLIC_TEXT = (
     SUPPLEMENT,
     Path("README.md"),
     Path("CITATION.cff"),
-    Path("docs/RELEASE_NOTES_V113.md"),
-    Path("docs/RELEASE_NOTES_V114.md"),
+    Path("docs/RELEASE_NOTES_V115.md"),
 )
 
 FORBIDDEN_EDITORIAL_HISTORY = (
@@ -83,6 +101,7 @@ FORBIDDEN_EDITORIAL_HISTORY = (
     r"strong prospective transfer",
     r"strong-transfer",
     r"sharp identified set",
+    r"information[- ]optimal(?:ity)?",
 )
 
 
@@ -137,8 +156,8 @@ def validate_v11() -> None:
             raise ValueError("npj cover letter does not use the v1.1 manuscript title")
         for fragment in (
             "bounded loss",
-            "can be uniformly smaller",
-            "Slattery et al.",
+            "sharp and minimal interval",
+            "pathwise exact after any realized audit subset",
             "prespecified classical-kernel reference family",
             "Prospective corroboration in two technically eligible tasks",
         ):
@@ -194,10 +213,15 @@ def validate_v11() -> None:
     code = Path("src/analysis/partial_identification.py").read_text(encoding="utf-8")
     if "def sharp_bounded_loss_envelope(" not in code:
         raise ValueError("bounded-loss implementation is missing")
-    if 'version = "1.1.4"' not in Path("pyproject.toml").read_text(encoding="utf-8"):
-        raise ValueError("pyproject version is not 1.1.4")
-    if 'version: "1.1.4"' not in Path("CITATION.cff").read_text(encoding="utf-8"):
-        raise ValueError("CITATION.cff version is not 1.1.4")
+    if 'version = "1.1.5"' not in Path("pyproject.toml").read_text(encoding="utf-8"):
+        raise ValueError("pyproject version is not 1.1.5")
+    citation = Path("CITATION.cff").read_text(encoding="utf-8")
+    if 'version: "1.1.5"' not in citation:
+        raise ValueError("CITATION.cff version is not 1.1.5")
+    expected_doi = "10.5281/zenodo.21764577"
+    for path in (MAIN, SUPPLEMENT, Path("README.md"), Path("CITATION.cff")):
+        if expected_doi not in path.read_text(encoding="utf-8"):
+            raise ValueError(f"{path} is missing the v1.1.5 version DOI")
     cover_status = "local cover checked" if cover is not None else "private cover omitted"
     print(
         "[ok] v1.1 theory, positioning, breadth, preservation, and release gates "

@@ -1,14 +1,24 @@
 # Final submission and release checklist
 
-Last local validation: 2 August 2026.
+Last local validation: 3 August 2026.
 
 Target: *npj Quantum Information*, Collection “Quantum machine learning:
 understanding capabilities, limitations, and perspectives for quantum
-advantage”. Baseline artifact: immutable v1.1.3, DOI
-`10.5281/zenodo.21751137`. Final release: v1.1.4, DOI
-`10.5281/zenodo.21759058`.
+advantage”. Baseline artifact: immutable v1.1.4, DOI
+`10.5281/zenodo.21759058`. Final release: v1.1.5, DOI
+`10.5281/zenodo.21764577`.
 
 ## Completed editorial closure
+
+- [x] Added source-verified bibliography for partial identification;
+  transductive minimax aggregation; active, multi-model, and OOD evaluation;
+  finite-shot complexity; and recent QML hardware evidence.
+- [x] Kept the exact scope: a fixed candidate versus the best member of a
+  prespecified fixed family on a finite batch under unrestricted label
+  completions.
+- [x] Replaced “information optimality” with “sharpness and minimality” and
+  stated that the adaptive update is pathwise exact after any realized audit
+  subset.
 
 - [x] Replaced “sharp identified set” with statistically precise interval
   terminology.
@@ -22,7 +32,7 @@ advantage”. Baseline artifact: immutable v1.1.3, DOI
   circuit/protocol sensitivity figure file neutrally.
 - [x] Renamed Figure 4 “Descriptive target-label-free family contrasts in
   eight fixed scenario-groups.”
-- [x] Reduced the npj cover letter to 407 words.
+- [x] Kept the npj cover letter within the 350--450 word validation window.
 - [x] Applied a conservative main-text prune while retaining every
   reproducibility-critical method and all ten permitted display items.
 - [x] Corrected bibliography metadata and regenerated the bibliography.
@@ -54,5 +64,5 @@ advantage”. Baseline artifact: immutable v1.1.3, DOI
 - [x] No committee, approval, exemption, reference, or date is asserted.
 
 The ethics blocker is closed. The exact closed validation set must pass before
-the tested v1.1.4 files are committed, tagged, and published without further
+the tested v1.1.5 files are committed, tagged, and published without further
 scientific or editorial changes.
