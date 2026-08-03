@@ -12,6 +12,7 @@ COMMANDS = [
     [sys.executable, "-m", "src.utils.ember.make_splits_ember_sparsity", "--help"],
     [sys.executable, "-m", "src.utils.ember.make_qsplits_from_master", "--help"],
     [sys.executable, "scripts/ember/run_compare_q_vs_c_full.py", "--help"],
+    [sys.executable, "scripts/netflow/run_netflow_grid.py", "--help"],
     [sys.executable, "-m", "src.experiments.ember.classical.run_ember_classical_kernel_sparsity_shift_qsplits", "--help"],
     [sys.executable, "-m", "src.experiments.ember.quantum.run_ember_quantum_kernel_sparsity_shift_qsplits", "--help"],
 ]

@@ -32,6 +32,16 @@ Thumbs.db
 *.temp
 tmp/
 
+# Private planning and editorial material
+plan_max_q1.md
+*.private.md
+*.prompt.md
+prompts/private/
+docs/private/
+docs/*_EDITORIAL_NOTES.md
+docs/*_EDITORIAL_STRATEGY.md
+docs/*_SUBMISSION_NOTES.md
+
 # LaTeX build artifacts (keep .bbl: required by arXiv)
 manuscript/*.aux
 manuscript/*.out
@@ -40,13 +50,6 @@ manuscript/*.blg
 manuscript/*.fls
 manuscript/*.fdb_latexmk
 manuscript/*.synctex.gz
-manuscript_tqe/*.aux
-manuscript_tqe/*.out
-manuscript_tqe/*.toc
-manuscript_tqe/*.blg
-manuscript_tqe/*.fls
-manuscript_tqe/*.fdb_latexmk
-manuscript_tqe/*.synctex.gz
 
 # Paper 2 draft (belongs to its own repository; never publish from here)
 Manuscript2.pdf
@@ -80,6 +83,9 @@ data/processed/ember/sanity_qsplits_*/
 # Local experimental logs / sanity outputs
 results/pipeline_validation_logs/
 results/sanity/
+results/**/_logs/
+results/**/tmp/
+results/**/scratch/
 
 # Smoke-test artifacts (regenerable)
 docs/smoke_test_report.json
@@ -92,17 +98,14 @@ results/pipeline_validation/
 **/GLOBAL_results_simple.json
 **/MANIFEST_compare_q_vs_c.json
 
-# Keep only canonical final result folders
-!results/aggregated/
-!results/aggregated/**
-!results/tables/
-!results/tables/**
+# Scientific results required by the reproduction drivers are intentionally
+# versioned. Do not ignore results/ globally; review new result files before
+# staging them, while keeping the transient patterns above excluded.
 # Raw datasets are never tracked
 data/raw/cicids2017/
 
 # Submission correspondence stays local
 manuscript/cover_letter*.md
-manuscript_tqe/cover_letter*.md
 
 # Local journal guidance scrape (consultation only)
 guidelines/npj.txt

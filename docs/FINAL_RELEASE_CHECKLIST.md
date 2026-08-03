@@ -4,9 +4,24 @@ Last local validation: 3 August 2026.
 
 Target: *npj Quantum Information*, Collection “Quantum machine learning:
 understanding capabilities, limitations, and perspectives for quantum
-advantage”. Baseline artifact: immutable v1.1.4, DOI
-`10.5281/zenodo.21759058`. Final release: v1.1.5, DOI
-`10.5281/zenodo.21764577`.
+advantage”. Baseline artifact: immutable v1.1.5, DOI
+`10.5281/zenodo.21764577`. Final release: v1.1.6, DOI
+`10.5281/zenodo.21776862`.
+
+## Completed repository curation
+
+- [x] Removed unreferenced internal plans, roadmaps, simulated-review notes,
+  historical release checklists, an obsolete venue converter, and superseded
+  release-planning material.
+- [x] Preserved every frozen scientific specification, prediction lock,
+  separated label, opening record, manifest, checksum, failure record, result,
+  table, figure, and reproduction dependency byte-for-byte.
+- [x] Replaced the machine-specific network-flow data default with the required
+  portable `--source-data-root` argument and documented it.
+- [x] Corrected `.gitignore`, kept the local cover letter private, and protected
+  the untracked private plan from `git add .` without ignoring scientific files.
+- [x] Added a compact artifact map and documented the roles of GitHub, Zenodo,
+  costly frozen inputs, quick validation, and full reproduction.
 
 ## Completed editorial closure
 
@@ -43,7 +58,7 @@ advantage”. Baseline artifact: immutable v1.1.4, DOI
 
 ## Validation record
 
-- [x] Main manuscript compiled: 56 pages; no undefined citations or
+- [x] Main manuscript compiled: 59 pages; no undefined citations or
   references; no overfull boxes.
 - [x] Supplementary Information compiled: 15 pages; no undefined references;
   no overfull boxes.
@@ -51,7 +66,7 @@ advantage”. Baseline artifact: immutable v1.1.4, DOI
 - [x] v0.7 and v0.8 artifact-integrity validators passed.
 - [x] Full test suite passed: 120 tests.
 - [x] CLI smoke suite passed.
-- [x] Visual audit completed for all 71 pages.
+- [x] Visual audit completed for all 74 pages.
 - [x] Candidate submission checksums recorded in the submission package.
 
 ## Ethics determination
@@ -64,5 +79,5 @@ advantage”. Baseline artifact: immutable v1.1.4, DOI
 - [x] No committee, approval, exemption, reference, or date is asserted.
 
 The ethics blocker is closed. The exact closed validation set must pass before
-the tested v1.1.5 files are committed, tagged, and published without further
+the tested v1.1.6 files are committed, tagged, and published without further
 scientific or editorial changes.

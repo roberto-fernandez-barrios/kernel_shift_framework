@@ -43,14 +43,13 @@ Normal use:
 - use the lockfiles only when you specifically want a closer archival rerun;
   they are dependency records, not exact machine images.
 
-## What still remains outside strict archival reproducibility
+## Limits of the archival environment capture
 
 The following would strengthen *exact* archival reruns further, but are not required for this repository to function as a reproducible public software artifact:
 
 - a fully hashed transitive pip lock generated from the exact machine used for the manuscript-facing runs,
 - a fully explicit Conda export from that same final environment,
 - detailed hardware/runtime notes for readers who want stricter comparison of the quantum branch runtime context,
-- final legal confirmation that the chosen open-source license matches the actual rights holder.
 
 ## Important note on release archives and DOI records
 

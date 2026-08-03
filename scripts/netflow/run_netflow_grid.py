@@ -1,7 +1,7 @@
 # scripts/netflow/run_netflow_grid.py
 """
-Workstream C driver: instantiate the kernel-swap protocol on network-flow
-datasets (UNSW-NB15, ToN-IoT scenarios prepared for Paper 2).
+Instantiate the kernel-swap protocol on the prepared UNSW-NB15 and ToN-IoT
+network-flow scenarios.
 
 Per scenario: export ref/cur pools -> master shift splits (m2_centroid analog
 + natural ref->cur drift) -> q-splits (shared module) -> extended kernel
@@ -43,7 +43,15 @@ def run(cmd: List[str], log_path: Path) -> None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--paper2-data", type=Path, default=Path(r"C:\Users\masteria.DOMINE\RF\paper_2\data\processed"))
+    ap.add_argument(
+        "--source-data-root",
+        type=Path,
+        required=True,
+        help=(
+            "Root containing the prepared unsw_nb15/ and ton_iot_q1_gate/ "
+            "CSV pools; see docs/NETFLOW_POOLS.md"
+        ),
+    )
     ap.add_argument("--data-root", type=Path, default=Path("data/processed/netflow"))
     ap.add_argument("--results-root", type=Path, default=Path("results/netflow"))
     ap.add_argument("--scenarios", nargs="+", default=list(SCENARIOS.keys()), choices=list(SCENARIOS.keys()))
@@ -73,8 +81,8 @@ def main() -> None:
         if not (data_dir / "X.npy").exists():
             run(
                 [py, "-m", "src.utils.netflow.export_refcur_to_Xy",
-                 "--ref-csv", str(args.paper2_data / ref_rel),
-                 "--cur-csv", str(args.paper2_data / cur_rel),
+                 "--ref-csv", str(args.source_data_root / ref_rel),
+                 "--cur-csv", str(args.source_data_root / cur_rel),
                  "--out-dir", str(data_dir)],
                 log_dir / f"export__{scenario}.log",
             )

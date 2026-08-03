@@ -1130,19 +1130,9 @@ La revisión v4 estará terminada únicamente cuando:
 
 ---
 
-# 21. Primera tarea para Claude Code en plan mode
+# 21. Historical implementation handoff
 
-Antes de implementar, Claude debe devolver:
-
-1. mapa exacto de los archivos que modificará;
-2. jerarquía experimental deducida del código;
-3. inventario real y deduplicado de candidatos;
-4. disponibilidad de índices por muestra y Gram matrices reutilizables;
-5. coste estimado en número de fits clásicos y kernels cuánticos nuevos;
-6. diseño concreto del control 60-vs-60;
-7. propuesta inferencial condicionada a la auditoría de independencia;
-8. riesgos de compatibilidad con los resultados v0.3;
-9. secuencia de commits;
-10. criterios automáticos de validación.
-
-No comenzar por reescribir el manuscrito. Empezar por **GATE 0, GATE 1 y GATE 2**, porque esos resultados determinan la historia final del paper.
+The original private agent handoff was removed during the v1.1.6 repository
+curation. It defined no scientific estimand, input, output, or validation gate;
+Sections 1--20 retain the scientific planning record referenced by the frozen
+v4 specification and analysis modules.

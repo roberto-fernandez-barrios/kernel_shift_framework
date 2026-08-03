@@ -131,9 +131,5 @@ That is not required to establish that the released repository is functional, re
 
 The repository should be considered **functionally validated for public release** as a reproducible research codebase.
 
-Any remaining work is release hygiene rather than core debugging, for example:
-
-- metadata polish,
-- citation polish,
-- optional environment-lock refinement,
-- optional future-proofing patches for ecosystem warnings or deprecations.
+The v1.1.6 release closes the remaining repository-hygiene and release-metadata
+work without changing the validated scientific artifact.

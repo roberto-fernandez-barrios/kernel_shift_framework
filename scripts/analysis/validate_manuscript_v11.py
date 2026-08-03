@@ -213,15 +213,15 @@ def validate_v11() -> None:
     code = Path("src/analysis/partial_identification.py").read_text(encoding="utf-8")
     if "def sharp_bounded_loss_envelope(" not in code:
         raise ValueError("bounded-loss implementation is missing")
-    if 'version = "1.1.5"' not in Path("pyproject.toml").read_text(encoding="utf-8"):
-        raise ValueError("pyproject version is not 1.1.5")
+    if 'version = "1.1.6"' not in Path("pyproject.toml").read_text(encoding="utf-8"):
+        raise ValueError("pyproject version is not 1.1.6")
     citation = Path("CITATION.cff").read_text(encoding="utf-8")
-    if 'version: "1.1.5"' not in citation:
-        raise ValueError("CITATION.cff version is not 1.1.5")
-    expected_doi = "10.5281/zenodo.21764577"
+    if 'version: "1.1.6"' not in citation:
+        raise ValueError("CITATION.cff version is not 1.1.6")
+    expected_doi = "10.5281/zenodo.21776862"
     for path in (MAIN, SUPPLEMENT, Path("README.md"), Path("CITATION.cff")):
         if expected_doi not in path.read_text(encoding="utf-8"):
-            raise ValueError(f"{path} is missing the v1.1.5 version DOI")
+            raise ValueError(f"{path} is missing the v1.1.6 version DOI")
     cover_status = "local cover checked" if cover is not None else "private cover omitted"
     print(
         "[ok] v1.1 theory, positioning, breadth, preservation, and release gates "

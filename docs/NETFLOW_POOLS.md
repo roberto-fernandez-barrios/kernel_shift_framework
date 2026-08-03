@@ -1,12 +1,20 @@
 # Provenance of the network-flow reference/current pools
 
 The netflow scenarios consume `data/processed/netflow/<scenario>/X.npy`, exported
-from reference/current CSV pools. The pools are built by the two scripts in
-`scripts/data/` (copied verbatim from the Paper-2 artifact so this repository is
-self-contained end to end):
+from reference/current CSV pools. The pools are built by the two
+provenance-preserving preparation scripts in `scripts/data/`, included so this
+repository is self-contained end to end:
 
 - `prepare_paper2_unsw_nb15_smoke.py` — UNSW-NB15 (scenarios: dos, reconnaissance)
 - `prepare_paper2_ton_iot_q1_gate.py` — ToN-IoT (scenario: scanning)
+
+Run the grid driver with the prepared-pool root supplied explicitly; no local
+machine path or external-repository layout is assumed:
+
+```bash
+python scripts/netflow/run_netflow_grid.py \
+  --source-data-root /path/to/prepared/netflow/pools
+```
 
 ## Exact construction semantics
 

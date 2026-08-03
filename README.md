@@ -58,8 +58,26 @@ scripts/
   analysis/          family comparisons, fixed-case inference, mechanism tests
   reporting/         every table and figure of the paper, generated from results/
 results/             frozen per-run summaries and versioned derived outputs
-manuscript/          main and Supplementary LaTeX/PDF, figures, cover letters
+manuscript/          main and Supplementary LaTeX/PDF plus publication figures
+docs/                frozen analysis contracts and public validation notes
+tests/               scientific invariants and artifact-integrity checks
 ```
+
+## Artifact levels
+
+GitHub contains the executable code, frozen scientific contracts, manuscript
+sources, tests, and the versioned result inputs required by the reproduction
+drivers. Zenodo contains the immutable release snapshot plus the final PDFs,
+source bundle, release notes, and checksums. The original datasets are not
+redistributed and must be obtained under their source licenses.
+
+The large `results/` tree is intentional: it includes costly frozen per-run
+summaries, prediction locks, separated audit labels, hashes, and derived outputs
+consumed by `scripts/reproduce_v4.py` through `scripts/reproduce_v11.py`. A quick
+validation uses `python -m pytest -q`, `python scripts/smoke/smoke_test_cli.py`,
+and `python scripts/reproduce_v11.py --stage all`; the commands below perform the
+full staged analysis checks. See [`ARTIFACT_MAP.md`](ARTIFACT_MAP.md) for the
+compact component-to-reproducer map.
 
 ## Reproducing
 
@@ -98,7 +116,7 @@ The reporting and audit stages deliberately consume versioned summaries and pred
 
 ## Manuscript and citation
 
-The main manuscript and Supplementary Information live in [`manuscript/`](manuscript/) (Springer Nature-compatible main source plus a standalone Supplementary file). If you use this software, please cite the immutable v1.1.5 release via [`CITATION.cff`](CITATION.cff) and [10.5281/zenodo.21764577](https://doi.org/10.5281/zenodo.21764577). The immutable v1.1.4 predecessor is [10.5281/zenodo.21759058](https://doi.org/10.5281/zenodo.21759058), the v1.1.3 predecessor is [10.5281/zenodo.21751137](https://doi.org/10.5281/zenodo.21751137), the earlier v0.8.0 artifact is [10.5281/zenodo.21717074](https://doi.org/10.5281/zenodo.21717074), and the all-version concept DOI is [10.5281/zenodo.19147649](https://doi.org/10.5281/zenodo.19147649).
+The main manuscript and Supplementary Information live in [`manuscript/`](manuscript/) (Springer Nature-compatible main source plus a standalone Supplementary file). If you use this software, please cite the immutable v1.1.6 release via [`CITATION.cff`](CITATION.cff) and [10.5281/zenodo.21776862](https://doi.org/10.5281/zenodo.21776862). Historical predecessors are v1.1.5 ([10.5281/zenodo.21764577](https://doi.org/10.5281/zenodo.21764577)), v1.1.4 ([10.5281/zenodo.21759058](https://doi.org/10.5281/zenodo.21759058)), v1.1.3 ([10.5281/zenodo.21751137](https://doi.org/10.5281/zenodo.21751137)), and v0.8.0 ([10.5281/zenodo.21717074](https://doi.org/10.5281/zenodo.21717074)). The all-version concept DOI is [10.5281/zenodo.19147649](https://doi.org/10.5281/zenodo.19147649).
 
 ## License
 
